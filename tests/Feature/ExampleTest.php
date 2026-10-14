@@ -16,4 +16,15 @@ class ExampleTest extends TestCase
 
         $response->assertStatus(200);
     }
+
+    /**
+     * Test the catalog page returns a successful response.
+     */
+    public function test_katalog_page_returns_a_successful_response(): void
+    {
+        $response = $this->get('/katalog');
+
+        $response->assertStatus(200);
+        $response->assertSee('Etalase Digital Kios Mandiri YPKABK');
+    }
 }
