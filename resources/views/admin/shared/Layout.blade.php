@@ -95,7 +95,11 @@
 
             {{-- Page Content --}}
             <main class="flex-1 overflow-y-auto px-6 py-4">
-                {{ $slot }}
+                @isset($slot)
+                    {{ $slot }}
+                @else
+                    @yield('content')
+                @endisset
             </main>
 
         </div>
