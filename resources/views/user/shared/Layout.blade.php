@@ -4,24 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ $title ?? 'Kios Mandiri YPKABK — Ciptakan Peluang untuk Anak Istimewa' }}</title>
+    <title>{{ $title ?? 'Kios Mandiri YPKABK' }}</title>
 
     <meta name="description" content="Kios Mandiri mengelola donasi preloved layak pakai dan karya kreatif anak berkebutuhan khusus binaan Yayasan Peduli Kasih ABK (YPKABK) untuk membiayai ruang terapi gratis dan pelatihan vokasi mandiri.">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=plus-jakarta-sans:400,500,600,700,800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.bunny.net/css?family=baloo-2:400,600,700,800&family=nunito:400,500,600,700&display=swap" rel="stylesheet" />
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="min-h-screen bg-[#FBF9F5] text-stone-800 font-sans antialiased flex flex-col selection:bg-rose-200 selection:text-rose-900">
+<body class="min-h-screen bg-cream text-ink font-sans antialiased flex flex-col selection:bg-sun selection:text-ink">
 
     {{-- Reusable Navigation Bar --}}
     @include('user.shared.navbar')
 
     {{-- Flash Notifications (If Any) --}}
     @if (session('success') || session('error'))
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 w-full">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 w-full">
             @if (session('success'))
                 <div class="flex items-center gap-3 p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-2xl shadow-sm text-sm">
                     <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -32,8 +32,8 @@
             @endif
 
             @if (session('error'))
-                <div class="flex items-center gap-3 p-4 bg-rose-50 border border-rose-200 text-rose-800 rounded-2xl shadow-sm text-sm">
-                    <svg class="w-5 h-5 text-rose-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="flex items-center gap-3 p-4 bg-butter border border-ink/20 text-ink rounded-2xl shadow-sm text-sm">
+                    <svg class="w-5 h-5 text-ink shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
                     <span>{{ session('error') }}</span>
