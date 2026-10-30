@@ -31,3 +31,11 @@ Pengguna utama: orang tua dan donatur usia 30-60 tahun, banyak memakai HP.
 ## Jangan dipakai
 Gradient, glassmorphism, pill/badge berlebihan, garis bergelombang,
 emoji sebagai ikon, teks putih di atas kuning, card di dalam card.
+
+## Bentuk
+- Tombol: rounded-full, min-height 48px. Kartu dan foto: rounded-2xl.
+- Latar hero: kuning soft solid atau gradient sangat halus (satu-satunya yang boleh).
+
+## Jangan dipakai
+Pill label kecil di atas judul, foto cutout bergaya stiker, kartu testimoni berbintang,
+card di dalam card, bayangan tebal, teks putih di atas kuning.

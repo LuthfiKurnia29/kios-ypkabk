@@ -5,9 +5,37 @@
 @source '../../storage/framework/views/*.php';
 
 @theme {
-    --font-sans: 'Plus Jakarta Sans', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
-    --color-brand-rose: #be185d;
-    --color-brand-teal: #0f766e;
-    --color-brand-cream: #fcfbf9;
+    /* === Design Tokens: Typography === */
+    --font-heading: 'Baloo 2', ui-sans-serif, system-ui, sans-serif;
+    --font-sans: 'Nunito', ui-sans-serif, system-ui, sans-serif;
+
+    /* === Design Tokens: Colors === */
+    --color-butter: #FBF0B8;
+    --color-cream: #FFFBE6;
+    --color-sun: #FFD93D;
+    --color-olive: #3A3826;
+    --color-ink: #2B2A1F;
+}
+
+@layer base {
+    html {
+        scroll-padding-top: 24px;
+    }
+
+    body {
+        font-size: 18px;
+        line-height: 1.7;
+    }
+}
+
+.bg-hero-gradient {
+  background: linear-gradient(
+    180deg,
+    #F9E58A 0%,
+    #FBEDA8 30%,
+    #FDF5CC 62%,
+    #FFFDF2 85%,
+    #FFFFFF 100%
+  );
 }
 
