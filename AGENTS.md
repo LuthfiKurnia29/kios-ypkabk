@@ -146,3 +146,11 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 - Run `vendor/bin/phpunit` to call the test runner directly. It accepts the same file path and `--filter=testName` arguments.
 
 </laravel-boost-guidelines>
+
+## Aturan Frontend (redesign UI)
+- Untuk tugas tampilan: baca DESIGN.md dan patuhi.
+- Hanya ubah file view (resources/views), CSS, dan aset frontend.
+- Jangan ubah route, controller, model, migration, atau logika backend.
+- Hanya ubah file yang berkaitan langsung dengan tugas yang diminta.
+- Jangan install package baru tanpa bertanya dulu.
+- Pertahankan semua variabel Blade ({{ }}, @foreach, @if, dll.), nama route(), dan atribut name pada form. Hanya ubah markup dan styling di sekitarnya.
