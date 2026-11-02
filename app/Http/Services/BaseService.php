@@ -2,7 +2,4 @@
 
 namespace App\Http\Services;
 
-
-class BaseService {
-    
-}
+class BaseService {}

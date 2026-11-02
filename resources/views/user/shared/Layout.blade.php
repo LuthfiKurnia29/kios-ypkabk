@@ -58,9 +58,9 @@
     <a href="https://wa.me/6281234567890?text=Halo%20Admin%20Kios%20Mandiri%20YPKABK,%20saya%20ingin%20bertanya%20tentang%20donasi/katalog" 
        target="_blank" 
        rel="noopener noreferrer"
-       class="fixed bottom-6 right-6 z-40 bg-emerald-600 hover:bg-emerald-700 text-white p-3.5 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all flex items-center gap-2 group"
+       class="fixed bottom-6 right-6 z-40 bg-emerald-600 hover:bg-emerald-700 text-white min-h-[48px] px-4 py-3 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all flex items-center gap-2 group focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-emerald-500"
        title="Hubungi Admin Kios via WhatsApp">
-        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+        <svg class="w-5 h-5 shrink-0" fill="currentColor" viewBox="0 0 24 24">
             <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0012.04 2z"/>
         </svg>
         <span class="max-w-0 overflow-hidden whitespace-nowrap group-hover:max-w-xs transition-all duration-300 ease-in-out text-sm font-semibold pr-1">

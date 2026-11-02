@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::create('log_purchases', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('purchase_id')->constrained('purchases')->cascadeOnDelete();
+            $table->text('desc');
+            $table->string('action');
             $table->timestamps();
         });
     }

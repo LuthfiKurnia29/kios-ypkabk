@@ -2,24 +2,15 @@
 
 namespace App\Http\Services;
 
-class ProductService extends BaseService {
-    public function getProducts(){
+class ProductService extends BaseService
+{
+    public function getProducts() {}
 
-    }
+    public function getDataProduct(uuid $uuid) {}
 
-    public function getDataProduct(uuid $uuid){
-        
-    }
+    public function createDataProduct() {}
 
-    public function createDataProduct(){
+    public function updateDataProduct() {}
 
-    }
-
-    public function updateDataProduct(){
-
-    }
-
-    public function deleteDataProduct(){
-        
-    }
+    public function deleteDataProduct() {}
 }
