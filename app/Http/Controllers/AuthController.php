@@ -72,5 +72,13 @@ class AuthController extends Controller
         return $user->isAdmin() ? 'admin.dashboard' : 'home';
     }
 
-    public function refreshToken() {}
+    /**
+     * Refresh the session token.
+     */
+    public function refreshToken(): RedirectResponse
+    {
+        $this->userService->refreshToken();
+
+        return redirect()->back()->with('success', 'Token berhasil diperbarui.');
+    }
 }

@@ -42,12 +42,12 @@
                 </div>
             </div>
 
-            {{-- Kolom 2: Navigasi Cepat (Maksimal 5 Item Sesuai DESIGN.md) --}}
+            {{-- Kolom 2: Navigasi Cepat (Maksimal 5 Item Sesuai DESIGN.md & SRS) --}}
             <div>
                 <h4 class="font-heading font-semibold text-base text-white tracking-wide mb-4">Menu Utama</h4>
                 <ul class="space-y-3 text-sm">
                     <li>
-                        <a href="{{ route('home') }}#beranda" class="text-white/80 hover:text-sun transition-colors inline-flex items-center gap-2">
+                        <a href="{{ route('home') }}" class="text-white/80 hover:text-sun transition-colors inline-flex items-center gap-2">
                             <span class="text-sun">&bull;</span>
                             <span>Beranda</span>
                         </a>
@@ -59,21 +59,21 @@
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('home') }}#dampak" class="text-white/80 hover:text-sun transition-colors inline-flex items-center gap-2">
+                        <a href="{{ route('tentang') }}" class="text-white/80 hover:text-sun transition-colors inline-flex items-center gap-2">
                             <span class="text-sun">&bull;</span>
-                            <span>Dampak Sosial</span>
+                            <span>Tentang Kami</span>
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('home') }}#cara-donasi" class="text-white/80 hover:text-sun transition-colors inline-flex items-center gap-2">
+                        <a href="{{ route('transparansi') }}" class="text-white/80 hover:text-sun transition-colors inline-flex items-center gap-2">
                             <span class="text-sun">&bull;</span>
-                            <span>Cara Donasi</span>
+                            <span>Transparansi Dana</span>
                         </a>
                     </li>
                     <li>
                         <a href="{{ route('home') }}#kontak" class="text-white/80 hover:text-sun transition-colors inline-flex items-center gap-2">
                             <span class="text-sun">&bull;</span>
-                            <span>Kontak &amp; Alamat</span>
+                            <span>Kontak Sentra</span>
                         </a>
                     </li>
                 </ul>
@@ -167,6 +167,9 @@
                 &copy; {{ date('Y') }} Kios Mandiri &mdash; Yayasan Peduli Kasih ABK (YPKABK). Hak Cipta Dilindungi Undang-Undang.
             </p>
             <div class="flex items-center gap-6">
+                <a href="{{ route('login') }}" class="text-white/40 hover:text-white transition-colors">
+                    Kelola Kios (Admin)
+                </a>
                 <a href="#beranda" class="inline-flex items-center gap-1.5 text-white/80 hover:text-sun font-semibold transition-colors">
                     <span>Kembali ke Atas</span>
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
