@@ -74,20 +74,28 @@
                 {{-- Horizontal Category Pills --}}
                 <div class="flex flex-wrap items-center justify-center gap-2 pt-3 text-xs font-semibold" id="catalog-category-tabs">
                     <button type="button" data-category="all" class="cat-pill px-4 py-2 rounded-xl bg-sun text-ink shadow-xs transition-colors">
-                        Semua Produk (128)
+                        Semua Produk ({{ $totalProductCount ?? (isset($products) ? $products->count() : 128) }})
                     </button>
-                    <button type="button" data-category="karya-abk" class="cat-pill px-4 py-2 rounded-xl bg-white border border-ink/15 text-ink/80 hover:border-ink/15 transition-colors">
-                        <span>🎨</span> Karya Seni &amp; Prakarya ABK (32)
-                    </button>
-                    <button type="button" data-category="pakaian" class="cat-pill px-4 py-2 rounded-xl bg-white border border-ink/15 text-ink/80 hover:border-ink/15 transition-colors">
-                        <span>👕</span> Pakaian &amp; Aksesori Preloved (45)
-                    </button>
-                    <button type="button" data-category="buku-mainan" class="cat-pill px-4 py-2 rounded-xl bg-white border border-ink/15 text-ink/80 hover:border-ink/15 transition-colors">
-                        <span>🧸</span> Buku &amp; Mainan Edukatif (27)
-                    </button>
-                    <button type="button" data-category="dekorasi" class="cat-pill px-4 py-2 rounded-xl bg-white border border-ink/15 text-ink/80 hover:border-ink/15 transition-colors">
-                        <span>🪴</span> Perlengkapan Rumah &amp; Dekorasi (24)
-                    </button>
+                    @if(isset($categories) && $categories->count() > 0)
+                        @foreach($categories as $category)
+                            <button type="button" data-category="{{ $category->slug }}" class="cat-pill px-4 py-2 rounded-xl bg-white border border-ink/15 text-ink/80 hover:border-ink/15 transition-colors">
+                                <span>{{ $category->icon ?: '🏷️' }}</span> {{ $category->name }} ({{ $category->products()->count() }})
+                            </button>
+                        @endforeach
+                    @else
+                        <button type="button" data-category="karya-abk" class="cat-pill px-4 py-2 rounded-xl bg-white border border-ink/15 text-ink/80 hover:border-ink/15 transition-colors">
+                            <span>🎨</span> Karya Seni &amp; Prakarya ABK (32)
+                        </button>
+                        <button type="button" data-category="pakaian" class="cat-pill px-4 py-2 rounded-xl bg-white border border-ink/15 text-ink/80 hover:border-ink/15 transition-colors">
+                            <span>👕</span> Pakaian &amp; Aksesori Preloved (45)
+                        </button>
+                        <button type="button" data-category="buku-mainan" class="cat-pill px-4 py-2 rounded-xl bg-white border border-ink/15 text-ink/80 hover:border-ink/15 transition-colors">
+                            <span>🧸</span> Buku &amp; Mainan Edukatif (27)
+                        </button>
+                        <button type="button" data-category="dekorasi" class="cat-pill px-4 py-2 rounded-xl bg-white border border-ink/15 text-ink/80 hover:border-ink/15 transition-colors">
+                            <span>🪴</span> Perlengkapan Rumah &amp; Dekorasi (24)
+                        </button>
+                    @endif
                 </div>
 
             </div>
@@ -223,7 +231,7 @@
                 {{-- Top Counter & Sorting Bar --}}
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
                     <div class="text-xs text-ink/80">
-                        <span class="font-bold text-ink">Menampilkan 6 dari 128 barang</span>
+                        <span class="font-bold text-ink">Menampilkan {{ isset($products) ? $products->count() : 6 }} barang</span>
                         <span class="text-ink/20 mx-2">•</span>
                         <span>Kurasi Terkini</span>
                     </div>
@@ -239,8 +247,110 @@
                     </div>
                 </div>
 
-                {{-- 6 Product Cards Grid --}}
+                {{-- Product Cards Grid (FR-03) --}}
                 <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6" id="catalog-items-grid">
+
+                    @if(isset($products) && $products->count() > 0)
+                        @foreach($products as $product)
+                            <div class="catalog-card bg-white rounded-3xl border border-ink/15 overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between group"
+                                 data-category="{{ $product->category?->slug ?? 'karya-abk' }}"
+                                 data-source="{{ $product->source ?? 'karya' }}"
+                                 data-price="{{ (int) $product->price }}"
+                                 data-condition="{{ $product->condition ?? 'baru' }}">
+
+                                <div>
+                                    {{-- Image Container --}}
+                                    <div class="relative aspect-[4/3] bg-cream overflow-hidden">
+                                        <img src="{{ asset($product->image ?: 'images/tote-bag.jpg') }}"
+                                             alt="{{ $product->name }}"
+                                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                             loading="lazy">
+
+                                        {{-- Source Tag --}}
+                                        <div class="absolute top-3 left-3 flex flex-wrap gap-1.5">
+                                            @if($product->source === 'karya')
+                                                <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-sun text-ink shadow-xs">
+                                                    🎨 Karya ABK
+                                                </span>
+                                            @else
+                                                <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-white/90 text-ink backdrop-blur-xs shadow-xs border border-ink/10">
+                                                    ♻️ Preloved
+                                                </span>
+                                            @endif
+
+                                            @if($product->is_featured)
+                                                <span class="px-2 py-1 rounded-full text-[10px] font-bold bg-amber-500 text-white shadow-xs">
+                                                    ⭐ Unggulan
+                                                </span>
+                                            @endif
+                                        </div>
+
+                                        {{-- Stock Status Badge (FR-03) --}}
+                                        <div class="absolute bottom-3 left-3">
+                                            @if($product->stock <= 0 || $product->status === 'empty')
+                                                <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-rose-600 text-white shadow-xs">
+                                                    Stok Habis
+                                                </span>
+                                            @elseif($product->stock <= 3 || $product->status === 'minimal_stock')
+                                                <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-600 text-white shadow-xs">
+                                                    Sisa {{ $product->stock }} pcs
+                                                </span>
+                                            @else
+                                                <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-600 text-white shadow-xs">
+                                                    Ready Stock
+                                                </span>
+                                            @endif
+                                        </div>
+                                    </div>
+
+                                    {{-- Card Body --}}
+                                    <div class="p-5 space-y-3">
+                                        <div class="space-y-1">
+                                            <span class="text-[10px] uppercase font-bold tracking-wider text-ink/50 block">
+                                                {{ $product->category?->name ?? 'Kategori Umum' }}
+                                            </span>
+                                            <h3 class="font-heading text-base font-bold text-ink group-hover:text-ink/80 transition-colors line-clamp-1" title="{{ $product->name }}">
+                                                {{ $product->name }}
+                                            </h3>
+                                            <p class="text-xs text-ink/70 line-clamp-2 leading-relaxed">
+                                                {{ $product->description ?: 'Barang kurasi berkualitas untuk mendukung beasiswa kemandirian anak berkebutuhan khusus.' }}
+                                            </p>
+                                        </div>
+
+                                        {{-- Meta: Artisan / Condition --}}
+                                        <div class="flex items-center gap-2 pt-1 text-[11px] text-ink/60">
+                                            <span>Kondisi: <strong class="text-ink capitalize">{{ $product->condition ?? 'mulus' }}</strong></span>
+                                            <span>•</span>
+                                            <span class="truncate">{{ $product->artisan_name ?: 'YPKABK' }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {{-- Card Footer & Actions (FR-03 / FR-06) --}}
+                                <div class="px-5 pb-5 pt-2 border-t border-ink/15 space-y-3">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <span class="text-[10px] uppercase text-ink/60 font-semibold block">Harga Donasi</span>
+                                            <span class="text-base font-extrabold text-ink">Rp {{ number_format($product->price, 0, ',', '.') }}</span>
+                                        </div>
+                                        <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-cream text-ink">
+                                            +100% Dana Terapi
+                                        </span>
+                                    </div>
+
+                                    <div class="grid grid-cols-2 gap-2 text-xs font-semibold">
+                                        <button type="button" onclick="addToCart('{{ addslashes($product->name) }}')" class="py-2.5 px-3 rounded-xl bg-butter text-ink hover:bg-butter/80 border border-ink/15 transition-colors flex items-center justify-center gap-1.5">
+                                            <span>🛒</span> Keranjang
+                                        </button>
+                                        <button type="button" onclick="openOrderModal('{{ addslashes($product->name) }}', '{{ number_format($product->price, 0, ',', '.') }}', {{ $product->id }})" class="py-2.5 px-3 rounded-xl bg-sun text-ink hover:bg-sun/90 shadow-xs transition-colors flex items-center justify-center gap-1.5">
+                                            <span>⚡</span> Beli Sekarang
+                                        </button>
+                                    </div>
+                                </div>
+
+                            </div>
+                        @endforeach
+                    @else
 
                     {{-- Item 1: Tote Bag --}}
                     <div class="catalog-card bg-white rounded-3xl border border-ink/15 overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between group"
@@ -703,6 +813,7 @@
 
                     </div>
 
+                    @endif
                 </div>
 
                 {{-- Pagination Row --}}
@@ -914,9 +1025,13 @@
         });
     });
 
-    // Simple Cart notification
+    // Simple Cart notification (FR-07)
     function addToCart(title) {
         alert(`Berhasil menambahkan "${title}" ke keranjang donasi belanja Anda!`);
     }
 </script>
+
+@include('user.pages.home._modal-order')
+@include('user.pages.home._modal-donasi')
+@include('user.pages.home._scripts')
 @endsection

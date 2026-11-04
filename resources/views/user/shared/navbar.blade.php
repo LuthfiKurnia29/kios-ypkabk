@@ -9,9 +9,9 @@
                 <img src="{{ asset('images/logo/logo.webp') }}" alt="Logo Kios Mandiri YPKABK" width="2437" height="1186" class="h-11 sm:h-12 lg:h-14 w-auto object-contain transition-transform group-hover:scale-[1.02]">
             </a>
 
-            {{-- Desktop Navigation Links (Tengah - Maksimal 5 Item) --}}
+            {{-- Desktop Navigation Links (Tengah - Maksimal 5 Item Sesuai DESIGN.md & SRS) --}}
             <div class="hidden lg:flex items-center gap-1 xl:gap-2 text-base font-medium">
-                <a href="{{ route('home') }}#beranda"
+                <a href="{{ route('home') }}"
                    class="inline-flex items-center h-20 px-3.5 border-b-2 transition-all {{ request()->routeIs('home') ? 'border-sun font-bold text-ink' : 'border-transparent text-ink/80 hover:text-ink hover:border-sun' }}">
                     Beranda
                 </a>
@@ -19,13 +19,13 @@
                    class="inline-flex items-center h-20 px-3.5 border-b-2 transition-all {{ request()->routeIs('katalog') ? 'border-sun font-bold text-ink' : 'border-transparent text-ink/80 hover:text-ink hover:border-sun' }}">
                     Katalog
                 </a>
-                <a href="{{ route('home') }}#dampak"
-                   class="inline-flex items-center h-20 px-3.5 border-b-2 border-transparent text-ink/80 hover:text-ink hover:border-sun transition-all">
-                    Dampak
+                <a href="{{ route('tentang') }}"
+                   class="inline-flex items-center h-20 px-3.5 border-b-2 transition-all {{ request()->routeIs('tentang') ? 'border-sun font-bold text-ink' : 'border-transparent text-ink/80 hover:text-ink hover:border-sun' }}">
+                    Tentang Kami
                 </a>
-                <a href="{{ route('home') }}#cara-donasi"
-                   class="inline-flex items-center h-20 px-3.5 border-b-2 border-transparent text-ink/80 hover:text-ink hover:border-sun transition-all">
-                    Cara Donasi
+                <a href="{{ route('transparansi') }}"
+                   class="inline-flex items-center h-20 px-3.5 border-b-2 transition-all {{ request()->routeIs('transparansi') ? 'border-sun font-bold text-ink' : 'border-transparent text-ink/80 hover:text-ink hover:border-sun' }}">
+                    Transparansi
                 </a>
                 <a href="{{ route('home') }}#kontak"
                    class="inline-flex items-center h-20 px-3.5 border-b-2 border-transparent text-ink/80 hover:text-ink hover:border-sun transition-all">
@@ -70,7 +70,7 @@
     <div id="mobile-menu" class="hidden lg:hidden border-t border-ink/10 bg-white shadow-xl transition-all duration-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 space-y-3">
             <nav class="flex flex-col space-y-1">
-                <a href="{{ route('home') }}#beranda"
+                <a href="{{ route('home') }}"
                    class="flex items-center justify-between px-4 py-3 rounded-xl text-base font-medium transition-colors {{ request()->routeIs('home') ? 'bg-cream text-ink font-bold' : 'text-ink/80 hover:bg-cream hover:text-ink' }}">
                     <span>Beranda</span>
                     <svg class="w-4 h-4 text-ink/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
@@ -80,14 +80,14 @@
                     <span>Katalog</span>
                     <svg class="w-4 h-4 text-ink/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                 </a>
-                <a href="{{ route('home') }}#dampak"
-                   class="flex items-center justify-between px-4 py-3 rounded-xl text-base font-medium text-ink/80 hover:bg-cream hover:text-ink transition-colors">
-                    <span>Dampak</span>
+                <a href="{{ route('tentang') }}"
+                   class="flex items-center justify-between px-4 py-3 rounded-xl text-base font-medium transition-colors {{ request()->routeIs('tentang') ? 'bg-cream text-ink font-bold' : 'text-ink/80 hover:bg-cream hover:text-ink' }}">
+                    <span>Tentang Kami</span>
                     <svg class="w-4 h-4 text-ink/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                 </a>
-                <a href="{{ route('home') }}#cara-donasi"
-                   class="flex items-center justify-between px-4 py-3 rounded-xl text-base font-medium text-ink/80 hover:bg-cream hover:text-ink transition-colors">
-                    <span>Cara Donasi</span>
+                <a href="{{ route('transparansi') }}"
+                   class="flex items-center justify-between px-4 py-3 rounded-xl text-base font-medium transition-colors {{ request()->routeIs('transparansi') ? 'bg-cream text-ink font-bold' : 'text-ink/80 hover:bg-cream hover:text-ink' }}">
+                    <span>Transparansi</span>
                     <svg class="w-4 h-4 text-ink/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                 </a>
                 <a href="{{ route('home') }}#kontak"

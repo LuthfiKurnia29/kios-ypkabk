@@ -88,8 +88,13 @@
 
                 <div class="bg-white border border-stone-200/80 rounded-3xl shadow-xl shadow-stone-900/5 p-8 sm:p-10">
                     <div class="space-y-2 mb-8">
+                        <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800">
+                            Portal Khusus Pengelola &amp; Admin
+                        </span>
                         <h2 class="text-2xl font-extrabold tracking-tight text-stone-900">Masuk ke akun Anda</h2>
-                        <p class="text-sm text-stone-500">Kelola donasi, pesanan, dan aktivitas kios dalam satu tempat.</p>
+                        <p class="text-xs text-stone-500">
+                            Pengunjung &amp; donatur dapat langsung berbelanja atau berdonasi tanpa perlu mendaftar akun (Perlindungan Privasi).
+                        </p>
                     </div>
 
                     {{-- Flash Messages --}}
