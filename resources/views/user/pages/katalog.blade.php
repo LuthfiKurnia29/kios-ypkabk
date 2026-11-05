@@ -339,7 +339,7 @@
                                     </div>
 
                                     <div class="grid grid-cols-2 gap-2 text-xs font-semibold">
-                                        <button type="button" onclick="addToCart('{{ addslashes($product->name) }}')" class="py-2.5 px-3 rounded-xl bg-butter text-ink hover:bg-butter/80 border border-ink/15 transition-colors flex items-center justify-center gap-1.5">
+                                        <button type="button" onclick="addToCart({{ $product->id }}, '{{ addslashes($product->name) }}', {{ (int)$product->price }}, '{{ asset($product->image ?: 'images/tote-bag.jpg') }}', '{{ addslashes($product->category?->name ?? 'Kategori Umum') }}')" class="py-2.5 px-3 rounded-xl bg-butter text-ink hover:bg-butter/80 border border-ink/15 transition-colors flex items-center justify-center gap-1.5">
                                             <span>🛒</span> Keranjang
                                         </button>
                                         <button type="button" onclick="openOrderModal('{{ addslashes($product->name) }}', '{{ number_format($product->price, 0, ',', '.') }}', {{ $product->id }})" class="py-2.5 px-3 rounded-xl bg-sun text-ink hover:bg-sun/90 shadow-xs transition-colors flex items-center justify-center gap-1.5">
@@ -416,7 +416,7 @@
                             </div>
 
                             <div class="grid grid-cols-2 gap-2 text-xs font-semibold">
-                                <button type="button" onclick="addToCart('Tote Bag Kanvas Lukis Pelangi Harapan')" class="py-2.5 px-3 rounded-xl bg-butter text-ink hover:bg-butter border border-ink/15 transition-colors flex items-center justify-center gap-1.5">
+                                <button type="button" onclick="addToCart(1, 'Tote Bag Kanvas Lukis Pelangi Harapan', 45000, '{{ asset('images/tote-bag.jpg') }}', 'Karya Vokasi ABK')" class="py-2.5 px-3 rounded-xl bg-butter text-ink hover:bg-butter border border-ink/15 transition-colors flex items-center justify-center gap-1.5">
                                     <span>🛒</span> Keranjang
                                 </button>
                                 <a href="https://wa.me/6281234567890?text=Halo%20Admin%20Kios%20Mandiri,%20saya%20mau%20pesan%20Tote%20Bag%20Kanvas%20Lukis%20Pelangi%20(Rp%2045.000)" target="_blank" rel="noopener noreferrer" class="py-2.5 px-3 rounded-xl bg-sun text-ink hover:bg-sun text-ink text-white shadow-xs transition-colors flex items-center justify-center gap-1.5">
@@ -492,7 +492,7 @@
                             </div>
 
                             <div class="grid grid-cols-2 gap-2 text-xs font-semibold">
-                                <button type="button" onclick="addToCart('Buku Cerita Bergambar Rimba')" class="py-2.5 px-3 rounded-xl bg-butter text-ink hover:bg-butter border border-ink/15 transition-colors flex items-center justify-center gap-1.5">
+                                <button type="button" onclick="addToCart(2, 'Buku Cerita Bergambar: Petualangan Rimba', 35000, '{{ asset('images/books.jpg') }}', 'Buku & Mainan Edukatif')" class="py-2.5 px-3 rounded-xl bg-butter text-ink hover:bg-butter border border-ink/15 transition-colors flex items-center justify-center gap-1.5">
                                     <span>🛒</span> Keranjang
                                 </button>
                                 <a href="https://wa.me/6281234567890?text=Halo%20Admin%20Kios%20Mandiri,%20saya%20mau%20pesan%20Buku%20Cerita%20Bergambar%20(Rp%2035.000)" target="_blank" rel="noopener noreferrer" class="py-2.5 px-3 rounded-xl bg-sun text-ink hover:bg-sun text-ink text-white shadow-xs transition-colors flex items-center justify-center gap-1.5">
@@ -568,7 +568,7 @@
                             </div>
 
                             <div class="grid grid-cols-2 gap-2 text-xs font-semibold">
-                                <button type="button" onclick="addToCart('Jaket Parka Anak Mustard')" class="py-2.5 px-3 rounded-xl bg-butter text-ink hover:bg-butter border border-ink/15 transition-colors flex items-center justify-center gap-1.5">
+                                <button type="button" onclick="addToCart(3, 'Jaket Parka Anak Mustard Warm', 55000, '{{ asset('images/denim-jacket.jpg') }}', 'Pakaian & Aksesori')" class="py-2.5 px-3 rounded-xl bg-butter text-ink hover:bg-butter border border-ink/15 transition-colors flex items-center justify-center gap-1.5">
                                     <span>🛒</span> Keranjang
                                 </button>
                                 <a href="https://wa.me/6281234567890?text=Halo%20Admin%20Kios%20Mandiri,%20saya%20mau%20pesan%20Jaket%20Parka%20Mustard%20(Rp%2055.000)" target="_blank" rel="noopener noreferrer" class="py-2.5 px-3 rounded-xl bg-sun text-ink hover:bg-sun text-ink text-white shadow-xs transition-colors flex items-center justify-center gap-1.5">
@@ -802,7 +802,7 @@
                             </div>
 
                             <div class="grid grid-cols-2 gap-2 text-xs font-semibold">
-                                <button type="button" onclick="addToCart('Hiasan Dinding Makrame Bohemian')" class="py-2.5 px-3 rounded-xl bg-butter text-ink hover:bg-butter border border-ink/15 transition-colors flex items-center justify-center gap-1.5">
+                                <button type="button" onclick="addToCart(4, 'Hiasan Dinding Makrame Bohemian', 65000, '{{ asset('images/tote-bag.jpg') }}', 'Karya Vokasi ABK')" class="py-2.5 px-3 rounded-xl bg-butter text-ink hover:bg-butter border border-ink/15 transition-colors flex items-center justify-center gap-1.5">
                                     <span>🛒</span> Keranjang
                                 </button>
                                 <a href="https://wa.me/6281234567890?text=Halo%20Admin%20Kios%20Mandiri,%20saya%20mau%20pesan%20Makrame%20Bohemian%20(Rp%2065.000)" target="_blank" rel="noopener noreferrer" class="py-2.5 px-3 rounded-xl bg-sun text-ink hover:bg-sun text-ink text-white shadow-xs transition-colors flex items-center justify-center gap-1.5">
@@ -1024,11 +1024,6 @@
             items.forEach(item => container.appendChild(item));
         });
     });
-
-    // Simple Cart notification (FR-07)
-    function addToCart(title) {
-        alert(`Berhasil menambahkan "${title}" ke keranjang donasi belanja Anda!`);
-    }
 </script>
 
 @include('user.pages.home._modal-order')

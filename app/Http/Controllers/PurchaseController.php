@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Services\DokuService;
 use App\Http\Services\PurchaseService;
 use App\Models\Purchase;
 use Illuminate\Http\JsonResponse;
@@ -71,15 +72,17 @@ class PurchaseController extends Controller
         ];
 
         $purchase = $this->purchaseService->createPurchase($customerData, $validated['items']);
+        $paymentUrl = app(DokuService::class)->generatePaymentUrl($purchase);
 
         if ($request->wantsJson()) {
             return response()->json([
                 'message' => 'Pesanan berhasil dibuat.',
                 'data' => $purchase,
+                'payment_url' => $paymentUrl,
             ], 201);
         }
 
-        return redirect()->back()->with('success', "Pesanan {$purchase->order_code} berhasil dibuat.");
+        return redirect()->away($paymentUrl);
     }
 
     /**

@@ -43,14 +43,22 @@
                                 <span class="text-[10px] uppercase text-ink/60 font-semibold block">Harga Donasi</span>
                                 <span class="text-base sm:text-lg font-extrabold text-ink">Rp {{ number_format($product->price, 0, ',', '.') }}</span>
                             </div>
-                            <button type="button"
-                                    onclick="openOrderModal('{{ addslashes($product->name) }}', '{{ number_format($product->price, 0, ',', '.') }}', {{ $product->id }})"
-                                    class="w-full min-h-[48px] rounded-full bg-sun hover:bg-sun/90 text-ink font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-all active:scale-95 shadow-sm">
-                                <svg class="w-4 h-4 text-ink" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-                                </svg>
-                                <span>Beli &amp; Bantu</span>
-                            </button>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button type="button"
+                                        onclick="addToCart({{ $product->id }}, '{{ addslashes($product->name) }}', {{ (int)$product->price }}, '{{ asset($product->image ?: 'images/tote-bag.jpg') }}', '{{ addslashes($product->category?->name ?? 'Karya ABK') }}')"
+                                        class="min-h-[48px] rounded-full border border-ink/15 hover:bg-butter text-ink font-bold text-xs flex items-center justify-center gap-1 transition-all active:scale-95"
+                                        title="Tambah ke keranjang">
+                                    <svg class="w-4 h-4 text-ink shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                                    </svg>
+                                    <span>+ Keranjang</span>
+                                </button>
+                                <button type="button"
+                                        onclick="openOrderModal('{{ addslashes($product->name) }}', '{{ number_format($product->price, 0, ',', '.') }}', {{ $product->id }})"
+                                        class="min-h-[48px] rounded-full bg-sun hover:bg-sun/90 text-ink font-bold text-xs flex items-center justify-center gap-1 transition-all active:scale-95 shadow-sm">
+                                    <span>⚡ Beli</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 @endforeach
@@ -79,14 +87,22 @@
                             <span class="text-[10px] uppercase text-ink/60 font-semibold block">Harga Donasi</span>
                             <span class="text-base sm:text-lg font-extrabold text-ink">Rp 45.000</span>
                         </div>
-                        <button type="button"
-                                onclick="openOrderModal('Tote Bag Lukis Pelangi Bahagia', '45.000')"
-                                class="w-full min-h-[48px] rounded-full bg-sun hover:bg-sun/90 text-ink font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-all active:scale-95 shadow-sm">
-                            <svg class="w-4 h-4 text-ink" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-                            </svg>
-                            <span>Beli &amp; Bantu</span>
-                        </button>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button type="button"
+                                    onclick="addToCart(1, 'Tote Bag Lukis Pelangi Bahagia', 45000, '{{ asset('images/tote-bag.jpg') }}', 'Kriya Kanvas ABK')"
+                                    class="min-h-[48px] rounded-full border border-ink/15 hover:bg-butter text-ink font-bold text-xs flex items-center justify-center gap-1 transition-all active:scale-95"
+                                    title="Tambah ke keranjang">
+                                <svg class="w-4 h-4 text-ink shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                                </svg>
+                                <span>+ Keranjang</span>
+                            </button>
+                            <button type="button"
+                                    onclick="openOrderModal('Tote Bag Lukis Pelangi Bahagia', '45.000', 1)"
+                                    class="min-h-[48px] rounded-full bg-sun hover:bg-sun/90 text-ink font-bold text-xs flex items-center justify-center gap-1 transition-all active:scale-95 shadow-sm">
+                                <span>⚡ Beli</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -113,14 +129,22 @@
                             <span class="text-[10px] uppercase text-ink/60 font-semibold block">Harga Donasi</span>
                             <span class="text-base sm:text-lg font-extrabold text-ink">Rp 65.000</span>
                         </div>
-                        <button type="button"
-                                onclick="openOrderModal('Boneka Rajut Amigurumi Kelinci', '65.000')"
-                                class="w-full min-h-[48px] rounded-full bg-sun hover:bg-sun/90 text-ink font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-all active:scale-95 shadow-sm">
-                            <svg class="w-4 h-4 text-ink" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-                            </svg>
-                            <span>Beli &amp; Bantu</span>
-                        </button>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button type="button"
+                                    onclick="addToCart(2, 'Boneka Rajut Amigurumi Kelinci', 65000, '{{ asset('images/crochet-bunny.jpg') }}', 'Kelas Rajut Vokasi')"
+                                    class="min-h-[48px] rounded-full border border-ink/15 hover:bg-butter text-ink font-bold text-xs flex items-center justify-center gap-1 transition-all active:scale-95"
+                                    title="Tambah ke keranjang">
+                                <svg class="w-4 h-4 text-ink shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                                </svg>
+                                <span>+ Keranjang</span>
+                            </button>
+                            <button type="button"
+                                    onclick="openOrderModal('Boneka Rajut Amigurumi Kelinci', '65.000', 2)"
+                                    class="min-h-[48px] rounded-full bg-sun hover:bg-sun/90 text-ink font-bold text-xs flex items-center justify-center gap-1 transition-all active:scale-95 shadow-sm">
+                                <span>⚡ Beli</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -147,14 +171,22 @@
                             <span class="text-[10px] uppercase text-ink/60 font-semibold block">Harga Donasi</span>
                             <span class="text-base sm:text-lg font-extrabold text-ink">Rp 95.000</span>
                         </div>
-                        <button type="button"
-                                onclick="openOrderModal('Set Ensiklopedia Anak (5 Jilid)', '95.000')"
-                                class="w-full min-h-[48px] rounded-full bg-sun hover:bg-sun/90 text-ink font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-all active:scale-95 shadow-sm">
-                            <svg class="w-4 h-4 text-ink" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-                            </svg>
-                            <span>Beli &amp; Bantu</span>
-                        </button>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button type="button"
+                                    onclick="addToCart(3, 'Set Ensiklopedia Anak (5 Jilid)', 95000, '{{ asset('images/books.jpg') }}', 'Buku Preloved Istimewa')"
+                                    class="min-h-[48px] rounded-full border border-ink/15 hover:bg-butter text-ink font-bold text-xs flex items-center justify-center gap-1 transition-all active:scale-95"
+                                    title="Tambah ke keranjang">
+                                <svg class="w-4 h-4 text-ink shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                                </svg>
+                                <span>+ Keranjang</span>
+                            </button>
+                            <button type="button"
+                                    onclick="openOrderModal('Set Ensiklopedia Anak (5 Jilid)', '95.000', 3)"
+                                    class="min-h-[48px] rounded-full bg-sun hover:bg-sun/90 text-ink font-bold text-xs flex items-center justify-center gap-1 transition-all active:scale-95 shadow-sm">
+                                <span>⚡ Beli</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -181,9 +213,23 @@
                             <span class="text-[10px] uppercase text-ink/60 font-semibold block">Harga Donasi</span>
                             <span class="text-base sm:text-lg font-extrabold text-ink">Rp 50.000</span>
                         </div>
-                        <button type="button"
-                                onclick="openOrderModal('Jaket Denim Anak Dinosaurus', '50.000')"
-                                class="w-full min-h-[48px] rounded-full bg-sun hover:bg-sun/90 text-ink font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-all active:scale-95 shadow-sm">
+                        <div class="grid grid-cols-2 gap-2">
+                            <button type="button"
+                                    onclick="addToCart(4, 'Jaket Denim Anak Dinosaurus', 50000, '{{ asset('images/denim-jacket.jpg') }}', 'Pakaian Preloved Terpilih')"
+                                    class="min-h-[48px] rounded-full border border-ink/15 hover:bg-butter text-ink font-bold text-xs flex items-center justify-center gap-1 transition-all active:scale-95"
+                                    title="Tambah ke keranjang">
+                                <svg class="w-4 h-4 text-ink shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                                </svg>
+                                <span>+ Keranjang</span>
+                            </button>
+                            <button type="button"
+                                    onclick="openOrderModal('Jaket Denim Anak Dinosaurus', '50.000', 4)"
+                                    class="min-h-[48px] rounded-full bg-sun hover:bg-sun/90 text-ink font-bold text-xs flex items-center justify-center gap-1 transition-all active:scale-95 shadow-sm">
+                                <span>⚡ Beli</span>
+                            </button>
+                        </div>
+                    </div>
                             <svg class="w-4 h-4 text-ink" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                             </svg>

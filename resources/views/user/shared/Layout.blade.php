@@ -68,5 +68,134 @@
         </span>
     </a>
 
+    {{-- Kios Floating Cart Toast Notification --}}
+    <div id="kios-toast"
+         class="fixed bottom-24 right-4 sm:right-6 z-50 hidden transition-all duration-300 transform translate-y-2 opacity-0"
+         role="alert"
+         aria-live="polite">
+        <div class="bg-white border-2 border-sun rounded-2xl shadow-xl p-4 flex items-center gap-3 max-w-sm sm:max-w-md text-ink">
+            <span class="text-2xl shrink-0" id="kios-toast-icon">🛍️</span>
+            <div class="flex-1 min-w-0">
+                <p id="kios-toast-title" class="font-bold text-xs uppercase tracking-wider text-ink/70">Keranjang Belanja</p>
+                <p id="kios-toast-message" class="text-xs sm:text-sm font-semibold text-ink truncate"></p>
+            </div>
+            <a href="{{ route('keranjang') }}"
+               class="px-3.5 py-2 bg-sun hover:bg-sun/90 text-ink text-xs font-bold rounded-xl shrink-0 transition-colors shadow-xs">
+                Lihat
+            </a>
+        </div>
+    </div>
+
+    {{-- Global Cart Management Script (Guest Cart via localStorage) --}}
+    <script>
+        const KIOS_CART_KEY = 'kios_cart_items_v1';
+
+        function getKiosCart() {
+            try {
+                return JSON.parse(localStorage.getItem(KIOS_CART_KEY)) || [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function saveKiosCart(cart) {
+            localStorage.setItem(KIOS_CART_KEY, JSON.stringify(cart));
+            updateAllCartBadges();
+            window.dispatchEvent(new CustomEvent('kios-cart-updated', { detail: { cart } }));
+        }
+
+        function updateAllCartBadges() {
+            const cart = getKiosCart();
+            const totalCount = cart.reduce((sum, item) => sum + (parseInt(item.quantity, 10) || 1), 0);
+
+            const desktopBadge = document.getElementById('nav-cart-badge-desktop');
+            const mobileIconBadge = document.getElementById('nav-cart-badge-mobile-icon');
+            const mobileDrawerBadge = document.getElementById('nav-cart-badge-mobile-drawer');
+
+            if (desktopBadge) {
+                if (totalCount > 0) {
+                    desktopBadge.innerText = totalCount;
+                    desktopBadge.classList.remove('hidden');
+                } else {
+                    desktopBadge.classList.add('hidden');
+                }
+            }
+
+            if (mobileIconBadge) {
+                if (totalCount > 0) {
+                    mobileIconBadge.innerText = totalCount > 99 ? '99+' : totalCount;
+                    mobileIconBadge.classList.remove('hidden');
+                } else {
+                    mobileIconBadge.classList.add('hidden');
+                }
+            }
+
+            if (mobileDrawerBadge) {
+                if (totalCount > 0) {
+                    mobileDrawerBadge.innerText = totalCount;
+                    mobileDrawerBadge.classList.remove('hidden');
+                } else {
+                    mobileDrawerBadge.classList.add('hidden');
+                }
+            }
+        }
+
+        let _toastTimer = null;
+        function showKiosToast(title, message, icon = '🛍️') {
+            const toast = document.getElementById('kios-toast');
+            const titleEl = document.getElementById('kios-toast-title');
+            const msgEl = document.getElementById('kios-toast-message');
+            const iconEl = document.getElementById('kios-toast-icon');
+
+            if (!toast || !msgEl) return;
+
+            if (titleEl) titleEl.innerText = title;
+            msgEl.innerText = message;
+            if (iconEl) iconEl.innerText = icon;
+
+            toast.classList.remove('hidden');
+            // Trigger animation
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+                toast.classList.add('translate-y-0', 'opacity-100');
+            });
+
+            clearTimeout(_toastTimer);
+            _toastTimer = setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-2', 'opacity-0');
+                setTimeout(() => toast.classList.add('hidden'), 300);
+            }, 3500);
+        }
+
+        function addToCart(id, name, price, image, category = 'Produk Kios') {
+            const cart = getKiosCart();
+            const numericId = id ? parseInt(id, 10) : null;
+            const numericPrice = typeof price === 'number' ? price : parseInt(String(price).replace(/[^0-9]/g, ''), 10) || 0;
+
+            const existingIndex = cart.findIndex(item => (numericId && item.id === numericId) || item.name === name);
+
+            if (existingIndex > -1) {
+                cart[existingIndex].quantity = (parseInt(cart[existingIndex].quantity, 10) || 1) + 1;
+            } else {
+                cart.push({
+                    id: numericId,
+                    name: name,
+                    price: numericPrice,
+                    image: image || '/images/tote-bag.jpg',
+                    category: category,
+                    quantity: 1
+                });
+            }
+
+            saveKiosCart(cart);
+            showKiosToast('Ditambahkan ke Keranjang', name, '✅');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateAllCartBadges();
+        });
+    </script>
+
 </body>
 </html>

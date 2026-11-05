@@ -84,4 +84,20 @@ class UserController extends Controller
             'donationCategories'
         ));
     }
+
+    /**
+     * Display the shopping cart page.
+     */
+    public function keranjang(): View
+    {
+        return view('user.pages.keranjang');
+    }
+
+    /**
+     * Display the checkout page.
+     */
+    public function checkout(): View
+    {
+        return view('user.pages.checkout');
+    }
 }

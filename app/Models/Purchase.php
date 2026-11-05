@@ -20,6 +20,7 @@ class Purchase extends Model
     {
         return [
             'total_price' => 'decimal:2',
+            'paid_at' => 'datetime',
         ];
     }
 

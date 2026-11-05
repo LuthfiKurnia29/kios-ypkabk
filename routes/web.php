@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DonationController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\ReviewController;
@@ -15,6 +16,8 @@ Route::get('/user', [UserController::class, 'index'])->name('user.home');
 Route::get('/katalog', [UserController::class, 'katalog'])->name('katalog');
 Route::get('/tentang-kami', [UserController::class, 'tentang'])->name('tentang');
 Route::get('/transparansi', [UserController::class, 'transparansi'])->name('transparansi');
+Route::get('/keranjang', [UserController::class, 'keranjang'])->name('keranjang');
+Route::get('/checkout', [UserController::class, 'checkout'])->name('checkout');
 
 // Products (Public read-only)
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
@@ -23,6 +26,14 @@ Route::get('/products/{product}', [ProductController::class, 'show'])->name('pro
 // Public Guest Orders & Checkout (FR-06 / NFR-02)
 Route::post('/purchases', [PurchaseController::class, 'store'])->name('purchases.store');
 Route::get('/purchases/{purchase}', [PurchaseController::class, 'show'])->name('purchases.show');
+Route::get('/purchases/{purchase}/success', [PaymentController::class, 'success'])->name('purchases.success');
+
+// DOKU Payment Gateway & Dummy Simulator
+Route::get('/payment/doku/checkout/{purchase}', [PaymentController::class, 'checkout'])->name('payment.doku.checkout');
+Route::get('/payment/doku/simulator/{purchase}', [PaymentController::class, 'simulator'])->name('payment.doku.simulator');
+Route::post('/payment/doku/simulator/{purchase}/action', [PaymentController::class, 'simulateAction'])->name('payment.doku.simulate-action');
+Route::post('/payment/doku/notify', [PaymentController::class, 'notify'])->name('payment.doku.notify');
+Route::get('/payment/doku/return', [PaymentController::class, 'returnUrl'])->name('payment.doku.return');
 
 // Public Donations Form (FR-04)
 Route::post('/donations', [DonationController::class, 'store'])->name('donations.store');

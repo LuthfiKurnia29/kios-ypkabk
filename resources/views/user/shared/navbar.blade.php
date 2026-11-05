@@ -33,8 +33,18 @@
                 </a>
             </div>
 
-            {{-- Right Action: Tombol Utama (Kanan) --}}
-            <div class="hidden lg:flex items-center">
+            {{-- Right Action: Keranjang & Tombol Utama (Kanan) --}}
+            <div class="hidden lg:flex items-center gap-3">
+                <a href="{{ route('keranjang') }}"
+                   class="relative inline-flex items-center justify-center gap-2 min-h-[48px] px-4 py-2.5 rounded-full border border-ink/15 hover:bg-cream text-ink text-sm font-bold transition-all active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-sun"
+                   aria-label="Keranjang Belanja">
+                    <svg class="w-5 h-5 text-ink shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                    </svg>
+                    <span>Keranjang</span>
+                    <span id="nav-cart-badge-desktop" class="hidden ml-0.5 px-2 py-0.5 rounded-full text-xs font-extrabold bg-[#D81B60] text-white">0</span>
+                </a>
+
                 <button type="button"
                         onclick="openDonationModal()"
                         class="inline-flex items-center justify-center gap-2 px-6 min-h-[48px] rounded-full bg-sun hover:bg-sun/90 text-ink text-base font-bold transition-all duration-200 active:scale-95 shadow-sm hover:shadow focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-sun">
@@ -45,8 +55,17 @@
                 </button>
             </div>
 
-            {{-- Mobile Menu Button --}}
+            {{-- Mobile Actions: Cart & Menu Toggle --}}
             <div class="flex items-center gap-2 lg:hidden">
+                <a href="{{ route('keranjang') }}"
+                   class="relative p-2.5 rounded-xl text-ink hover:bg-cream transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sun"
+                   aria-label="Keranjang Belanja">
+                    <svg class="w-6 h-6 text-ink" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                    </svg>
+                    <span id="nav-cart-badge-mobile-icon" class="hidden absolute top-1.5 right-1.5 bg-[#D81B60] text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">0</span>
+                </a>
+
                 <button type="button"
                         id="mobile-menu-toggle"
                         aria-label="Toggle navigation menu"
@@ -94,6 +113,16 @@
                    class="flex items-center justify-between px-4 py-3 rounded-xl text-base font-medium text-ink/80 hover:bg-cream hover:text-ink transition-colors">
                     <span>Kontak</span>
                     <svg class="w-4 h-4 text-ink/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </a>
+                <a href="{{ route('keranjang') }}"
+                   class="flex items-center justify-between px-4 py-3 rounded-xl text-base font-medium transition-colors {{ request()->routeIs('keranjang') ? 'bg-cream text-ink font-bold' : 'text-ink/80 hover:bg-cream hover:text-ink' }}">
+                    <span class="flex items-center gap-2">
+                        <svg class="w-5 h-5 text-ink shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                        </svg>
+                        <span>Keranjang Belanja</span>
+                    </span>
+                    <span id="nav-cart-badge-mobile-drawer" class="hidden px-2 py-0.5 rounded-full text-xs font-bold bg-[#D81B60] text-white">0</span>
                 </a>
             </nav>
 
