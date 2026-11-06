@@ -1,54 +1,44 @@
-{{-- ========================================================
-     SECTION: CERITA / TESTIMONI - FR-01 / FR-04
-     id="cerita", layout: kartu kutipan berwarna, bisa digeser.
-     ======================================================== --}}
-<section id="cerita" class="bg-white py-16 lg:py-24">
-    <div class="max-w-7xl mx-auto px-6 space-y-10 lg:space-y-12">
+{{-- Section: Cerita dari Sahabat Kios / Testimoni (Latar #FFFBF7 Sesuai PDF Halaman 1) --}}
+<section id="cerita" class="w-full bg-[#FFFBF7] py-16 lg:py-20 font-sans">
+    <div class="max-w-[1200px] mx-auto px-6 space-y-10">
 
         {{-- Header Section --}}
-        <div class="space-y-3">
-            <span class="text-sm font-semibold text-ink/60 block">
-                Cerita Nyata
+        <div class="space-y-3 max-w-2xl">
+            <span class="text-xs uppercase tracking-wider font-semibold text-primary">
+                Suara Komunitas
             </span>
-            <h2 class="font-heading text-3xl lg:text-5xl font-bold text-ink tracking-tight leading-tight">
-                Cerita dari Donatur &amp; Pembeli
+            <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#2B2430] tracking-tight">
+                Cerita dari Sahabat Kios
             </h2>
-            <p class="text-lg text-ink/70 leading-relaxed">
-                Rantai kebaikan yang mengalir dari setiap barang preloved dan karya vokasi anak-anak istimewa binaan YPKABK.
+            <p class="text-sm sm:text-base text-[#2B2430]/75 font-normal leading-relaxed">
+                Pengalaman donatur dan pembeli dalam mendukung program kemandirian anak.
             </p>
         </div>
 
-        {{-- Kartu Kutipan Berwarna (Bisa Digeser di Mobile) --}}
-        <div class="flex overflow-x-auto snap-x snap-mandatory gap-4 -mx-6 px-6 lg:mx-0 lg:px-0 lg:grid lg:grid-cols-3 lg:gap-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden pb-4 lg:pb-0">
+        {{-- 3 Kartu Putih Berjejer (Tinggi Sama, Inisial di Lingkaran Kecil, Tanpa Foto) --}}
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
             @if(isset($reviews) && $reviews->count() > 0)
-                @php
-                    $colors = [
-                        ['bg' => 'bg-sun text-ink', 'quote' => 'text-ink/30', 'avatar_bg' => 'bg-white text-ink'],
-                        ['bg' => 'bg-cream text-ink border border-ink/10', 'quote' => 'text-ink/30', 'avatar_bg' => 'bg-sun text-ink'],
-                        ['bg' => 'bg-olive text-white', 'quote' => 'text-sun', 'avatar_bg' => 'bg-sun text-ink', 'name_color' => 'text-white', 'role_color' => 'text-white/70'],
-                    ];
-                @endphp
-                @foreach($reviews as $index => $review)
-                    @php
-                        $color = $colors[$index % count($colors)];
-                        $isDark = str_contains($color['bg'], 'bg-olive');
-                    @endphp
-                    <div class="{{ $color['bg'] }} rounded-3xl p-8 flex flex-col justify-between min-h-[320px] min-w-[85%] sm:min-w-[70%] lg:min-w-0 snap-center shrink-0 lg:shrink shadow-sm">
-                        <div class="space-y-4">
-                            <span class="font-heading text-6xl leading-none {{ $color['quote'] }} select-none block">&ldquo;</span>
-                            <blockquote class="text-lg leading-relaxed {{ $isDark ? 'text-white' : 'text-ink' }}">
-                                {{ $review->quote }}
+                @foreach($reviews->take(3) as $review)
+                    <div class="bg-white rounded-[12px] p-6 sm:p-8 border border-[#2B2430]/10 flex flex-col justify-between space-y-6 shadow-xs h-full">
+                        <div class="space-y-3">
+                            <span class="text-xs font-semibold text-primary block">
+                                {{ str_contains(strtolower($review->role ?? ''), 'pembeli') ? 'Ulasan Pembeli' : 'Ulasan Donatur' }}
+                            </span>
+                            <blockquote class="text-sm sm:text-base font-normal leading-relaxed text-[#2B2430]/85">
+                                &ldquo;{{ $review->quote }}&rdquo;
                             </blockquote>
                         </div>
-                        <div class="flex items-center gap-3 mt-8 pt-4">
-                            <div class="w-12 h-12 rounded-full {{ $color['avatar_bg'] }} font-heading font-bold text-base flex items-center justify-center shrink-0 shadow-sm">
-                                {{ $review->initials }}
+
+                        <div class="flex items-center gap-3 pt-4 border-t border-[#2B2430]/10">
+                            {{-- Inisial di Lingkaran Kecil (Tanpa Foto) --}}
+                            <div class="w-10 h-10 rounded-full bg-[#FDEEF4] text-primary font-bold text-sm flex items-center justify-center shrink-0 border border-primary/20">
+                                {{ $review->initials ?: substr($review->name ?? 'U', 0, 2) }}
                             </div>
-                            <div>
-                                <h3 class="font-heading text-lg font-bold {{ $isDark ? 'text-white' : 'text-ink' }} leading-tight">
+                            <div class="min-w-0">
+                                <h3 class="font-semibold text-sm text-[#2B2430] truncate">
                                     {{ $review->name }}
                                 </h3>
-                                <p class="text-sm {{ $isDark ? 'text-white/70' : 'text-ink/70' }}">
+                                <p class="text-xs text-[#2B2430]/60 font-normal truncate">
                                     {{ $review->role }}
                                 </p>
                             </div>
@@ -56,69 +46,57 @@
                     </div>
                 @endforeach
             @else
-                {{-- Fallback jika DB kosong --}}
-                <div class="bg-sun text-ink rounded-3xl p-8 flex flex-col justify-between min-h-[320px] min-w-[85%] sm:min-w-[70%] lg:min-w-0 snap-center shrink-0 lg:shrink shadow-sm">
-                    <div class="space-y-4">
-                        <span class="font-heading text-6xl leading-none text-ink/30 select-none block">&ldquo;</span>
-                        <blockquote class="text-lg leading-relaxed text-ink">
-                            Sempat bingung pakaian anak menumpuk mau dikemanakan. Di Kios Mandiri YPKABK prosesnya mudah, laporannya transparan, dan senang sekali melihat hasilnya membuka ruang terapi bagi anak-anak istimewa.
+                {{-- Fallback jika data database kosong --}}
+                <div class="bg-white rounded-[12px] p-6 sm:p-8 border border-[#2B2430]/10 flex flex-col justify-between space-y-6 shadow-xs h-full">
+                    <div class="space-y-3">
+                        <span class="text-xs font-semibold text-primary block">Ulasan Donatur</span>
+                        <blockquote class="text-sm sm:text-base font-normal leading-relaxed text-[#2B2430]/85">
+                            &ldquo;Proses donasi pakaian kerja di Kios Mandiri tertata jelas dan komunikatif. Mengetahui hasilnya disalurkan untuk jam terapi adik-adik di Sidoarjo membuat donasi terasa bermakna.&rdquo;
                         </blockquote>
                     </div>
-                    <div class="flex items-center gap-3 mt-8 pt-4">
-                        <div class="w-12 h-12 rounded-full bg-white text-ink font-heading font-bold text-base flex items-center justify-center shrink-0 shadow-sm">
-                            NK
+                    <div class="flex items-center gap-3 pt-4 border-t border-[#2B2430]/10">
+                        <div class="w-10 h-10 rounded-full bg-[#FDEEF4] text-primary font-bold text-sm flex items-center justify-center shrink-0 border border-primary/20">
+                            RW
                         </div>
-                        <div>
-                            <h3 class="font-heading text-lg font-bold text-ink leading-tight">
-                                Nanie Kurniawati
-                            </h3>
-                            <p class="text-sm text-ink/70">
-                                Donatur Preloved &bull; Sidoarjo
-                            </p>
+                        <div class="min-w-0">
+                            <h3 class="font-semibold text-sm text-[#2B2430] truncate">Ibu Rina Wardhani</h3>
+                            <p class="text-xs text-[#2B2430]/60 font-normal truncate">Donatur Preloved &bull; Surabaya</p>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-cream text-ink border border-ink/10 rounded-3xl p-8 flex flex-col justify-between min-h-[320px] min-w-[85%] sm:min-w-[70%] lg:min-w-0 snap-center shrink-0 lg:shrink shadow-sm">
-                    <div class="space-y-4">
-                        <span class="font-heading text-6xl leading-none text-ink/30 select-none block">&ldquo;</span>
-                        <blockquote class="text-lg leading-relaxed text-ink">
-                            Saya beli papan titian dan tote bag rajut. Kualitasnya sangat rapi, packing ramah lingkungan, dan yang terpenting menyokong anak-anak istimewa jadi lebih mandiri.
+                <div class="bg-white rounded-[12px] p-6 sm:p-8 border border-[#2B2430]/10 flex flex-col justify-between space-y-6 shadow-xs h-full">
+                    <div class="space-y-3">
+                        <span class="text-xs font-semibold text-primary block">Ulasan Pembeli</span>
+                        <blockquote class="text-sm sm:text-base font-normal leading-relaxed text-[#2B2430]/85">
+                            &ldquo;Tote bag karya Dimas rapi dan motifnya bagus untuk tas kerja harian. Membeli produk ini membantu keberlanjutan sanggar kriya anak-anak istimewa.&rdquo;
                         </blockquote>
                     </div>
-                    <div class="flex items-center gap-3 mt-8 pt-4">
-                        <div class="w-12 h-12 rounded-full bg-sun text-ink font-heading font-bold text-base flex items-center justify-center shrink-0 shadow-sm">
-                            DP
+                    <div class="flex items-center gap-3 pt-4 border-t border-[#2B2430]/10">
+                        <div class="w-10 h-10 rounded-full bg-[#FDEEF4] text-primary font-bold text-sm flex items-center justify-center shrink-0 border border-primary/20">
+                            DW
                         </div>
-                        <div>
-                            <h3 class="font-heading text-lg font-bold text-ink leading-tight">
-                                Dr. Dimas Prasetyo
-                            </h3>
-                            <p class="text-sm text-ink/70">
-                                Pembeli &amp; Orang Tua Asuh &bull; Mojokerto
-                            </p>
+                        <div class="min-w-0">
+                            <h3 class="font-semibold text-sm text-[#2B2430] truncate">Mas Danang Wicaksono</h3>
+                            <p class="text-xs text-[#2B2430]/60 font-normal truncate">Pembeli &bull; Mojokerto</p>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-olive text-white rounded-3xl p-8 flex flex-col justify-between min-h-[320px] min-w-[85%] sm:min-w-[70%] lg:min-w-0 snap-center shrink-0 lg:shrink shadow-sm">
-                    <div class="space-y-4">
-                        <span class="font-heading text-6xl leading-none text-sun select-none block">&ldquo;</span>
-                        <blockquote class="text-lg leading-relaxed text-white">
-                            Pelatihan keterampilan di sentra Mojokerto sangat bermakna bagi putra kami. Kini dia jauh lebih percaya diri dan bangga melihat karya kerajinannya bisa diapresiasi serta dibeli oleh banyak orang.
+                <div class="bg-white rounded-[12px] p-6 sm:p-8 border border-[#2B2430]/10 flex flex-col justify-between space-y-6 shadow-xs h-full">
+                    <div class="space-y-3">
+                        <span class="text-xs font-semibold text-primary block">Ulasan Pembeli</span>
+                        <blockquote class="text-sm sm:text-base font-normal leading-relaxed text-[#2B2430]/85">
+                            &ldquo;Kualitas produk kriya anak-anak sangat memuaskan, kemasan ramah lingkungan, dan layanan pengirimannya cepat. Sangat merekomendasikan berbelanja sambil berdonasi di sini.&rdquo;
                         </blockquote>
                     </div>
-                    <div class="flex items-center gap-3 mt-8 pt-4">
-                        <div class="w-12 h-12 rounded-full bg-sun text-ink font-heading font-bold text-base flex items-center justify-center shrink-0 shadow-sm">
+                    <div class="flex items-center gap-3 pt-4 border-t border-[#2B2430]/10">
+                        <div class="w-10 h-10 rounded-full bg-[#FDEEF4] text-primary font-bold text-sm flex items-center justify-center shrink-0 border border-primary/20">
                             EW
                         </div>
-                        <div>
-                            <h3 class="font-heading text-lg font-bold text-white leading-tight">
-                                Ibu Endah Wulandari
-                            </h3>
-                            <p class="text-sm text-white/70">
-                                Orang Tua Siswa &amp; Donatur &bull; Mojokerto
-                            </p>
+                        <div class="min-w-0">
+                            <h3 class="font-semibold text-sm text-[#2B2430] truncate">Ibu Endah Wulandari</h3>
+                            <p class="text-xs text-[#2B2430]/60 font-normal truncate">Pembeli &bull; Mojokerto</p>
                         </div>
                     </div>
                 </div>
