@@ -1,105 +1,77 @@
-{{-- ========================================================
-     SECTION: TENTANG & DAMPAK - FR-01 / SRS
-     id="dampak", latar putih, padding py-16 lg:py-24.
-     - Judul section
-     - 3 foto kegiatan berbentuk lonjong (rounded-full rasio lebar)
-     - 3 angka dampak (angka Baloo 2 besar, keterangan kecil)
-     ======================================================== --}}
-<section id="dampak" class="bg-white py-16 lg:py-24">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12 lg:space-y-16">
+{{-- Section: Jejak Kebaikan / Angka Dampak (Latar #FDEEF4 Sesuai PDF Halaman 1) --}}
+<section id="dampak" class="w-full bg-[#FDEEF4] py-16 lg:py-20 font-sans">
+    <div class="max-w-[1200px] mx-auto px-6 space-y-10">
 
-        {{-- Judul Section --}}
-        <div class="text-center max-w-2xl mx-auto space-y-3">
-            <h2 class="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-ink tracking-tight">
-                Dampak Nyata dari Setiap Donasi Anda
+        {{-- Header Section --}}
+        <div class="space-y-3 max-w-2xl">
+            <span class="text-xs uppercase tracking-wider font-semibold text-primary">
+                Laporan Keterbukaan
+            </span>
+            <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#2B2430] tracking-tight">
+                Jejak Kebaikan Anda yang Tumbuh Bersama Kami
             </h2>
-            <p class="text-ink/75 text-base sm:text-lg leading-relaxed">
-                Kebaikan yang Anda titipkan menjadi ruang terapi gratis, alat belajar ramah sensori, dan kemandirian bagi anak-anak berkebutuhan khusus.
+            <p class="text-sm sm:text-base text-[#2B2430]/75 font-normal leading-relaxed">
+                Transparansi adalah janji kami kepada setiap donatur dan pembeli dermawan.
             </p>
         </div>
 
-        {{-- 3 Foto Kegiatan Berbentuk Lonjong --}}
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            <div class="aspect-[16/9] rounded-[999px] overflow-hidden bg-cream shadow-sm">
-                <img src="{{ asset('images/kegiatan/kegiatan-grup.webp') }}"
-                     alt="Kegiatan kelompok anak-anak istimewa bersama pembina YPKABK"
-                     width="1600"
-                     height="1066"
-                     class="w-full h-full object-cover object-left rounded-[999px]"
-                     loading="lazy">
-            </div>
-
-            <div class="aspect-[16/9] rounded-[999px] overflow-hidden bg-cream shadow-sm">
-                <img src="{{ asset('images/kegiatan/kegiatan-lomba.webp') }}"
-                     alt="Anak berkebutuhan khusus berpartisipasi dalam kegiatan lomba kreatif YPKABK"
-                     width="853"
-                     height="1280"
-                     class="w-full h-full object-cover rounded-[999px]"
-                     loading="lazy">
-            </div>
-
-            <div class="aspect-[16/9] rounded-[999px] overflow-hidden bg-butter shadow-sm">
-                <img src="{{ asset('images/kegiatan/anak-bernyanyi.webp') }}"
-                     alt="Anak istimewa bernyanyi dengan penuh keceriaan dalam kegiatan YPKABK"
-                     width="640"
-                     height="663"
-                     class="w-full h-full object-contain rounded-[999px]"
-                     loading="lazy">
-            </div>
-        </div>
-
-        {{-- Baris 3 Angka Dampak --}}
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 pt-4 text-center">
+        {{-- Grid Kartu Dampak: 3 Kolom, Kartu Terakhir Berlatar Primary Teks Putih --}}
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             @if(isset($impactMetrics) && $impactMetrics->count() > 0)
                 @foreach($impactMetrics as $metric)
-                    <div class="space-y-2">
-                        <div class="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold text-ink">
-                            {{ $metric->value }}
+                    @php
+                        $isLast = $loop->last;
+                    @endphp
+                    <div class="{{ $isLast ? 'bg-primary text-white border-primary' : 'bg-white text-[#2B2430] border-[#2B2430]/10' }} rounded-[12px] p-6 sm:p-8 border flex flex-col justify-between space-y-4 shadow-xs">
+                        <div class="space-y-3">
+                            <span class="text-xs uppercase tracking-wider font-semibold {{ $isLast ? 'text-white/80' : 'text-primary' }}">
+                                {{ $isLast ? 'Alokasi Dana' : ($loop->first ? 'Penyaluran' : 'Penerima Manfaat') }}
+                            </span>
+                            <div class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight {{ $isLast ? 'text-white' : 'text-primary' }}">
+                                {{ $metric->value }}
+                            </div>
+                            <div class="font-semibold text-base sm:text-lg leading-snug {{ $isLast ? 'text-white' : 'text-[#2B2430]' }}">
+                                {{ $metric->label }}
+                            </div>
                         </div>
-                        <div class="text-base sm:text-lg font-bold text-ink">
-                            {{ $metric->label }}
-                        </div>
-                        <div class="text-xs sm:text-sm text-ink/70">
+                        <p class="text-xs sm:text-sm font-normal leading-relaxed {{ $isLast ? 'text-white/90' : 'text-[#2B2430]/70' }}">
                             {{ $metric->description }}
-                        </div>
+                        </p>
                     </div>
                 @endforeach
             @else
-                {{-- Fallback default --}}
-                <div class="space-y-2">
-                    <div class="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold text-ink">
-                        1.420+
+                {{-- Fallback jika data database belum ada --}}
+                <div class="bg-white text-[#2B2430] rounded-[12px] p-6 sm:p-8 border border-[#2B2430]/10 flex flex-col justify-between space-y-4 shadow-xs">
+                    <div class="space-y-3">
+                        <span class="text-xs uppercase tracking-wider font-semibold text-primary">Penyaluran</span>
+                        <div class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-primary">1.420+</div>
+                        <div class="font-semibold text-base sm:text-lg leading-snug text-[#2B2430]">Barang tersalurkan</div>
                     </div>
-                    <div class="text-base sm:text-lg font-bold text-ink">
-                        Barang Preloved Tersalurkan
-                    </div>
-                    <div class="text-xs sm:text-sm text-ink/70">
-                        Dari 1.120+ donatur di Sidoarjo &amp; Mojokerto
-                    </div>
+                    <p class="text-xs sm:text-sm font-normal leading-relaxed text-[#2B2430]/70">
+                        Barang preloved terkurasi yang diterima pemilik baru dan tidak berakhir sebagai sampah.
+                    </p>
                 </div>
 
-                <div class="space-y-2">
-                    <div class="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold text-ink">
-                        38 Anak
+                <div class="bg-white text-[#2B2430] rounded-[12px] p-6 sm:p-8 border border-[#2B2430]/10 flex flex-col justify-between space-y-4 shadow-xs">
+                    <div class="space-y-3">
+                        <span class="text-xs uppercase tracking-wider font-semibold text-primary">Penerima Manfaat</span>
+                        <div class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-primary">38 ABK</div>
+                        <div class="font-semibold text-base sm:text-lg leading-snug text-[#2B2430]">Terlatih mandiri</div>
                     </div>
-                    <div class="text-base sm:text-lg font-bold text-ink">
-                        ABK Terlatih Mandiri
-                    </div>
-                    <div class="text-xs sm:text-sm text-ink/70">
-                        Kelas keterampilan, kriya, dan pelayanan kios
-                    </div>
+                    <p class="text-xs sm:text-sm font-normal leading-relaxed text-[#2B2430]/70">
+                        Remaja dengan autisme, down syndrome, dan disabilitas fisik kini aktif berkarya kriya dan menjahit.
+                    </p>
                 </div>
 
-                <div class="space-y-2">
-                    <div class="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold text-ink">
-                        Rp 84,5 Jt
+                <div class="bg-primary text-white rounded-[12px] p-6 sm:p-8 border border-primary flex flex-col justify-between space-y-4 shadow-xs">
+                    <div class="space-y-3">
+                        <span class="text-xs uppercase tracking-wider font-semibold text-white/80">Alokasi Dana</span>
+                        <div class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white">Rp 84,5 Jt</div>
+                        <div class="font-semibold text-base sm:text-lg leading-snug text-white">Dana terapi terkumpul</div>
                     </div>
-                    <div class="text-base sm:text-lg font-bold text-ink">
-                        Dana Terapi Terkumpul
-                    </div>
-                    <div class="text-xs sm:text-sm text-ink/70">
-                        100% dialokasikan secara transparan
-                    </div>
+                    <p class="text-xs sm:text-sm font-normal leading-relaxed text-white/90">
+                        Seluruh dana digunakan untuk 620 jam sesi terapi okupasi, wicara, dan fisioterapi tanpa potongan perantara.
+                    </p>
                 </div>
             @endif
         </div>

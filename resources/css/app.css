@@ -5,11 +5,17 @@
 @source '../../storage/framework/views/*.php';
 
 @theme {
-    /* === Design Tokens: Typography === */
-    --font-heading: 'Baloo 2', ui-sans-serif, system-ui, sans-serif;
-    --font-sans: 'Nunito', ui-sans-serif, system-ui, sans-serif;
+    /* === Design Tokens: Typography (Plus Jakarta Sans untuk Semua Teks) === */
+    --font-heading: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+    --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
 
-    /* === Design Tokens: Colors === */
+    /* === Design Tokens: Colors (PDF Acuan Desain) === */
+    --color-primary: #C2185B;
+    --color-teks: #2B2430;
+    --color-pink-pucat: #FDEEF4;
+    --color-krem: #FFFBF7;
+
+    /* === Design Tokens: Colors (Lama) === */
     --color-butter: #FBF0B8;
     --color-cream: #FFFBE6;
     --color-sun: #FFD93D;
@@ -23,8 +29,14 @@
     }
 
     body {
-        font-size: 18px;
-        line-height: 1.7;
+        font-family: var(--font-sans);
+        font-size: 16px;
+        line-height: 1.6;
+        color: var(--color-teks);
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        font-family: var(--font-sans);
     }
 }
 
@@ -38,4 +50,3 @@
     #FFFFFF 100%
   );
 }
-
