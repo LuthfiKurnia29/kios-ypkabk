@@ -17,7 +17,7 @@ class UserService extends BaseService
      */
     public function login(array $credentials, bool $remember = false): bool
     {
-        return Auth::attempt($credentials, $remember);
+        return Auth::attempt($credentials);
     }
 
     /**

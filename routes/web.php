@@ -48,6 +48,7 @@ Route::post('/refresh-token', [AuthController::class, 'refreshToken'])
 Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
 
+    Route::get('/admin/products', [ProductController::class, 'adminIndex'])->name('admin.products.index');
     Route::post('/admin/products', [ProductController::class, 'store'])->name('admin.products.store');
     Route::put('/admin/products/{product}', [ProductController::class, 'update'])->name('admin.products.update');
     Route::delete('/admin/products/{product}', [ProductController::class, 'destroy'])->name('admin.products.destroy');
@@ -63,4 +64,3 @@ Route::middleware(['auth', 'admin'])->group(function () {
 Route::view('/dampak', 'user.pages.dampak')->name('dampak');
 Route::view('/cara-donasi', 'user.pages.cara-donasi')->name('cara-donasi');
 Route::view('/kontak', 'user.pages.kontak')->name('kontak');
-

@@ -15,14 +15,16 @@
     $status = is_array($product) ? ($product['status'] ?? 'ready') : ($product->status ?? 'ready');
 
     $isOutOfStock = ($stock <= 0) || ($status === 'empty');
-    $hasValidImage = !empty($image) && file_exists(public_path($image));
+    $isDataUri = !empty($image) && (str_starts_with($image, 'data:image') || str_starts_with($image, 'http'));
+    $hasValidImage = !empty($image) && ($isDataUri || file_exists(public_path($image)));
+    $imageSrc = $isDataUri ? $image : asset($image);
 @endphp
 
 <div {{ $attributes->merge(['class' => 'rounded-[12px] p-4 border flex flex-col justify-between space-y-3 transition-shadow ' . ($isOutOfStock ? 'bg-stone-50 border-stone-200 opacity-75' : 'bg-white border-[#2B2430]/10 hover:shadow-sm')]) }}>
     {{-- Foto Produk (Rasio 4:5) --}}
     <div class="w-full aspect-[4/5] rounded-[8px] overflow-hidden bg-[#FDEEF4] relative">
         @if($hasValidImage)
-            <img src="{{ asset($image) }}"
+            <img src="{{ $imageSrc }}"
                  alt="{{ $name }}"
                  class="w-full h-full object-cover rounded-[8px] {{ $isOutOfStock ? 'grayscale-[50%]' : '' }}"
                  loading="lazy">

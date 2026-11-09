@@ -24,12 +24,12 @@ class AdminController extends Controller
 
         $recentPurchases = Purchase::with(['detailPurchases.product', 'user'])
             ->latest()
-            ->take(8)
+            ->take(5)
             ->get();
 
         $recentDonations = Donation::with('category')
             ->latest()
-            ->take(8)
+            ->take(5)
             ->get();
 
         return view('admin.pages.dashboard', compact(
