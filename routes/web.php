@@ -58,3 +58,9 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/donations', [DonationController::class, 'index'])->name('admin.donations.index');
     Route::patch('/admin/donations/{donation}/status', [DonationController::class, 'updateStatus'])->name('admin.donations.update-status');
 });
+
+// --- Halaman statis frontend ---
+Route::view('/dampak', 'user.pages.dampak')->name('dampak');
+Route::view('/cara-donasi', 'user.pages.cara-donasi')->name('cara-donasi');
+Route::view('/kontak', 'user.pages.kontak')->name('kontak');
+

@@ -1,207 +1,85 @@
-{{-- ========================================================
-     SECTION: PRODUK PILIHAN (4 PRODUK) - FR-01
-     id="produk-pilihan", latar putih, py-16 lg:py-24.
-     Judul dan satu kalimat, grid 4 produk (4 kolom desktop, 2 kolom HP).
-     ======================================================== --}}
-<section id="produk-pilihan" class="bg-white py-16 lg:py-24">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+{{-- Section: Produk Pilihan (Latar #FDEEF4 Sesuai PDF Halaman 1) --}}
+<section id="produk-pilihan" class="w-full bg-[#FDEEF4] py-16 lg:py-20 font-sans">
+    <div class="max-w-[1200px] mx-auto px-6 space-y-10">
 
-        {{-- Judul dan Satu Kalimat --}}
-        <div class="text-center max-w-2xl mx-auto space-y-3">
-            <h2 class="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-ink tracking-tight leading-tight">
-                Karya Anak Istimewa &amp; Donasi Preloved Terpilih
-            </h2>
-            <p class="text-ink/75 text-base sm:text-lg leading-relaxed">
-                Setiap pembelian langsung mendanai sesi rehabilitasi dan membuka masa depan mandiri bagi anak-anak berkebutuhan khusus.
-            </p>
+        {{-- Header Section --}}
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+            <div class="space-y-3 max-w-2xl">
+                <span class="text-xs uppercase tracking-wider font-semibold text-primary">
+                    Koleksi Butik Amal
+                </span>
+                <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#2B2430] tracking-tight">
+                    Temukan baik, untuk hari baik.
+                </h2>
+                <p class="text-sm sm:text-base text-[#2B2430]/75 font-normal leading-relaxed">
+                    Produk buatan tangan anak istimewa dan donasi preloved pilihan berkualitas butik.
+                </p>
+            </div>
+            <div class="text-xs font-semibold text-[#2B2430]/70 flex items-center gap-1.5 self-start sm:self-end pb-1">
+                <span class="w-2 h-2 rounded-full bg-primary"></span>
+                <span>Stok diperbarui setiap pekan</span>
+            </div>
         </div>
 
-        {{-- Grid 4 Produk (4 Kolom Desktop, 2 Kolom HP) --}}
+        {{-- Grid 4 Produk Menggunakan Komponen <x-product-card> --}}
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             @if(isset($featuredProducts) && $featuredProducts->count() > 0)
                 @foreach($featuredProducts as $product)
-                    <div class="bg-cream rounded-2xl p-4 flex flex-col justify-between shadow-sm space-y-4">
-                        <div class="space-y-3">
-                            <div class="rounded-2xl overflow-hidden aspect-[4/3] bg-butter">
-                                <img src="{{ asset($product->image ?: 'images/tote-bag.jpg') }}"
-                                     alt="{{ $product->name }}"
-                                     class="w-full h-full object-cover rounded-2xl"
-                                     loading="lazy">
-                            </div>
-                            <div class="space-y-1">
-                                <h3 class="font-heading text-base sm:text-lg font-bold text-ink leading-snug line-clamp-1" title="{{ $product->name }}">
-                                    {{ $product->name }}
-                                </h3>
-                                <p class="text-xs sm:text-sm text-ink/70 line-clamp-1">
-                                    {{ $product->artisan_name ?: ($product->source === 'karya' ? 'Kriya Siswa ABK' : 'Barang Donasi Terpilih') }}
-                                </p>
-                            </div>
-                        </div>
-
-                        <div class="space-y-3 pt-2 border-t border-ink/10">
-                            <div>
-                                <span class="text-[10px] uppercase text-ink/60 font-semibold block">Harga Donasi</span>
-                                <span class="text-base sm:text-lg font-extrabold text-ink">Rp {{ number_format($product->price, 0, ',', '.') }}</span>
-                            </div>
-                            <button type="button"
-                                    onclick="openOrderModal('{{ addslashes($product->name) }}', '{{ number_format($product->price, 0, ',', '.') }}', {{ $product->id }})"
-                                    class="w-full min-h-[48px] rounded-full bg-sun hover:bg-sun/90 text-ink font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-all active:scale-95 shadow-sm">
-                                <svg class="w-4 h-4 text-ink" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-                                </svg>
-                                <span>Beli &amp; Bantu</span>
-                            </button>
-                        </div>
-                    </div>
+                    <x-product-card :product="$product" button-label="Pilih Produk" />
                 @endforeach
             @else
                 {{-- Fallback jika database belum di-seed --}}
-                <div class="bg-cream rounded-2xl p-4 flex flex-col justify-between shadow-sm space-y-4">
-                    <div class="space-y-3">
-                        <div class="rounded-2xl overflow-hidden aspect-[4/3] bg-butter">
-                            <img src="{{ asset('images/tote-bag.jpg') }}"
-                                 alt="Tote Bag Lukis Pelangi Bahagia"
-                                 class="w-full h-full object-cover rounded-2xl"
-                                 loading="lazy">
-                        </div>
-                        <div class="space-y-1">
-                            <h3 class="font-heading text-base sm:text-lg font-bold text-ink leading-snug">
-                                Tote Bag Lukis Pelangi Bahagia
-                            </h3>
-                            <p class="text-xs sm:text-sm text-ink/70">
-                                Kriya Kanvas ABK
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="space-y-3 pt-2 border-t border-ink/10">
-                        <div>
-                            <span class="text-[10px] uppercase text-ink/60 font-semibold block">Harga Donasi</span>
-                            <span class="text-base sm:text-lg font-extrabold text-ink">Rp 45.000</span>
-                        </div>
-                        <button type="button"
-                                onclick="openOrderModal('Tote Bag Lukis Pelangi Bahagia', '45.000')"
-                                class="w-full min-h-[48px] rounded-full bg-sun hover:bg-sun/90 text-ink font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-all active:scale-95 shadow-sm">
-                            <svg class="w-4 h-4 text-ink" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-                            </svg>
-                            <span>Beli &amp; Bantu</span>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="bg-cream rounded-2xl p-4 flex flex-col justify-between shadow-sm space-y-4">
-                    <div class="space-y-3">
-                        <div class="rounded-2xl overflow-hidden aspect-[4/3] bg-butter">
-                            <img src="{{ asset('images/crochet-bunny.jpg') }}"
-                                 alt="Boneka Rajut Amigurumi Kelinci"
-                                 class="w-full h-full object-cover rounded-2xl"
-                                 loading="lazy">
-                        </div>
-                        <div class="space-y-1">
-                            <h3 class="font-heading text-base sm:text-lg font-bold text-ink leading-snug">
-                                Boneka Rajut Amigurumi Kelinci
-                            </h3>
-                            <p class="text-xs sm:text-sm text-ink/70">
-                                Kelas Rajut Vokasi
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="space-y-3 pt-2 border-t border-ink/10">
-                        <div>
-                            <span class="text-[10px] uppercase text-ink/60 font-semibold block">Harga Donasi</span>
-                            <span class="text-base sm:text-lg font-extrabold text-ink">Rp 65.000</span>
-                        </div>
-                        <button type="button"
-                                onclick="openOrderModal('Boneka Rajut Amigurumi Kelinci', '65.000')"
-                                class="w-full min-h-[48px] rounded-full bg-sun hover:bg-sun/90 text-ink font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-all active:scale-95 shadow-sm">
-                            <svg class="w-4 h-4 text-ink" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-                            </svg>
-                            <span>Beli &amp; Bantu</span>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="bg-cream rounded-2xl p-4 flex flex-col justify-between shadow-sm space-y-4">
-                    <div class="space-y-3">
-                        <div class="rounded-2xl overflow-hidden aspect-[4/3] bg-butter">
-                            <img src="{{ asset('images/books.jpg') }}"
-                                 alt="Set Ensiklopedia Anak (5 Jilid)"
-                                 class="w-full h-full object-cover rounded-2xl"
-                                 loading="lazy">
-                        </div>
-                        <div class="space-y-1">
-                            <h3 class="font-heading text-base sm:text-lg font-bold text-ink leading-snug">
-                                Set Ensiklopedia Anak (5 Jilid)
-                            </h3>
-                            <p class="text-xs sm:text-sm text-ink/70">
-                                Buku Preloved Istimewa
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="space-y-3 pt-2 border-t border-ink/10">
-                        <div>
-                            <span class="text-[10px] uppercase text-ink/60 font-semibold block">Harga Donasi</span>
-                            <span class="text-base sm:text-lg font-extrabold text-ink">Rp 95.000</span>
-                        </div>
-                        <button type="button"
-                                onclick="openOrderModal('Set Ensiklopedia Anak (5 Jilid)', '95.000')"
-                                class="w-full min-h-[48px] rounded-full bg-sun hover:bg-sun/90 text-ink font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-all active:scale-95 shadow-sm">
-                            <svg class="w-4 h-4 text-ink" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-                            </svg>
-                            <span>Beli &amp; Bantu</span>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="bg-cream rounded-2xl p-4 flex flex-col justify-between shadow-sm space-y-4">
-                    <div class="space-y-3">
-                        <div class="rounded-2xl overflow-hidden aspect-[4/3] bg-butter">
-                            <img src="{{ asset('images/denim-jacket.jpg') }}"
-                                 alt="Jaket Denim Anak Dinosaurus"
-                                 class="w-full h-full object-cover rounded-2xl"
-                                 loading="lazy">
-                        </div>
-                        <div class="space-y-1">
-                            <h3 class="font-heading text-base sm:text-lg font-bold text-ink leading-snug">
-                                Jaket Denim Anak Dinosaurus
-                            </h3>
-                            <p class="text-xs sm:text-sm text-ink/70">
-                                Pakaian Preloved Terpilih
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="space-y-3 pt-2 border-t border-ink/10">
-                        <div>
-                            <span class="text-[10px] uppercase text-ink/60 font-semibold block">Harga Donasi</span>
-                            <span class="text-base sm:text-lg font-extrabold text-ink">Rp 50.000</span>
-                        </div>
-                        <button type="button"
-                                onclick="openOrderModal('Jaket Denim Anak Dinosaurus', '50.000')"
-                                class="w-full min-h-[48px] rounded-full bg-sun hover:bg-sun/90 text-ink font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-all active:scale-95 shadow-sm">
-                            <svg class="w-4 h-4 text-ink" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-                            </svg>
-                            <span>Beli &amp; Bantu</span>
-                        </button>
-                    </div>
-                </div>
+                @php
+                    $mockProducts = [
+                        [
+                            'id' => 1,
+                            'name' => 'Tote Bag Bunga Ceria',
+                            'price' => 65000,
+                            'source' => 'karya',
+                            'artisan_name' => 'Sentra Sidoarjo',
+                            'description' => 'Lukisan tangan oleh Dimas (16 th, Autisme) di Sentra Sidoarjo.',
+                            'image' => 'images/pict-2.webp',
+                        ],
+                        [
+                            'id' => 2,
+                            'name' => 'Kemeja Linen Santai',
+                            'price' => 85000,
+                            'source' => 'preloved',
+                            'artisan_name' => 'Kondisi 95%',
+                            'description' => 'Kondisi baik dan bersih, donasi pendukung di Surabaya.',
+                            'image' => 'images/pict-3.webp',
+                        ],
+                        [
+                            'id' => 3,
+                            'name' => 'Paket Buku Cerita',
+                            'price' => 50000,
+                            'source' => 'preloved',
+                            'artisan_name' => 'Set 3 Buku',
+                            'description' => 'Tiga buku dongeng bergambar anak, kondisi rapi dan bersih.',
+                            'image' => 'images/pict-4.webp',
+                        ],
+                        [
+                            'id' => 4,
+                            'name' => 'Gelang Manik Pelangi',
+                            'price' => 25000,
+                            'source' => 'karya',
+                            'artisan_name' => 'Sentra Mojokerto',
+                            'description' => 'Dirangkai oleh Nabila (14 th, Down Syndrome) dalam latihan kemandirian.',
+                            'image' => 'images/pict-1.webp',
+                        ],
+                    ];
+                @endphp
+                @foreach($mockProducts as $product)
+                    <x-product-card :product="$product" button-label="Pilih Produk" />
+                @endforeach
             @endif
         </div>
 
-        {{-- Tombol bg-sun "Lihat semua produk" ke route('katalog') --}}
-        <div class="text-center pt-2">
+        {{-- Tombol Lihat Semua Produk --}}
+        <div class="text-center pt-4">
             <a href="{{ route('katalog') }}"
-               class="inline-flex items-center justify-center gap-2 px-8 min-h-[48px] rounded-full bg-sun hover:bg-sun/90 text-ink font-bold text-base transition-all active:scale-95 shadow-sm">
-                <span>Lihat semua produk</span>
-                <svg class="w-4 h-4 text-ink" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-                </svg>
+               class="inline-flex items-center justify-center px-8 h-[44px] rounded-[8px] bg-primary hover:bg-primary/90 text-white font-semibold text-sm transition-all active:scale-[0.98] shadow-xs">
+                Lihat Semua Produk
             </a>
         </div>
 

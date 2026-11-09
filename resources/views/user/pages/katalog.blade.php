@@ -1,1037 +1,734 @@
 @extends('user.shared.Layout')
 
 @section('content')
-<div class="space-y-10 lg:space-y-14 pb-16">
+@php
+    $productList = (isset($products) && count($products) > 0) ? $products : [
+        [
+            'id' => 1,
+            'name' => 'Tote Bag Lukis Pelangi',
+            'price' => 45000,
+            'source' => 'karya',
+            'condition' => 'mulus',
+            'category_id' => 1,
+            'stock' => 5,
+            'status' => 'ready',
+            'artisan_name' => 'Karya Dimas (16 th), Sentra Sidoarjo',
+            'description' => 'Lukisan tangan penuh warna di atas kain kanvas tebal ramah lingkungan.',
+            'image' => 'images/pict-2.webp',
+        ],
+        [
+            'id' => 2,
+            'name' => 'Boneka Rajut Kelinci',
+            'price' => 65000,
+            'source' => 'karya',
+            'condition' => 'baru',
+            'category_id' => 1,
+            'stock' => 3,
+            'status' => 'ready',
+            'artisan_name' => 'Karya Nabila (14 th), Sentra Sidoarjo',
+            'description' => 'Rajutan benang wol lembut amigurumi buatan siswa vokasi.',
+            'image' => 'images/pict-1.webp',
+        ],
+        [
+            'id' => 3,
+            'name' => 'Set Ensiklopedia Anak',
+            'price' => 95000,
+            'source' => 'preloved',
+            'condition' => 'mulus',
+            'category_id' => 3,
+            'stock' => 2,
+            'status' => 'ready',
+            'artisan_name' => 'Donasi Keluarga Ibu Rini, Mojokerto',
+            'description' => 'Tiga buku dongeng bergambar anak, kondisi rapi dan halaman lengkap.',
+            'image' => 'images/pict-4.webp',
+        ],
+        [
+            'id' => 4,
+            'name' => 'Jaket Denim Anak',
+            'price' => 50000,
+            'source' => 'preloved',
+            'condition' => 'mulus',
+            'category_id' => 2,
+            'stock' => 1,
+            'status' => 'ready',
+            'artisan_name' => 'Kondisi Sangat Baik (Size 6-8 th)',
+            'description' => 'Pakaian anak denim bersih, kancing lengkap, siap pakai.',
+            'image' => 'images/pict-3.webp',
+        ],
+        [
+            'id' => 5,
+            'name' => 'Gelang Manik Pelangi',
+            'price' => 25000,
+            'source' => 'karya',
+            'condition' => 'baru',
+            'category_id' => 1,
+            'stock' => 8,
+            'status' => 'ready',
+            'artisan_name' => 'Karya Sarah (15 th), Sentra Mojokerto',
+            'description' => 'Dirangkai oleh anak istimewa dalam latihan motorik halus.',
+            'image' => 'images/pict-2.webp',
+        ],
+        [
+            'id' => 6,
+            'name' => 'Kemeja Linen Santai',
+            'price' => 70000,
+            'source' => 'preloved',
+            'condition' => 'baru',
+            'category_id' => 2,
+            'stock' => 2,
+            'status' => 'ready',
+            'artisan_name' => 'Kondisi Istimewa (Size L Dewasa)',
+            'description' => 'Kemeja pria linen katun sejuk, donasi pendukung di Surabaya.',
+            'image' => 'images/pict-3.webp',
+        ],
+        [
+            'id' => 7,
+            'name' => 'Hiasan Dinding Tenun Mini',
+            'price' => 80000,
+            'source' => 'karya',
+            'condition' => 'baru',
+            'category_id' => 4,
+            'stock' => 0,
+            'status' => 'empty',
+            'artisan_name' => 'Karya Bayu (15 th), Sentra Sidoarjo',
+            'description' => 'Tenun benang warna pastel berbingkai kayu mini.',
+            'image' => null,
+        ],
+    ];
 
-    {{-- ========================================================
-         HEADER KATALOG: BG-HERO-GRADIENT DI BELAKANG NAVBAR
-         ======================================================== --}}
-    <div class="bg-hero-gradient pt-24 pb-10 space-y-6">
-        {{-- TOP TRUST NOTICE BAR (NFR-02) --}}
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="bg-cream rounded-2xl border border-ink/15 text-ink py-2.5 px-4 text-xs font-medium">
-                <div class="flex flex-col md:flex-row items-center justify-between gap-2 text-center md:text-left">
-                    <div class="flex items-center gap-2">
-                        <span class="w-5 h-5 rounded-full bg-cream text-ink flex items-center justify-center shrink-0">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
-                            </svg>
-                        </span>
-                        <span>
-                            <strong>Transparan:</strong> 100% margin penjualan dialokasikan untuk beasiswa terapi &amp; kemandirian vokasi anak istimewa YPKABK.
-                        </span>
-                    </div>
-                    <div class="flex items-center gap-4 text-ink text-[11px] font-semibold">
-                        <span class="flex items-center gap-1">
-                            <span>📦</span> Kemasan Kardus Daur Ulang
-                        </span>
-                        <span class="text-ink">•</span>
-                        <span class="flex items-center gap-1 text-ink">
-                            <span>⚡</span> Belanja Cepat Tanpa Perlu Bikin Akun
-                        </span>
-                    </div>
-                </div>
+    $totalCount = $totalProductCount ?? count($productList);
+@endphp
+
+{{-- 1. Header Halaman (Komponen <x-page-header>) --}}
+<x-page-header
+    title="Katalog"
+    subtitle="Semua hasil penjualan mendanai terapi dan pelatihan anak istimewa."
+    :pill="$totalCount . ' produk tersedia'"
+    breadcrumb="Beranda / Katalog"
+/>
+
+{{-- 2. Konten Utama: Sidebar Filter + Grid Produk --}}
+<section class="w-full bg-[#FFFBF7] py-10 lg:py-16">
+    <div class="max-w-[1200px] mx-auto px-6">
+        <div class="flex flex-col lg:flex-row gap-8 items-start">
+
+            {{-- Mobile Filter Trigger Button --}}
+            <div class="w-full flex items-center justify-between lg:hidden pb-2">
+                <button type="button"
+                        id="open-filter-drawer-btn"
+                        class="inline-flex items-center gap-2 px-4 py-2.5 rounded-[8px] bg-white border border-[#2B2430]/15 text-sm font-semibold text-[#2B2430] shadow-xs active:scale-95 transition-all">
+                    <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+                    </svg>
+                    <span>Filter Produk</span>
+                </button>
+                <span class="text-xs text-[#2B2430]/70 font-medium">
+                    {{ $totalCount }} produk
+                </span>
             </div>
-        </div>
-
-        {{-- CATALOG HEADER & SEARCH --}}
-        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-2">
-            <div class="text-center max-w-3xl mx-auto space-y-4">
-                
-                {{-- Category Badge --}}
-                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-butter border border-ink/15 text-ink text-xs font-semibold">
-                    <span>🏷️</span> Etalase Belanja Berdampak Sosial
-                </div>
-
-                <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-ink tracking-tight leading-tight">
-                    Etalase Digital Kios Mandiri YPKABK
-                </h1>
-
-                <p class="text-sm sm:text-base text-ink/80 leading-relaxed max-w-2xl mx-auto">
-                    Setiap pembelian Anda 100% mendukung pelatihan kemandirian, fasilitas sensory room, dan beasiswa terapi anak berkebutuhan khusus.
-                </p>
-
-                {{-- Search Bar --}}
-                <div class="max-w-2xl mx-auto pt-2">
-                    <div class="relative flex items-center bg-white rounded-2xl border border-ink/15 p-1.5 shadow-sm focus-within:ring-2 focus-within:ring-sun focus-within:border-transparent transition-all">
-                        <span class="pl-3.5 text-ink/60">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                            </svg>
-                        </span>
-                        <input type="text" 
-                               id="catalog-search-input"
-                               placeholder="Cari totebag lukis, kemeja anak preloved, buku dongeng..." 
-                               class="w-full pl-3 pr-4 py-2.5 text-sm text-ink placeholder-ink/40 focus:outline-none bg-transparent">
-                        <button type="button" 
-                                id="catalog-search-btn"
-                                class="px-5 py-2.5 rounded-xl bg-sun text-ink hover:bg-sun text-ink font-semibold text-xs tracking-wide shadow-xs active:scale-95 transition-all shrink-0">
-                            Cari Produk
-                        </button>
-                    </div>
-                </div>
-
-                {{-- Horizontal Category Pills --}}
-                <div class="flex flex-wrap items-center justify-center gap-2 pt-3 text-xs font-semibold" id="catalog-category-tabs">
-                    <button type="button" data-category="all" class="cat-pill px-4 py-2 rounded-xl bg-sun text-ink shadow-xs transition-colors">
-                        Semua Produk ({{ $totalProductCount ?? (isset($products) ? $products->count() : 128) }})
-                    </button>
-                    @if(isset($categories) && $categories->count() > 0)
-                        @foreach($categories as $category)
-                            <button type="button" data-category="{{ $category->slug }}" class="cat-pill px-4 py-2 rounded-xl bg-white border border-ink/15 text-ink/80 hover:border-ink/15 transition-colors">
-                                <span>{{ $category->icon ?: '🏷️' }}</span> {{ $category->name }} ({{ $category->products()->count() }})
-                            </button>
-                        @endforeach
-                    @else
-                        <button type="button" data-category="karya-abk" class="cat-pill px-4 py-2 rounded-xl bg-white border border-ink/15 text-ink/80 hover:border-ink/15 transition-colors">
-                            <span>🎨</span> Karya Seni &amp; Prakarya ABK (32)
-                        </button>
-                        <button type="button" data-category="pakaian" class="cat-pill px-4 py-2 rounded-xl bg-white border border-ink/15 text-ink/80 hover:border-ink/15 transition-colors">
-                            <span>👕</span> Pakaian &amp; Aksesori Preloved (45)
-                        </button>
-                        <button type="button" data-category="buku-mainan" class="cat-pill px-4 py-2 rounded-xl bg-white border border-ink/15 text-ink/80 hover:border-ink/15 transition-colors">
-                            <span>🧸</span> Buku &amp; Mainan Edukatif (27)
-                        </button>
-                        <button type="button" data-category="dekorasi" class="cat-pill px-4 py-2 rounded-xl bg-white border border-ink/15 text-ink/80 hover:border-ink/15 transition-colors">
-                            <span>🪴</span> Perlengkapan Rumah &amp; Dekorasi (24)
-                        </button>
-                    @endif
-                </div>
-
-            </div>
-        </section>
-    </div>
-
-
-    {{-- ========================================================
-         MAIN CONTENT: SIDEBAR FILTERS + PRODUCT GRID
-         ======================================================== --}}
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
 
             {{-- ----------------------------------------------------
-                 LEFT COLUMN: FILTER ETALASE (SIDEBAR)
+                 SIDEBAR FILTER DESKTOP (280px)
                  ---------------------------------------------------- --}}
-            <aside class="lg:col-span-3 space-y-6 bg-white rounded-3xl p-6 border border-ink/15 shadow-xs lg:sticky lg:top-28">
-                
+            <aside class="hidden lg:block w-[280px] shrink-0 bg-white rounded-[12px] p-6 border border-[#2B2430]/10 shadow-xs space-y-6 sticky top-24">
                 {{-- Header Filter --}}
-                <div class="flex items-center justify-between pb-4 border-b border-ink/15">
-                    <div class="flex items-center gap-2">
-                        <svg class="w-4 h-4 text-ink" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
-                        </svg>
-                        <h3 class="font-bold text-ink text-sm">Filter Etalase</h3>
-                    </div>
-                    <button type="button" id="reset-filter-btn" class="text-xs font-semibold text-ink hover:text-ink transition-colors">
-                        Reset Semua
+                <div class="flex items-center justify-between pb-4 border-b border-[#2B2430]/10">
+                    <h2 class="font-bold text-base text-[#2B2430]">Filter Produk</h2>
+                    <button type="button" id="sidebar-reset-btn" class="text-xs font-semibold text-primary hover:underline">
+                        Reset
                     </button>
                 </div>
 
-                {{-- Filter Group 1: Sumber Barang --}}
-                <div class="space-y-3">
-                    <h4 class="text-xs font-bold text-ink/60 uppercase tracking-wider">Sumber Barang</h4>
-                    <div class="space-y-2 text-xs text-ink/80">
-                        <label class="flex items-center justify-between cursor-pointer group">
-                            <div class="flex items-center gap-2.5">
-                                <input type="checkbox" value="karya" class="filter-source rounded text-ink focus:ring-sun border-ink/15">
-                                <span class="group-hover:text-ink font-medium">Karya Original ABK</span>
-                            </div>
-                            <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-cream text-ink">
-                                Spesial
-                            </span>
+                {{-- Filter Group 1: Kategori dari $categories (Tanpa N+1, Tanpa Jumlah jika Tidak Tersedia) --}}
+                @if(isset($categories) && count($categories) > 0)
+                    <div class="space-y-3">
+                        <h3 class="text-xs uppercase tracking-wider font-bold text-[#2B2430]/60">Kategori</h3>
+                        <div class="space-y-2 text-sm text-[#2B2430]">
+                            @foreach($categories as $category)
+                                <label class="flex items-center gap-2.5 cursor-pointer select-none">
+                                    <input type="checkbox"
+                                           value="{{ $category->id }}"
+                                           class="filter-checkbox filter-category w-4 h-4 rounded border-[#2B2430]/20 text-primary focus:ring-primary">
+                                    <span class="text-xs sm:text-sm font-medium">{{ $category->name }}</span>
+                                </label>
+                            @endforeach
+                        </div>
+                    </div>
+                @else
+                    <div class="space-y-3">
+                        <h3 class="text-xs uppercase tracking-wider font-bold text-[#2B2430]/60">Kategori</h3>
+                        <div class="space-y-2 text-sm text-[#2B2430]">
+                            <label class="flex items-center gap-2.5 cursor-pointer select-none">
+                                <input type="checkbox" value="1" class="filter-checkbox filter-category w-4 h-4 rounded border-[#2B2430]/20 text-primary focus:ring-primary">
+                                <span class="text-xs sm:text-sm font-medium">Rajut &amp; Kriya ABK</span>
+                            </label>
+                            <label class="flex items-center gap-2.5 cursor-pointer select-none">
+                                <input type="checkbox" value="2" class="filter-checkbox filter-category w-4 h-4 rounded border-[#2B2430]/20 text-primary focus:ring-primary">
+                                <span class="text-xs sm:text-sm font-medium">Pakaian Preloved</span>
+                            </label>
+                            <label class="flex items-center gap-2.5 cursor-pointer select-none">
+                                <input type="checkbox" value="3" class="filter-checkbox filter-category w-4 h-4 rounded border-[#2B2430]/20 text-primary focus:ring-primary">
+                                <span class="text-xs sm:text-sm font-medium">Buku &amp; Mainan Edukatif</span>
+                            </label>
+                            <label class="flex items-center gap-2.5 cursor-pointer select-none">
+                                <input type="checkbox" value="4" class="filter-checkbox filter-category w-4 h-4 rounded border-[#2B2430]/20 text-primary focus:ring-primary">
+                                <span class="text-xs sm:text-sm font-medium">Dekorasi &amp; Kerajinan</span>
+                            </label>
+                        </div>
+                    </div>
+                @endif
+
+                {{-- Filter Group 2: Jenis Barang (source: Karya ABK / Preloved) --}}
+                <div class="space-y-3 pt-4 border-t border-[#2B2430]/10">
+                    <h3 class="text-xs uppercase tracking-wider font-bold text-[#2B2430]/60">Jenis Barang</h3>
+                    <div class="space-y-2 text-sm text-[#2B2430]">
+                        <label class="flex items-center gap-2.5 cursor-pointer select-none">
+                            <input type="checkbox" value="karya" class="filter-checkbox filter-source w-4 h-4 rounded border-[#2B2430]/20 text-primary focus:ring-primary">
+                            <span class="text-xs sm:text-sm font-medium">Karya ABK</span>
                         </label>
-                        <label class="flex items-center justify-between cursor-pointer group">
-                            <div class="flex items-center gap-2.5">
-                                <input type="checkbox" value="preloved" class="filter-source rounded text-ink focus:ring-sun border-ink/15">
-                                <span class="group-hover:text-ink font-medium">Donasi Preloved Lolos QC</span>
-                            </div>
-                            <span class="text-ink/60 text-[11px]">96</span>
+                        <label class="flex items-center gap-2.5 cursor-pointer select-none">
+                            <input type="checkbox" value="preloved" class="filter-checkbox filter-source w-4 h-4 rounded border-[#2B2430]/20 text-primary focus:ring-primary">
+                            <span class="text-xs sm:text-sm font-medium">Preloved</span>
                         </label>
                     </div>
                 </div>
 
-                {{-- Filter Group 2: Harga Donasi --}}
-                <div class="space-y-3 pt-4 border-t border-ink/15">
-                    <h4 class="text-xs font-bold text-ink/60 uppercase tracking-wider">Harga Donasi</h4>
-                    <div class="space-y-2 text-xs text-ink/80">
-                        <label class="flex items-center gap-2.5 cursor-pointer">
-                            <input type="radio" name="price-filter" value="all" checked class="filter-price text-ink focus:ring-sun border-ink/15">
-                            <span>Semua Harga</span>
+                {{-- Filter Group 3: Kondisi (condition: baru / mulus / layak) --}}
+                <div class="space-y-3 pt-4 border-t border-[#2B2430]/10">
+                    <h3 class="text-xs uppercase tracking-wider font-bold text-[#2B2430]/60">Kondisi</h3>
+                    <div class="space-y-2 text-sm text-[#2B2430]">
+                        <label class="flex items-center gap-2.5 cursor-pointer select-none">
+                            <input type="checkbox" value="baru" class="filter-checkbox filter-condition w-4 h-4 rounded border-[#2B2430]/20 text-primary focus:ring-primary">
+                            <span class="text-xs sm:text-sm font-medium">Baru</span>
                         </label>
-                        <label class="flex items-center gap-2.5 cursor-pointer">
-                            <input type="radio" name="price-filter" value="under-30" class="filter-price text-ink focus:ring-sun border-ink/15">
-                            <span>&lt; Rp 30.000 <span class="text-[11px] text-ink/60">(Ramah Kantong)</span></span>
+                        <label class="flex items-center gap-2.5 cursor-pointer select-none">
+                            <input type="checkbox" value="mulus" class="filter-checkbox filter-condition w-4 h-4 rounded border-[#2B2430]/20 text-primary focus:ring-primary">
+                            <span class="text-xs sm:text-sm font-medium">Sangat Baik</span>
                         </label>
-                        <label class="flex items-center gap-2.5 cursor-pointer">
-                            <input type="radio" name="price-filter" value="30-75" class="filter-price text-ink focus:ring-sun border-ink/15">
-                            <span>Rp 30.000 – Rp 75.000</span>
-                        </label>
-                        <label class="flex items-center gap-2.5 cursor-pointer">
-                            <input type="radio" name="price-filter" value="over-75" class="filter-price text-ink focus:ring-sun border-ink/15">
-                            <span>&gt; Rp 75.000</span>
+                        <label class="flex items-center gap-2.5 cursor-pointer select-none">
+                            <input type="checkbox" value="layak" class="filter-checkbox filter-condition w-4 h-4 rounded border-[#2B2430]/20 text-primary focus:ring-primary">
+                            <span class="text-xs sm:text-sm font-medium">Baik</span>
                         </label>
                     </div>
                 </div>
 
-                {{-- Filter Group 3: Tingkat Kondisi --}}
-                <div class="space-y-3 pt-4 border-t border-ink/15">
-                    <h4 class="text-xs font-bold text-ink/60 uppercase tracking-wider">Tingkat Kondisi</h4>
-                    <div class="space-y-2 text-xs text-ink/80">
-                        <label class="flex items-center gap-2.5 cursor-pointer">
-                            <input type="checkbox" value="baru" class="filter-condition rounded text-ink focus:ring-sun border-ink/15">
-                            <span>Baru (Prakarya &amp; Vokasi)</span>
-                        </label>
-                        <label class="flex items-center gap-2.5 cursor-pointer">
-                            <input type="checkbox" value="mulus" class="filter-condition rounded text-ink focus:ring-sun border-ink/15">
-                            <span>Preloved Sangat Mulus (95–99%)</span>
-                        </label>
-                        <label class="flex items-center gap-2.5 cursor-pointer">
-                            <input type="checkbox" value="layak" class="filter-condition rounded text-ink focus:ring-sun border-ink/15">
-                            <span>Preloved Baik &amp; Layak (90%)</span>
-                        </label>
+                {{-- Filter Group 4: Rentang Harga Min / Maks --}}
+                <div class="space-y-3 pt-4 border-t border-[#2B2430]/10">
+                    <h3 class="text-xs uppercase tracking-wider font-bold text-[#2B2430]/60">Rentang Harga</h3>
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                        <div>
+                            <label class="block text-[11px] text-[#2B2430]/60 mb-1">Min (Rp)</label>
+                            <input type="number"
+                                   id="price-min"
+                                   placeholder="0"
+                                   min="0"
+                                   step="5000"
+                                   class="w-full px-2.5 py-1.5 rounded-[6px] border border-[#2B2430]/20 text-xs text-[#2B2430] focus:outline-none focus:ring-1 focus:ring-primary">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] text-[#2B2430]/60 mb-1">Maks (Rp)</label>
+                            <input type="number"
+                                   id="price-max"
+                                   placeholder="150000"
+                                   min="0"
+                                   step="5000"
+                                   class="w-full px-2.5 py-1.5 rounded-[6px] border border-[#2B2430]/20 text-xs text-[#2B2430] focus:outline-none focus:ring-1 focus:ring-primary">
+                        </div>
                     </div>
                 </div>
 
-                {{-- Filter Group 4: Ketersediaan --}}
-                <div class="space-y-3 pt-4 border-t border-ink/15">
-                    <h4 class="text-xs font-bold text-ink/60 uppercase tracking-wider">Ketersediaan</h4>
-                    <div class="grid grid-cols-2 gap-2 text-xs font-semibold">
-                        <button type="button" class="py-2 px-3 rounded-xl bg-butter text-ink border border-ink/15">
-                            Tersedia Saja
-                        </button>
-                        <button type="button" class="py-2 px-3 rounded-xl bg-cream text-ink/80 hover:bg-cream border border-ink/15">
-                            Termasuk Terjual
-                        </button>
-                    </div>
+                {{-- Tombol Terapkan & Reset --}}
+                <div class="pt-4 space-y-2 border-t border-[#2B2430]/10">
+                    <button type="button"
+                            id="sidebar-apply-btn"
+                            class="w-full h-10 flex items-center justify-center rounded-[8px] bg-primary hover:bg-primary/90 text-white font-semibold text-sm transition-all shadow-xs active:scale-95">
+                        Terapkan Filter
+                    </button>
+                    <button type="button"
+                            id="sidebar-clear-btn"
+                            class="w-full h-10 flex items-center justify-center rounded-[8px] border border-[#2B2430]/20 text-[#2B2430] hover:bg-stone-50 font-semibold text-sm transition-all">
+                        Reset Pilihan
+                    </button>
                 </div>
-
-                {{-- Callout Box: Punya Barang Bagus Tak Terpakai? --}}
-                <div class="rounded-2xl p-4 bg-butter border border-ink/15 space-y-2.5 text-xs">
-                    <div class="w-8 h-8 rounded-lg bg-butter text-ink flex items-center justify-center font-bold">
-                        📦
-                    </div>
-                    <h5 class="font-bold text-ink leading-tight">Punya barang bagus tak terpakai?</h5>
-                    <p class="text-ink/80 leading-relaxed text-[11px]">
-                        Donasikan pakaian, buku anak, atau mainan edukatif Anda ke Kios Mandiri. Kami cuci, kurasi, dan jadikan dana pemberdayaan anak istimewa.
-                    </p>
-                    <a href="{{ url('/#donasi-sekarang') }}" class="font-semibold text-ink hover:text-ink transition-colors inline-flex items-center gap-1 text-[11px]">
-                        <span>Kirim Donasi Barang Sekarang</span>
-                        <span>&rarr;</span>
-                    </a>
-                </div>
-
             </aside>
 
-
             {{-- ----------------------------------------------------
-                 RIGHT COLUMN: PRODUCT CATALOG GRID
+                 MAIN CATALOG AREA
                  ---------------------------------------------------- --}}
-            <main class="lg:col-span-9 space-y-6">
+            <main class="flex-grow w-full space-y-6">
 
-                {{-- Top Counter & Sorting Bar --}}
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
-                    <div class="text-xs text-ink/80">
-                        <span class="font-bold text-ink">Menampilkan {{ isset($products) ? $products->count() : 6 }} barang</span>
-                        <span class="text-ink/20 mx-2">•</span>
-                        <span>Kurasi Terkini</span>
+                {{-- Toolbar: Penghitung Produk + Urutkan + Chip Filter Aktif --}}
+                <div class="space-y-3 pb-2 border-b border-[#2B2430]/10">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        {{-- Text Status Menampilkan X dari Y produk --}}
+                        <p class="text-sm text-[#2B2430]/80 font-medium">
+                            Menampilkan <span id="visible-count" class="font-bold text-[#2B2430]">{{ count($productList) }}</span> dari <span id="total-count" class="font-bold text-[#2B2430]">{{ count($productList) }}</span> produk pilihan
+                        </p>
+
+                        {{-- Dropdown Urutkan --}}
+                        <div class="flex items-center gap-2 self-start sm:self-auto">
+                            <label for="catalog-sort" class="text-xs font-semibold text-[#2B2430]/70 shrink-0">
+                                Urutkan:
+                            </label>
+                            <select id="catalog-sort"
+                                    class="px-3 py-1.5 rounded-[8px] bg-white border border-[#2B2430]/20 text-xs font-semibold text-[#2B2430] focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer">
+                                <option value="terbaru">Terbaru</option>
+                                <option value="termurah">Harga Terendah</option>
+                                <option value="termahal">Harga Tertinggi</option>
+                            </select>
+                        </div>
                     </div>
 
-                    <div class="flex items-center gap-2 text-xs">
-                        <label for="catalog-sort" class="text-ink/60 font-medium">Urutkan:</label>
-                        <select id="catalog-sort" class="px-3 py-1.5 rounded-xl border border-ink/15 bg-white text-ink text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-sun">
-                            <option value="unggulan">Karya Unggulan ABK</option>
-                            <option value="termurah">Harga Terendah</option>
-                            <option value="termahal">Harga Tertinggi</option>
-                            <option value="terbaru">Terbaru Ditambahkan</option>
-                        </select>
+                    {{-- Chip Filter Aktif yang Bisa Dihapus --}}
+                    <div id="active-chips-container" class="hidden flex-wrap items-center gap-2 pt-1 text-xs">
+                        <span class="text-[11px] text-[#2B2430]/60 font-medium">Filter aktif:</span>
+                        <div id="active-chips-list" class="flex flex-wrap items-center gap-2"></div>
+                        <button type="button" id="clear-all-chips-btn" class="text-xs text-primary font-semibold hover:underline ml-1">
+                            Hapus Semua
+                        </button>
                     </div>
                 </div>
 
-                {{-- Product Cards Grid (FR-03) --}}
-                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6" id="catalog-items-grid">
-
-                    @if(isset($products) && $products->count() > 0)
-                        @foreach($products as $product)
-                            <div class="catalog-card bg-white rounded-3xl border border-ink/15 overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between group"
-                                 data-category="{{ $product->category?->slug ?? 'karya-abk' }}"
-                                 data-source="{{ $product->source ?? 'karya' }}"
-                                 data-price="{{ (int) $product->price }}"
-                                 data-condition="{{ $product->condition ?? 'baru' }}">
-
-                                <div>
-                                    {{-- Image Container --}}
-                                    <div class="relative aspect-[4/3] bg-cream overflow-hidden">
-                                        <img src="{{ asset($product->image ?: 'images/tote-bag.jpg') }}"
-                                             alt="{{ $product->name }}"
-                                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                             loading="lazy">
-
-                                        {{-- Source Tag --}}
-                                        <div class="absolute top-3 left-3 flex flex-wrap gap-1.5">
-                                            @if($product->source === 'karya')
-                                                <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-sun text-ink shadow-xs">
-                                                    🎨 Karya ABK
-                                                </span>
-                                            @else
-                                                <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-white/90 text-ink backdrop-blur-xs shadow-xs border border-ink/10">
-                                                    ♻️ Preloved
-                                                </span>
-                                            @endif
-
-                                            @if($product->is_featured)
-                                                <span class="px-2 py-1 rounded-full text-[10px] font-bold bg-amber-500 text-white shadow-xs">
-                                                    ⭐ Unggulan
-                                                </span>
-                                            @endif
-                                        </div>
-
-                                        {{-- Stock Status Badge (FR-03) --}}
-                                        <div class="absolute bottom-3 left-3">
-                                            @if($product->stock <= 0 || $product->status === 'empty')
-                                                <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-rose-600 text-white shadow-xs">
-                                                    Stok Habis
-                                                </span>
-                                            @elseif($product->stock <= 3 || $product->status === 'minimal_stock')
-                                                <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-600 text-white shadow-xs">
-                                                    Sisa {{ $product->stock }} pcs
-                                                </span>
-                                            @else
-                                                <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-600 text-white shadow-xs">
-                                                    Ready Stock
-                                                </span>
-                                            @endif
-                                        </div>
-                                    </div>
-
-                                    {{-- Card Body --}}
-                                    <div class="p-5 space-y-3">
-                                        <div class="space-y-1">
-                                            <span class="text-[10px] uppercase font-bold tracking-wider text-ink/50 block">
-                                                {{ $product->category?->name ?? 'Kategori Umum' }}
-                                            </span>
-                                            <h3 class="font-heading text-base font-bold text-ink group-hover:text-ink/80 transition-colors line-clamp-1" title="{{ $product->name }}">
-                                                {{ $product->name }}
-                                            </h3>
-                                            <p class="text-xs text-ink/70 line-clamp-2 leading-relaxed">
-                                                {{ $product->description ?: 'Barang kurasi berkualitas untuk mendukung beasiswa kemandirian anak berkebutuhan khusus.' }}
-                                            </p>
-                                        </div>
-
-                                        {{-- Meta: Artisan / Condition --}}
-                                        <div class="flex items-center gap-2 pt-1 text-[11px] text-ink/60">
-                                            <span>Kondisi: <strong class="text-ink capitalize">{{ $product->condition ?? 'mulus' }}</strong></span>
-                                            <span>•</span>
-                                            <span class="truncate">{{ $product->artisan_name ?: 'YPKABK' }}</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {{-- Card Footer & Actions (FR-03 / FR-06) --}}
-                                <div class="px-5 pb-5 pt-2 border-t border-ink/15 space-y-3">
-                                    <div class="flex items-center justify-between">
-                                        <div>
-                                            <span class="text-[10px] uppercase text-ink/60 font-semibold block">Harga Donasi</span>
-                                            <span class="text-base font-extrabold text-ink">Rp {{ number_format($product->price, 0, ',', '.') }}</span>
-                                        </div>
-                                        <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-cream text-ink">
-                                            +100% Dana Terapi
-                                        </span>
-                                    </div>
-
-                                    <div class="grid grid-cols-2 gap-2 text-xs font-semibold">
-                                        <button type="button" onclick="addToCart('{{ addslashes($product->name) }}')" class="py-2.5 px-3 rounded-xl bg-butter text-ink hover:bg-butter/80 border border-ink/15 transition-colors flex items-center justify-center gap-1.5">
-                                            <span>🛒</span> Keranjang
-                                        </button>
-                                        <button type="button" onclick="openOrderModal('{{ addslashes($product->name) }}', '{{ number_format($product->price, 0, ',', '.') }}', {{ $product->id }})" class="py-2.5 px-3 rounded-xl bg-sun text-ink hover:bg-sun/90 shadow-xs transition-colors flex items-center justify-center gap-1.5">
-                                            <span>⚡</span> Beli Sekarang
-                                        </button>
-                                    </div>
-                                </div>
-
-                            </div>
-                        @endforeach
-                    @else
-
-                    {{-- Item 1: Tote Bag --}}
-                    <div class="catalog-card bg-white rounded-3xl border border-ink/15 overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between group"
-                         data-category="karya-abk"
-                         data-source="karya"
-                         data-price="45000"
-                         data-condition="baru">
-                        
-                        <div>
-                            {{-- Image Container --}}
-                            <div class="relative aspect-[4/3] bg-cream overflow-hidden">
-                                {{-- TODO: ganti foto produk asli --}}
-                                <img src="{{ asset('images/tote-bag.jpg') }}" 
-                                     alt="Tote Bag Kanvas Lukis Pelangi" 
-                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                                
-                                <div class="absolute top-3 left-3">
-                                    <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-sun text-ink shadow-xs flex items-center gap-1">
-                                        <span>🎨</span> Karya Vokasi ABK
-                                    </span>
-                                </div>
-                                <div class="absolute top-3 right-3">
-                                    <span class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-white/90 backdrop-blur-xs text-ink/80 border border-ink/15">
-                                        Stok: 3 pcs
-                                    </span>
-                                </div>
-                            </div>
-
-                            {{-- Card Body --}}
-                            <div class="p-5 space-y-3">
-                                <p class="text-[11px] font-semibold text-ink/60 flex items-center gap-1">
-                                    <span>✍️</span> Dibuat oleh Tim Vokasional Siswa YPKABK
-                                </p>
-                                <h3 class="text-base font-bold text-ink leading-snug line-clamp-1">
-                                    Tote Bag Kanvas Lukis Pelangi Harapan
-                                </h3>
-                                <p class="text-xs text-ink/60 line-clamp-2 leading-relaxed">
-                                    Totebag katun tebal ukuran 36x40cm, dilukis manual dengan cat akrilik ramah lingkungan. Dilengkapi furing blacu lembut.
-                                </p>
-
-                                {{-- Feature Badges --}}
-                                <div class="flex flex-wrap gap-1.5 pt-1">
-                                    <span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-cream text-ink/80">
-                                        100% Baru
-                                    </span>
-                                    <span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-cream text-ink/80">
-                                        Bahan Tebal
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {{-- Card Footer & Actions --}}
-                        <div class="px-5 pb-5 pt-2 border-t border-ink/15 space-y-3">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <span class="text-[10px] uppercase text-ink/60 font-semibold block">Harga Donasi</span>
-                                    <span class="text-base font-extrabold text-ink">Rp 45.000</span>
-                                </div>
-                                <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-cream text-ink">
-                                    +100% Dana Terapi
-                                </span>
-                            </div>
-
-                            <div class="grid grid-cols-2 gap-2 text-xs font-semibold">
-                                <button type="button" onclick="addToCart('Tote Bag Kanvas Lukis Pelangi Harapan')" class="py-2.5 px-3 rounded-xl bg-butter text-ink hover:bg-butter border border-ink/15 transition-colors flex items-center justify-center gap-1.5">
-                                    <span>🛒</span> Keranjang
-                                </button>
-                                <a href="https://wa.me/6281234567890?text=Halo%20Admin%20Kios%20Mandiri,%20saya%20mau%20pesan%20Tote%20Bag%20Kanvas%20Lukis%20Pelangi%20(Rp%2045.000)" target="_blank" rel="noopener noreferrer" class="py-2.5 px-3 rounded-xl bg-sun text-ink hover:bg-sun text-ink text-white shadow-xs transition-colors flex items-center justify-center gap-1.5">
-                                    <span>⚡</span> Beli via WA
-                                </a>
-                            </div>
-                        </div>
-
-                    </div>
-
-
-                    {{-- Item 2: Buku Cerita --}}
-                    <div class="catalog-card bg-white rounded-3xl border border-ink/15 overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between group"
-                         data-category="buku-mainan"
-                         data-source="preloved"
-                         data-price="35000"
-                         data-condition="mulus">
-                        
-                        <div>
-                            {{-- Image Container --}}
-                            <div class="relative aspect-[4/3] bg-cream overflow-hidden">
-                                {{-- TODO: ganti foto produk asli --}}
-                                <img src="{{ asset('images/books.jpg') }}" 
-                                     alt="Buku Cerita Bergambar Sahabat Rimba" 
-                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                                
-                                <div class="absolute top-3 left-3">
-                                    <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-butter0 text-white shadow-xs flex items-center gap-1">
-                                        <span>📖</span> Preloved 98%
-                                    </span>
-                                </div>
-                                <div class="absolute top-3 right-3">
-                                    <span class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-white/90 backdrop-blur-xs text-ink border border-ink/15">
-                                        1 pcs (Rare)
-                                    </span>
-                                </div>
-                            </div>
-
-                            {{-- Card Body --}}
-                            <div class="p-5 space-y-3">
-                                <p class="text-[11px] font-semibold text-ink/60 flex items-center gap-1">
-                                    <span>💙</span> Donasi dari Kak Arini – Sidoarjo
-                                </p>
-                                <h3 class="text-base font-bold text-ink leading-snug line-clamp-1">
-                                    Buku Cerita Bergambar: Petualangan Rimba
-                                </h3>
-                                <p class="text-xs text-ink/60 line-clamp-2 leading-relaxed">
-                                    Bilingual Indonesia-Inggris. Kertas tebal glossy, kondisi prima tanpa coretan. Sangat mendidik untuk batita &amp; balita.
-                                </p>
-
-                                {{-- Feature Badges --}}
-                                <div class="flex flex-wrap gap-1.5 pt-1">
-                                    <span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-cream text-ink/80">
-                                        QC Lolos
-                                    </span>
-                                    <span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-cream text-ink/80">
-                                        Hardcover
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {{-- Card Footer & Actions --}}
-                        <div class="px-5 pb-5 pt-2 border-t border-ink/15 space-y-3">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <span class="text-[10px] uppercase text-ink/60 font-semibold block">Harga Donasi</span>
-                                    <div class="flex items-baseline gap-2">
-                                        <span class="text-base font-extrabold text-ink">Rp 35.000</span>
-                                        <span class="text-xs text-ink/60 line-through">Rp 85.000</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="grid grid-cols-2 gap-2 text-xs font-semibold">
-                                <button type="button" onclick="addToCart('Buku Cerita Bergambar Rimba')" class="py-2.5 px-3 rounded-xl bg-butter text-ink hover:bg-butter border border-ink/15 transition-colors flex items-center justify-center gap-1.5">
-                                    <span>🛒</span> Keranjang
-                                </button>
-                                <a href="https://wa.me/6281234567890?text=Halo%20Admin%20Kios%20Mandiri,%20saya%20mau%20pesan%20Buku%20Cerita%20Bergambar%20(Rp%2035.000)" target="_blank" rel="noopener noreferrer" class="py-2.5 px-3 rounded-xl bg-sun text-ink hover:bg-sun text-ink text-white shadow-xs transition-colors flex items-center justify-center gap-1.5">
-                                    <span>⚡</span> Beli via WA
-                                </a>
-                            </div>
-                        </div>
-
-                    </div>
-
-
-                    {{-- Item 3: Jaket Mustard --}}
-                    <div class="catalog-card bg-white rounded-3xl border border-ink/15 overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between group"
-                         data-category="pakaian"
-                         data-source="preloved"
-                         data-price="55000"
-                         data-condition="mulus">
-                        
-                        <div>
-                            {{-- Image Container --}}
-                            <div class="relative aspect-[4/3] bg-cream overflow-hidden flex items-center justify-center">
-                                {{-- TODO: ganti foto produk asli --}}
-                                <img src="{{ asset('images/denim-jacket.jpg') }}" 
-                                     alt="Jaket Parka Anak Mustard Warm" 
-                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                                
-                                <div class="absolute top-3 left-3">
-                                    <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-butter0 text-white shadow-xs flex items-center gap-1">
-                                        <span>👕</span> Preloved 95%
-                                    </span>
-                                </div>
-                                <div class="absolute top-3 right-3">
-                                    <span class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-white/90 backdrop-blur-xs text-ink/80 border border-ink/15">
-                                        1 pcs (Size 6–8 thn)
-                                    </span>
-                                </div>
-                            </div>
-
-                            {{-- Card Body --}}
-                            <div class="p-5 space-y-3">
-                                <p class="text-[11px] font-semibold text-ink/60 flex items-center gap-1">
-                                    <span>💙</span> Donasi dari Ibu Maya – Sidoarjo
-                                </p>
-                                <h3 class="text-base font-bold text-ink leading-snug line-clamp-1">
-                                    Jaket Parka Anak Mustard Warm
-                                </h3>
-                                <p class="text-xs text-ink/60 line-clamp-2 leading-relaxed">
-                                    Bahan katun twill tebal &amp; berfuring halus. Bersih harum, resleting lancar, tidak ada noda atau robek.
-                                </p>
-
-                                {{-- Feature Badges --}}
-                                <div class="flex flex-wrap gap-1.5 pt-1">
-                                    <span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-cream text-ink/80">
-                                        Laundry Higienis
-                                    </span>
-                                    <span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-cream text-ink/80">
-                                        Unisex
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {{-- Card Footer & Actions --}}
-                        <div class="px-5 pb-5 pt-2 border-t border-ink/15 space-y-3">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <span class="text-[10px] uppercase text-ink/60 font-semibold block">Harga Donasi</span>
-                                    <div class="flex items-baseline gap-2">
-                                        <span class="text-base font-extrabold text-ink">Rp 55.000</span>
-                                        <span class="text-xs text-ink/60 line-through">Rp 179.000</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="grid grid-cols-2 gap-2 text-xs font-semibold">
-                                <button type="button" onclick="addToCart('Jaket Parka Anak Mustard')" class="py-2.5 px-3 rounded-xl bg-butter text-ink hover:bg-butter border border-ink/15 transition-colors flex items-center justify-center gap-1.5">
-                                    <span>🛒</span> Keranjang
-                                </button>
-                                <a href="https://wa.me/6281234567890?text=Halo%20Admin%20Kios%20Mandiri,%20saya%20mau%20pesan%20Jaket%20Parka%20Mustard%20(Rp%2055.000)" target="_blank" rel="noopener noreferrer" class="py-2.5 px-3 rounded-xl bg-sun text-ink hover:bg-sun text-ink text-white shadow-xs transition-colors flex items-center justify-center gap-1.5">
-                                    <span>⚡</span> Beli via WA
-                                </a>
-                            </div>
-                        </div>
-
-                    </div>
-
-
-                    {{-- Item 4: Set Tatakan Cangkir --}}
-                    <div class="catalog-card bg-white rounded-3xl border border-ink/15 overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between group"
-                         data-category="karya-abk"
-                         data-source="karya"
-                         data-price="28000"
-                         data-condition="baru">
-                        
-                        <div>
-                            {{-- Image Container --}}
-                            <div class="relative aspect-[4/3] bg-cream overflow-hidden flex items-center justify-center p-4">
-                                <div class="flex items-center justify-center gap-3">
-                                    <div class="w-20 h-20 rounded-full bg-orange-200 border-4 border-ink/15 flex flex-col items-center justify-center shadow-md">
-                                        <span class="text-2xl">☀️</span>
-                                        <span class="text-[9px] font-bold text-ink">Gerabah</span>
-                                    </div>
-                                    <div class="w-20 h-20 rounded-full bg-emerald-100 border-4 border-emerald-300 flex flex-col items-center justify-center shadow-md">
-                                        <span class="text-2xl">🌿</span>
-                                        <span class="text-[9px] font-bold text-emerald-900">Lukis</span>
-                                    </div>
-                                </div>
-                                
-                                <div class="absolute top-3 left-3">
-                                    <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-sun text-ink shadow-xs flex items-center gap-1">
-                                        <span>🎨</span> Karya Siswa ABK
-                                    </span>
-                                </div>
-                                <div class="absolute top-3 right-3">
-                                    <span class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-white/90 backdrop-blur-xs text-ink/80 border border-ink/15">
-                                        Stok: 5 set
-                                    </span>
-                                </div>
-                            </div>
-
-                            {{-- Card Body --}}
-                            <div class="p-5 space-y-3">
-                                <p class="text-[11px] font-semibold text-ink/60 flex items-center gap-1">
-                                    <span>✍️</span> Kelas Kerajinan Tangan YPKABK
-                                </p>
-                                <h3 class="text-base font-bold text-ink leading-snug line-clamp-1">
-                                    Set Tatakan Cangkir Lukis Gerabah
-                                </h3>
-                                <p class="text-xs text-ink/60 line-clamp-2 leading-relaxed">
-                                    Tatakan gerabah terra cotta dilapisi pernis anti-air. Mempercantik meja kerja sekaligus menyerap embun gelas.
-                                </p>
-
-                                {{-- Feature Badges --}}
-                                <div class="flex flex-wrap gap-1.5 pt-1">
-                                    <span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-cream text-ink/80">
-                                        Anti Air
-                                    </span>
-                                    <span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-cream text-ink/80">
-                                        Handmade
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {{-- Card Footer & Actions --}}
-                        <div class="px-5 pb-5 pt-2 border-t border-ink/15 space-y-3">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <span class="text-[10px] uppercase text-ink/60 font-semibold block">Harga Donasi</span>
-                                    <span class="text-base font-extrabold text-ink">Rp 28.000</span>
-                                </div>
-                                <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-butter text-ink">
-                                    Best Seller
-                                </span>
-                            </div>
-
-                            <div class="grid grid-cols-2 gap-2 text-xs font-semibold">
-                                <button type="button" onclick="addToCart('Set Tatakan Cangkir Lukis Gerabah')" class="py-2.5 px-3 rounded-xl bg-butter text-ink hover:bg-butter border border-ink/15 transition-colors flex items-center justify-center gap-1.5">
-                                    <span>🛒</span> Keranjang
-                                </button>
-                                <a href="https://wa.me/6281234567890?text=Halo%20Admin%20Kios%20Mandiri,%20saya%20mau%20pesan%20Set%20Tatakan%20Cangkir%20(Rp%2028.000)" target="_blank" rel="noopener noreferrer" class="py-2.5 px-3 rounded-xl bg-sun text-ink hover:bg-sun text-ink text-white shadow-xs transition-colors flex items-center justify-center gap-1.5">
-                                    <span>⚡</span> Beli via WA
-                                </a>
-                            </div>
-                        </div>
-
-                    </div>
-
-
-                    {{-- Item 5: Wooden Montessori --}}
-                    <div class="catalog-card bg-white rounded-3xl border border-ink/15 overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between group"
-                         data-category="buku-mainan"
-                         data-source="preloved"
-                         data-price="42000"
-                         data-condition="mulus">
-                        
-                        <div>
-                            {{-- Image Container --}}
-                            <div class="relative aspect-[4/3] bg-cream overflow-hidden">
-                                {{-- TODO: ganti foto produk asli --}}
-                                <img src="{{ asset('images/balance-board.jpg') }}" 
-                                     alt="Wooden Montessori Stacking Tower" 
-                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                                
-                                <div class="absolute top-3 left-3">
-                                    <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-butter0 text-white shadow-xs flex items-center gap-1">
-                                        <span>🪵</span> Preloved 95%
-                                    </span>
-                                </div>
-                                <div class="absolute top-3 right-3">
-                                    <span class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-white/90 backdrop-blur-xs text-ink/80 border border-ink/15">
-                                        1 unit (Lengkap)
-                                    </span>
-                                </div>
-                            </div>
-
-                            {{-- Card Body --}}
-                            <div class="p-5 space-y-3">
-                                <p class="text-[11px] font-semibold text-ink/60 flex items-center gap-1">
-                                    <span>💙</span> Donasi dari Keluarga Bpk. Doni – Malang
-                                </p>
-                                <h3 class="text-base font-bold text-ink leading-snug line-clamp-1">
-                                    Wooden Montessori Stacking Tower
-                                </h3>
-                                <p class="text-xs text-ink/60 line-clamp-2 leading-relaxed">
-                                    Kayu halus tanpa serpihan, cat non-toxic waterbased aman untuk batita. Melatih koordinasi motorik &amp; kognitif.
-                                </p>
-
-                                {{-- Feature Badges --}}
-                                <div class="flex flex-wrap gap-1.5 pt-1">
-                                    <span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-cream text-ink/80">
-                                        Komplit 16 Balok
-                                    </span>
-                                    <span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-cream text-ink/80">
-                                        Desinfeksi UV
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {{-- Card Footer & Actions --}}
-                        <div class="px-5 pb-5 pt-2 border-t border-ink/15 space-y-3">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <span class="text-[10px] uppercase text-ink/60 font-semibold block">Harga Donasi</span>
-                                    <div class="flex items-baseline gap-2">
-                                        <span class="text-base font-extrabold text-ink">Rp 42.000</span>
-                                        <span class="text-xs text-ink/60 line-through">Rp 120.000</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="grid grid-cols-2 gap-2 text-xs font-semibold">
-                                <button type="button" onclick="addToCart('Wooden Montessori Stacking Tower')" class="py-2.5 px-3 rounded-xl bg-butter text-ink hover:bg-butter border border-ink/15 transition-colors flex items-center justify-center gap-1.5">
-                                    <span>🛒</span> Keranjang
-                                </button>
-                                <a href="https://wa.me/6281234567890?text=Halo%20Admin%20Kios%20Mandiri,%20saya%20mau%20pesan%20Wooden%20Montessori%20(Rp%2042.000)" target="_blank" rel="noopener noreferrer" class="py-2.5 px-3 rounded-xl bg-sun text-ink hover:bg-sun text-ink text-white shadow-xs transition-colors flex items-center justify-center gap-1.5">
-                                    <span>⚡</span> Beli via WA
-                                </a>
-                            </div>
-                        </div>
-
-                    </div>
-
-
-                    {{-- Item 6: Hiasan Makrame --}}
-                    <div class="catalog-card bg-white rounded-3xl border border-ink/15 overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between group"
-                         data-category="dekorasi"
-                         data-source="preloved"
-                         data-price="65000"
-                         data-condition="mulus">
-                        
-                        <div>
-                            {{-- Image Container --}}
-                            <div class="relative aspect-[4/3] bg-cream overflow-hidden flex items-center justify-center">
-                                {{-- TODO: ganti foto produk asli --}}
-                                <img src="{{ asset('images/crochet-bunny.jpg') }}" 
-                                     alt="Hiasan Dinding Makrame Bohemian" 
-                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                                
-                                <div class="absolute top-3 left-3">
-                                    <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-butter0 text-white shadow-xs flex items-center gap-1">
-                                        <span>🧵</span> Preloved 97%
-                                    </span>
-                                </div>
-                                <div class="absolute top-3 right-3">
-                                    <span class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-white/90 backdrop-blur-xs text-ink border border-ink/15">
-                                        1 pcs Tersedia
-                                    </span>
-                                </div>
-                            </div>
-
-                            {{-- Card Body --}}
-                            <div class="p-5 space-y-3">
-                                <p class="text-[11px] font-semibold text-ink/60 flex items-center gap-1">
-                                    <span>💙</span> Donasi dari Ibu Laras – Bandung
-                                </p>
-                                <h3 class="text-base font-bold text-ink leading-snug line-clamp-1">
-                                    Hiasan Dinding Makrame Bohemian
-                                </h3>
-                                <p class="text-xs text-ink/60 line-clamp-2 leading-relaxed">
-                                    Tali katun premium warna broken white, kayu gantungan jati belanda halus. Estetik untuk ruang tamu atau kamar anak.
-                                </p>
-
-                                {{-- Feature Badges --}}
-                                <div class="flex flex-wrap gap-1.5 pt-1">
-                                    <span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-cream text-ink/80">
-                                        Dekorasi Unik
-                                    </span>
-                                    <span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-cream text-ink/80">
-                                        Sudah Dicuci
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {{-- Card Footer & Actions --}}
-                        <div class="px-5 pb-5 pt-2 border-t border-ink/15 space-y-3">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <span class="text-[10px] uppercase text-ink/60 font-semibold block">Harga Donasi</span>
-                                    <div class="flex items-baseline gap-2">
-                                        <span class="text-base font-extrabold text-ink">Rp 65.000</span>
-                                        <span class="text-xs text-ink/60 line-through">Rp 160.000</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="grid grid-cols-2 gap-2 text-xs font-semibold">
-                                <button type="button" onclick="addToCart('Hiasan Dinding Makrame Bohemian')" class="py-2.5 px-3 rounded-xl bg-butter text-ink hover:bg-butter border border-ink/15 transition-colors flex items-center justify-center gap-1.5">
-                                    <span>🛒</span> Keranjang
-                                </button>
-                                <a href="https://wa.me/6281234567890?text=Halo%20Admin%20Kios%20Mandiri,%20saya%20mau%20pesan%20Makrame%20Bohemian%20(Rp%2065.000)" target="_blank" rel="noopener noreferrer" class="py-2.5 px-3 rounded-xl bg-sun text-ink hover:bg-sun text-ink text-white shadow-xs transition-colors flex items-center justify-center gap-1.5">
-                                    <span>⚡</span> Beli via WA
-                                </a>
-                            </div>
-                        </div>
-
-                    </div>
-
-                    @endif
+                {{-- Grid Produk (3 Kolom Desktop, 2 Tablet, 1-2 Mobile) --}}
+                <div id="catalog-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    @foreach($productList as $item)
+                        @php
+                            $itemId = is_array($item) ? ($item['id'] ?? '') : $item->id;
+                            $itemName = is_array($item) ? ($item['name'] ?? $item['title'] ?? '') : $item->name;
+                            $itemCategory = is_array($item) ? ($item['category_id'] ?? '') : ($item->category_id ?? '');
+                            $itemSource = is_array($item) ? ($item['source'] ?? '') : ($item->source ?? '');
+                            $itemCondition = is_array($item) ? ($item['condition'] ?? '') : ($item->condition ?? '');
+                            $itemPrice = (float)(is_array($item) ? ($item['price'] ?? 0) : $item->price);
+                            $itemDate = is_array($item) ? ($item['id'] ?? 0) : ($item->id ?? 0);
+                        @endphp
+                        <x-product-card
+                            :product="$item"
+                            button-label="Pilih Produk"
+                            class="catalog-item"
+                            data-id="{{ $itemId }}"
+                            data-name="{{ strtolower($itemName) }}"
+                            data-category="{{ $itemCategory }}"
+                            data-source="{{ $itemSource }}"
+                            data-condition="{{ $itemCondition }}"
+                            data-price="{{ $itemPrice }}"
+                            data-order="{{ $itemDate }}"
+                        />
+                    @endforeach
                 </div>
 
-                {{-- Pagination Row --}}
-                <div class="pt-8 border-t border-ink/15 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-ink/60">
-                    <div>
-                        Menampilkan 6 barang aktif dari total 128 barang terkurasi minggu ini.
+                {{-- Kondisi Nyata: Produk Tidak Ditemukan Saat Filter Kosong --}}
+                <div id="no-products-found" class="hidden py-16 px-6 text-center space-y-4 bg-white rounded-[12px] border border-[#2B2430]/10 shadow-xs">
+                    <div class="w-12 h-12 mx-auto rounded-full bg-[#FDEEF4] text-primary flex items-center justify-center">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
                     </div>
-                    <div class="flex items-center gap-1 font-semibold">
-                        <button type="button" class="px-3 py-1.5 rounded-lg border border-ink/15 hover:bg-cream text-ink/60 cursor-not-allowed" disabled>
-                            Sebelumnya
-                        </button>
-                        <button type="button" class="w-8 h-8 rounded-lg bg-sun text-ink font-bold shadow-xs">
-                            1
-                        </button>
-                        <button type="button" class="w-8 h-8 rounded-lg border border-ink/15 hover:bg-cream text-ink/80">
-                            2
-                        </button>
-                        <button type="button" class="w-8 h-8 rounded-lg border border-ink/15 hover:bg-cream text-ink/80">
-                            3
-                        </button>
-                        <button type="button" class="px-3 py-1.5 rounded-lg border border-ink/15 hover:bg-cream text-ink font-bold">
-                            Berikutnya
+                    <h3 class="text-lg sm:text-xl font-bold text-[#2B2430]">
+                        Produk tidak ditemukan
+                    </h3>
+                    <p class="text-xs sm:text-sm text-[#2B2430]/70 max-w-md mx-auto leading-relaxed">
+                        Tidak ada produk yang cocok dengan kombinasi filter yang dipilih. Silakan sesuaikan kriteria atau atur ulang filter Anda.
+                    </p>
+                    <div class="pt-2">
+                        <button type="button"
+                                id="empty-state-reset-btn"
+                                class="inline-flex items-center justify-center px-6 h-10 rounded-[8px] bg-primary hover:bg-primary/90 text-white font-semibold text-sm transition-all shadow-xs active:scale-95">
+                            Reset Filter
                         </button>
                     </div>
                 </div>
 
             </main>
-
         </div>
-    </section>
+    </div>
+</section>
 
-
-    {{-- ========================================================
-         BOTTOM SECTION: STANDAR HIGIENITAS & PENGEMASAN
-         ======================================================== --}}
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
-        
-        {{-- Section Header --}}
-        <div class="text-center max-w-3xl mx-auto space-y-3 mb-10">
-            <span class="inline-block px-3 py-1 rounded-full text-xs font-bold tracking-wider uppercase bg-butter text-ink">
-                STANDAR HIGIENITAS &amp; PENGEMASAN
-            </span>
-            <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-ink tracking-tight">
-                Belanja Nyaman, Hati Tenang, Berdampak Nyata
-            </h2>
-            <p class="text-ink/80 text-sm leading-relaxed">
-                Semua produk preloved maupun karya kerajinan melalui proses seleksi ketat sebelum sampai di tangan Anda.
-            </p>
+{{-- ----------------------------------------------------
+     MOBILE FILTER BOTTOM SHEET (DRAWER)
+     ---------------------------------------------------- --}}
+<div id="mobile-filter-drawer" class="fixed inset-0 z-50 hidden bg-black/50 flex flex-col justify-end lg:hidden transition-opacity">
+    <div class="bg-white rounded-t-[20px] max-h-[85vh] flex flex-col w-full shadow-2xl overflow-hidden">
+        {{-- Drawer Header --}}
+        <div class="flex items-center justify-between p-5 border-b border-[#2B2430]/10">
+            <h3 class="font-bold text-base text-[#2B2430]">Filter &amp; Urutkan</h3>
+            <button type="button" id="close-filter-drawer-btn" class="p-1 rounded-lg text-[#2B2430]/60 hover:text-[#2B2430]" aria-label="Tutup Filter">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
         </div>
 
-        {{-- 3 Feature Cards --}}
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            
-            {{-- Feature 1 --}}
-            <div class="bg-white rounded-3xl p-7 border border-ink/15 shadow-xs space-y-4 hover:shadow-md transition-shadow">
-                <div class="w-12 h-12 rounded-2xl bg-butter text-ink flex items-center justify-center text-xl">
-                    🧴
+        {{-- Drawer Content (Scrollable) --}}
+        <div class="p-5 overflow-y-auto space-y-6 flex-grow text-xs sm:text-sm">
+            {{-- Kategori Mobile --}}
+            <div class="space-y-3">
+                <h4 class="text-xs uppercase tracking-wider font-bold text-[#2B2430]/60">Kategori</h4>
+                <div class="space-y-2 text-[#2B2430]">
+                    @if(isset($categories) && count($categories) > 0)
+                        @foreach($categories as $category)
+                            <label class="flex items-center gap-2.5 cursor-pointer">
+                                <input type="checkbox"
+                                       value="{{ $category->id }}"
+                                       class="filter-checkbox-mobile mobile-category w-4 h-4 rounded border-[#2B2430]/20 text-primary focus:ring-primary">
+                                <span class="font-medium">{{ $category->name }}</span>
+                            </label>
+                        @endforeach
+                    @else
+                        <label class="flex items-center gap-2.5 cursor-pointer">
+                            <input type="checkbox" value="1" class="filter-checkbox-mobile mobile-category w-4 h-4 rounded border-[#2B2430]/20 text-primary focus:ring-primary">
+                            <span class="font-medium">Rajut &amp; Kriya ABK</span>
+                        </label>
+                        <label class="flex items-center gap-2.5 cursor-pointer">
+                            <input type="checkbox" value="2" class="filter-checkbox-mobile mobile-category w-4 h-4 rounded border-[#2B2430]/20 text-primary focus:ring-primary">
+                            <span class="font-medium">Pakaian Preloved</span>
+                        </label>
+                        <label class="flex items-center gap-2.5 cursor-pointer">
+                            <input type="checkbox" value="3" class="filter-checkbox-mobile mobile-category w-4 h-4 rounded border-[#2B2430]/20 text-primary focus:ring-primary">
+                            <span class="font-medium">Buku &amp; Mainan Edukatif</span>
+                        </label>
+                    @endif
                 </div>
-                <h3 class="text-base font-bold text-ink">
-                    Pembersihan &amp; Sanitasi Higienis
-                </h3>
-                <p class="text-xs text-ink/60 leading-relaxed">
-                    Pakaian donasi dicuci laundry berpewangi lembut, mainan dan buku dibersihkan dengan cairan disinfektan ramah anak sebelum difoto &amp; diarsipkan.
-                </p>
             </div>
 
-            {{-- Feature 2 --}}
-            <div class="bg-white rounded-3xl p-7 border border-ink/15 shadow-xs space-y-4 hover:shadow-md transition-shadow">
-                <div class="w-12 h-12 rounded-2xl bg-butter text-ink flex items-center justify-center text-xl">
-                    📦
+            {{-- Jenis Barang Mobile --}}
+            <div class="space-y-3 pt-4 border-t border-[#2B2430]/10">
+                <h4 class="text-xs uppercase tracking-wider font-bold text-[#2B2430]/60">Jenis Barang</h4>
+                <div class="space-y-2 text-[#2B2430]">
+                    <label class="flex items-center gap-2.5 cursor-pointer">
+                        <input type="checkbox" value="karya" class="filter-checkbox-mobile mobile-source w-4 h-4 rounded border-[#2B2430]/20 text-primary focus:ring-primary">
+                        <span class="font-medium">Karya ABK</span>
+                    </label>
+                    <label class="flex items-center gap-2.5 cursor-pointer">
+                        <input type="checkbox" value="preloved" class="filter-checkbox-mobile mobile-source w-4 h-4 rounded border-[#2B2430]/20 text-primary focus:ring-primary">
+                        <span class="font-medium">Preloved</span>
+                    </label>
                 </div>
-                <h3 class="text-base font-bold text-ink">
-                    Kemasan Daur Ulang Ramah Lingkungan
-                </h3>
-                <p class="text-xs text-ink/60 leading-relaxed">
-                    Kami meminimalisir bubble wrap plastik dan menggunakan kotak kardus daur ulang bersih, disematkan kartu ucapan terima kasih buatan tangan anak binaan.
-                </p>
             </div>
 
-            {{-- Feature 3 --}}
-            <div class="bg-white rounded-3xl p-7 border border-ink/15 shadow-xs space-y-4 hover:shadow-md transition-shadow">
-                <div class="w-12 h-12 rounded-2xl bg-cream text-ink flex items-center justify-center text-xl">
-                    🚚
+            {{-- Kondisi Mobile --}}
+            <div class="space-y-3 pt-4 border-t border-[#2B2430]/10">
+                <h4 class="text-xs uppercase tracking-wider font-bold text-[#2B2430]/60">Kondisi</h4>
+                <div class="space-y-2 text-[#2B2430]">
+                    <label class="flex items-center gap-2.5 cursor-pointer">
+                        <input type="checkbox" value="baru" class="filter-checkbox-mobile mobile-condition w-4 h-4 rounded border-[#2B2430]/20 text-primary focus:ring-primary">
+                        <span class="font-medium">Baru</span>
+                    </label>
+                    <label class="flex items-center gap-2.5 cursor-pointer">
+                        <input type="checkbox" value="mulus" class="filter-checkbox-mobile mobile-condition w-4 h-4 rounded border-[#2B2430]/20 text-primary focus:ring-primary">
+                        <span class="font-medium">Sangat Baik</span>
+                    </label>
+                    <label class="flex items-center gap-2.5 cursor-pointer">
+                        <input type="checkbox" value="layak" class="filter-checkbox-mobile mobile-condition w-4 h-4 rounded border-[#2B2430]/20 text-primary focus:ring-primary">
+                        <span class="font-medium">Baik</span>
+                    </label>
                 </div>
-                <h3 class="text-base font-bold text-ink">
-                    Ongkir Hemat ke Seluruh Indonesia
-                </h3>
-                <p class="text-xs text-ink/60 leading-relaxed">
-                    Bekerjasama dengan kurir reguler &amp; kargo terpercaya. Pengiriman setiap hari kerja dari Kios Mandiri Sidoarjo &amp; Mojokerto disertai pelacakan nomor resi otomatis.
-                </p>
             </div>
 
+            {{-- Rentang Harga Mobile --}}
+            <div class="space-y-3 pt-4 border-t border-[#2B2430]/10">
+                <h4 class="text-xs uppercase tracking-wider font-bold text-[#2B2430]/60">Rentang Harga</h4>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-[11px] text-[#2B2430]/60 mb-1">Min (Rp)</label>
+                        <input type="number" id="mobile-price-min" placeholder="0" class="w-full px-2.5 py-1.5 rounded-[6px] border border-[#2B2430]/20 text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] text-[#2B2430]/60 mb-1">Maks (Rp)</label>
+                        <input type="number" id="mobile-price-max" placeholder="150000" class="w-full px-2.5 py-1.5 rounded-[6px] border border-[#2B2430]/20 text-xs">
+                    </div>
+                </div>
+            </div>
         </div>
 
-    </section>
-
+        {{-- Drawer Actions --}}
+        <div class="p-4 border-t border-[#2B2430]/10 bg-white grid grid-cols-2 gap-3">
+            <button type="button" id="mobile-reset-btn" class="h-11 rounded-[8px] border border-[#2B2430]/20 text-[#2B2430] font-semibold text-sm">
+                Reset
+            </button>
+            <button type="button" id="mobile-apply-btn" class="h-11 rounded-[8px] bg-primary text-white font-semibold text-sm">
+                Terapkan
+            </button>
+        </div>
+    </div>
 </div>
 
-{{-- Interactive Client-side Logic for Catalog Search, Filter, and Cart Toast --}}
+{{-- ----------------------------------------------------
+     CLIENT-SIDE FILTER & SORT VANILLA JAVASCRIPT
+     ---------------------------------------------------- --}}
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        const searchInput = document.getElementById('catalog-search-input');
-        const searchBtn = document.getElementById('catalog-search-btn');
-        const categoryPills = document.querySelectorAll('.cat-pill');
-        const sourceCheckboxes = document.querySelectorAll('.filter-source');
-        const priceRadios = document.querySelectorAll('.filter-price');
-        const conditionCheckboxes = document.querySelectorAll('.filter-condition');
-        const resetBtn = document.getElementById('reset-filter-btn');
-        const cards = document.querySelectorAll('.catalog-card');
+        const grid = document.getElementById('catalog-grid');
+        const items = Array.from(document.querySelectorAll('.catalog-item'));
+        const visibleCountEl = document.getElementById('visible-count');
+        const totalCountEl = document.getElementById('total-count');
+        const noProductsEl = document.getElementById('no-products-found');
         const sortSelect = document.getElementById('catalog-sort');
 
-        let activeCategory = 'all';
+        const activeChipsContainer = document.getElementById('active-chips-container');
+        const activeChipsList = document.getElementById('active-chips-list');
+        const clearAllChipsBtn = document.getElementById('clear-all-chips-btn');
+
+        // Inputs Desktop
+        const desktopCatInputs = document.querySelectorAll('.filter-category');
+        const desktopSourceInputs = document.querySelectorAll('.filter-source');
+        const desktopConditionInputs = document.querySelectorAll('.filter-condition');
+        const desktopPriceMin = document.getElementById('price-min');
+        const desktopPriceMax = document.getElementById('price-max');
+        const sidebarApplyBtn = document.getElementById('sidebar-apply-btn');
+        const sidebarResetBtn = document.getElementById('sidebar-reset-btn');
+        const emptyStateResetBtn = document.getElementById('empty-state-reset-btn');
+
+        // Drawer Mobile
+        const drawer = document.getElementById('mobile-filter-drawer');
+        const openDrawerBtn = document.getElementById('open-filter-drawer-btn');
+        const closeDrawerBtn = document.getElementById('close-filter-drawer-btn');
+        const mobileApplyBtn = document.getElementById('mobile-apply-btn');
+        const mobileResetBtn = document.getElementById('mobile-reset-btn');
+        const mobileCatInputs = document.querySelectorAll('.mobile-category');
+        const mobileSourceInputs = document.querySelectorAll('.mobile-source');
+        const mobileConditionInputs = document.querySelectorAll('.mobile-condition');
+        const mobilePriceMin = document.getElementById('mobile-price-min');
+        const mobilePriceMax = document.getElementById('mobile-price-max');
+
+        // Total products
+        if (totalCountEl) totalCountEl.innerText = items.length;
+
+        // Current filter state
+        let state = {
+            categories: [],
+            sources: [],
+            conditions: [],
+            minPrice: null,
+            maxPrice: null
+        };
+
+        function syncInputsFromState() {
+            // Sync Desktop
+            desktopCatInputs.forEach(i => i.checked = state.categories.includes(i.value));
+            desktopSourceInputs.forEach(i => i.checked = state.sources.includes(i.value));
+            desktopConditionInputs.forEach(i => i.checked = state.conditions.includes(i.value));
+            if (desktopPriceMin) desktopPriceMin.value = state.minPrice ?? '';
+            if (desktopPriceMax) desktopPriceMax.value = state.maxPrice ?? '';
+
+            // Sync Mobile
+            mobileCatInputs.forEach(i => i.checked = state.categories.includes(i.value));
+            mobileSourceInputs.forEach(i => i.checked = state.sources.includes(i.value));
+            mobileConditionInputs.forEach(i => i.checked = state.conditions.includes(i.value));
+            if (mobilePriceMin) mobilePriceMin.value = state.minPrice ?? '';
+            if (mobilePriceMax) mobilePriceMax.value = state.maxPrice ?? '';
+        }
+
+        function renderChips() {
+            if (!activeChipsList || !activeChipsContainer) return;
+            activeChipsList.innerHTML = '';
+
+            const chips = [];
+
+            state.categories.forEach(catId => {
+                const labelEl = document.querySelector(`.filter-category[value="${catId}"]`);
+                const name = labelEl ? labelEl.nextElementSibling?.textContent?.trim() : `Kategori ${catId}`;
+                chips.push({ type: 'category', val: catId, label: name });
+            });
+
+            state.sources.forEach(src => {
+                const label = src === 'karya' ? 'Karya ABK' : 'Preloved';
+                chips.push({ type: 'source', val: src, label });
+            });
+
+            state.conditions.forEach(cond => {
+                const map = { 'baru': 'Kondisi: Baru', 'mulus': 'Kondisi: Sangat Baik', 'layak': 'Kondisi: Baik' };
+                chips.push({ type: 'condition', val: cond, label: map[cond] || cond });
+            });
+
+            if (state.minPrice !== null && state.minPrice > 0) {
+                chips.push({ type: 'minPrice', val: null, label: `Min: Rp ${parseInt(state.minPrice).toLocaleString('id-ID')}` });
+            }
+
+            if (state.maxPrice !== null && state.maxPrice > 0) {
+                chips.push({ type: 'maxPrice', val: null, label: `Maks: Rp ${parseInt(state.maxPrice).toLocaleString('id-ID')}` });
+            }
+
+            if (chips.length > 0) {
+                activeChipsContainer.classList.remove('hidden');
+                activeChipsContainer.classList.add('flex');
+
+                chips.forEach(chip => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white border border-[#2B2430]/15 text-[#2B2430] hover:border-primary hover:text-primary transition-colors text-[11px] font-medium shadow-2xs';
+                    btn.innerHTML = `<span>${chip.label}</span><svg class="w-3 h-3 text-[#2B2430]/50 hover:text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>`;
+
+                    btn.addEventListener('click', () => {
+                        if (chip.type === 'category') {
+                            state.categories = state.categories.filter(c => c !== chip.val);
+                        } else if (chip.type === 'source') {
+                            state.sources = state.sources.filter(s => s !== chip.val);
+                        } else if (chip.type === 'condition') {
+                            state.conditions = state.conditions.filter(c => c !== chip.val);
+                        } else if (chip.type === 'minPrice') {
+                            state.minPrice = null;
+                        } else if (chip.type === 'maxPrice') {
+                            state.maxPrice = null;
+                        }
+                        syncInputsFromState();
+                        applyFilters();
+                    });
+
+                    activeChipsList.appendChild(btn);
+                });
+            } else {
+                activeChipsContainer.classList.add('hidden');
+                activeChipsContainer.classList.remove('flex');
+            }
+        }
 
         function applyFilters() {
-            const query = (searchInput?.value || '').toLowerCase().trim();
-            const checkedSources = Array.from(sourceCheckboxes).filter(c => c.checked).map(c => c.value);
-            const selectedPrice = Array.from(priceRadios).find(r => r.checked)?.value || 'all';
-            const checkedConditions = Array.from(conditionCheckboxes).filter(c => c.checked).map(c => c.value);
+            let visibleCount = 0;
 
-            cards.forEach(card => {
-                const title = card.querySelector('h3')?.innerText.toLowerCase() || '';
-                const desc = card.querySelector('p.line-clamp-2')?.innerText.toLowerCase() || '';
+            items.forEach(card => {
                 const cat = card.getAttribute('data-category');
-                const source = card.getAttribute('data-source');
-                const price = parseInt(card.getAttribute('data-price') || '0', 10);
-                const condition = card.getAttribute('data-condition');
+                const src = card.getAttribute('data-source');
+                const cond = card.getAttribute('data-condition');
+                const price = parseFloat(card.getAttribute('data-price') || '0');
 
-                // Search query match
-                const matchesQuery = !query || title.includes(query) || desc.includes(query);
+                // Filter Category
+                const matchCategory = (state.categories.length === 0) || state.categories.includes(cat);
 
-                // Category pill match
-                const matchesCat = (activeCategory === 'all') || (cat === activeCategory);
+                // Filter Source
+                const matchSource = (state.sources.length === 0) || state.sources.includes(src);
 
-                // Source checkbox match
-                const matchesSource = (checkedSources.length === 0) || checkedSources.includes(source);
+                // Filter Condition
+                const matchCondition = (state.conditions.length === 0) || state.conditions.includes(cond);
 
-                // Price radio match
-                let matchesPrice = true;
-                if (selectedPrice === 'under-30') matchesPrice = price < 30000;
-                else if (selectedPrice === '30-75') matchesPrice = price >= 30000 && price <= 75000;
-                else if (selectedPrice === 'over-75') matchesPrice = price > 75000;
+                // Filter Price
+                let matchPrice = true;
+                if (state.minPrice !== null && state.minPrice !== '') {
+                    if (price < parseFloat(state.minPrice)) matchPrice = false;
+                }
+                if (state.maxPrice !== null && state.maxPrice !== '') {
+                    if (price > parseFloat(state.maxPrice)) matchPrice = false;
+                }
 
-                // Condition checkbox match
-                const matchesCondition = (checkedConditions.length === 0) || checkedConditions.includes(condition);
-
-                if (matchesQuery && matchesCat && matchesSource && matchesPrice && matchesCondition) {
-                    card.style.display = 'flex';
+                if (matchCategory && matchSource && matchCondition && matchPrice) {
+                    card.style.display = '';
+                    visibleCount++;
                 } else {
                     card.style.display = 'none';
                 }
             });
+
+            if (visibleCountEl) visibleCountEl.innerText = visibleCount;
+
+            // Empty state check
+            if (noProductsEl) {
+                if (visibleCount === 0) {
+                    noProductsEl.classList.remove('hidden');
+                } else {
+                    noProductsEl.classList.add('hidden');
+                }
+            }
+
+            renderChips();
         }
 
-        // Category tabs click
-        categoryPills.forEach(pill => {
-            pill.addEventListener('click', () => {
-                categoryPills.forEach(p => {
-                    p.classList.remove('bg-sun text-ink', 'text-white', 'shadow-xs');
-                    p.classList.add('bg-white', 'border', 'border-ink/15', 'text-ink/80');
-                });
-                pill.classList.remove('bg-white', 'border', 'border-ink/15', 'text-ink/80');
-                pill.classList.add('bg-sun text-ink', 'text-white', 'shadow-xs');
-
-                activeCategory = pill.getAttribute('data-category');
-                applyFilters();
-            });
-        });
-
-        // Search trigger
-        searchBtn?.addEventListener('click', applyFilters);
-        searchInput?.addEventListener('keyup', (e) => {
-            if (e.key === 'Enter') applyFilters();
-        });
-
-        // Filter events
-        sourceCheckboxes.forEach(c => c.addEventListener('change', applyFilters));
-        priceRadios.forEach(r => r.addEventListener('change', applyFilters));
-        conditionCheckboxes.forEach(c => c.addEventListener('change', applyFilters));
-
-        // Reset filter
-        resetBtn?.addEventListener('click', () => {
-            if (searchInput) searchInput.value = '';
-            sourceCheckboxes.forEach(c => c.checked = false);
-            conditionCheckboxes.forEach(c => c.checked = false);
-            const allPrice = document.querySelector('.filter-price[value="all"]');
-            if (allPrice) allPrice.checked = true;
-
-            categoryPills[0]?.click();
+        function resetAllFilters() {
+            state = {
+                categories: [],
+                sources: [],
+                conditions: [],
+                minPrice: null,
+                maxPrice: null
+            };
+            syncInputsFromState();
             applyFilters();
-        });
+        }
+
+        // Apply from desktop
+        function readFromDesktop() {
+            state.categories = Array.from(desktopCatInputs).filter(i => i.checked).map(i => i.value);
+            state.sources = Array.from(desktopSourceInputs).filter(i => i.checked).map(i => i.value);
+            state.conditions = Array.from(desktopConditionInputs).filter(i => i.checked).map(i => i.value);
+            state.minPrice = desktopPriceMin?.value ? parseFloat(desktopPriceMin.value) : null;
+            state.maxPrice = desktopPriceMax?.value ? parseFloat(desktopPriceMax.value) : null;
+            applyFilters();
+        }
+
+        // Apply from mobile
+        function readFromMobile() {
+            state.categories = Array.from(mobileCatInputs).filter(i => i.checked).map(i => i.value);
+            state.sources = Array.from(mobileSourceInputs).filter(i => i.checked).map(i => i.value);
+            state.conditions = Array.from(mobileConditionInputs).filter(i => i.checked).map(i => i.value);
+            state.minPrice = mobilePriceMin?.value ? parseFloat(mobilePriceMin.value) : null;
+            state.maxPrice = mobilePriceMax?.value ? parseFloat(mobilePriceMax.value) : null;
+            syncInputsFromState();
+            applyFilters();
+            closeDrawer();
+        }
+
+        // Listeners Desktop
+        sidebarApplyBtn?.addEventListener('click', readFromDesktop);
+        sidebarResetBtn?.addEventListener('click', resetAllFilters);
+        emptyStateResetBtn?.addEventListener('click', resetAllFilters);
+        clearAllChipsBtn?.addEventListener('click', resetAllFilters);
+
+        // Instant filter on checkbox changes
+        desktopCatInputs.forEach(i => i.addEventListener('change', readFromDesktop));
+        desktopSourceInputs.forEach(i => i.addEventListener('change', readFromDesktop));
+        desktopConditionInputs.forEach(i => i.addEventListener('change', readFromDesktop));
 
         // Sorting
         sortSelect?.addEventListener('change', () => {
-            const container = document.getElementById('catalog-items-grid');
-            if (!container) return;
-            const items = Array.from(cards);
-
             const val = sortSelect.value;
-            items.sort((a, b) => {
-                const priceA = parseInt(a.getAttribute('data-price') || '0', 10);
-                const priceB = parseInt(b.getAttribute('data-price') || '0', 10);
+            const currentItems = Array.from(items);
+
+            currentItems.sort((a, b) => {
+                const priceA = parseFloat(a.getAttribute('data-price') || '0');
+                const priceB = parseFloat(b.getAttribute('data-price') || '0');
+                const orderA = parseInt(a.getAttribute('data-order') || '0', 10);
+                const orderB = parseInt(b.getAttribute('data-order') || '0', 10);
 
                 if (val === 'termurah') return priceA - priceB;
                 if (val === 'termahal') return priceB - priceA;
-                return 0;
+                return orderB - orderA; // Terbaru
             });
 
-            items.forEach(item => container.appendChild(item));
+            currentItems.forEach(el => grid?.appendChild(el));
         });
-    });
 
-    // Simple Cart notification (FR-07)
-    function addToCart(title) {
-        alert(`Berhasil menambahkan "${title}" ke keranjang donasi belanja Anda!`);
-    }
+        // Mobile Drawer Controls
+        function openDrawer() {
+            if (drawer) {
+                syncInputsFromState();
+                drawer.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeDrawer() {
+            if (drawer) {
+                drawer.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+        }
+
+        openDrawerBtn?.addEventListener('click', openDrawer);
+        closeDrawerBtn?.addEventListener('click', closeDrawer);
+        mobileApplyBtn?.addEventListener('click', readFromMobile);
+        mobileResetBtn?.addEventListener('click', () => {
+            resetAllFilters();
+            closeDrawer();
+        });
+
+        drawer?.addEventListener('click', (e) => {
+            if (e.target === drawer) closeDrawer();
+        });
+
+        // Initial setup
+        applyFilters();
+    });
 </script>
 
+{{-- Modal & Skrip Interaktif (Hanya SATU Kali Di-include) --}}
 @include('user.pages.home._modal-order')
-@include('user.pages.home._modal-donasi')
 @include('user.pages.home._scripts')
 @endsection
