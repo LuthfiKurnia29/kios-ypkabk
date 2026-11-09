@@ -29,7 +29,7 @@ class DonationController extends Controller
             return response()->json($donations);
         }
 
-        return view('admin.pages.dashboard', compact('donations'));
+        return view('admin.pages.donations', compact('donations'));
     }
 
     /**
@@ -81,4 +81,3 @@ class DonationController extends Controller
         return redirect()->back()->with('success', 'Status donasi berhasil diperbarui.');
     }
 }
-

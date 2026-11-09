@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Services\ProductService;
+use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -14,6 +15,21 @@ class ProductController extends Controller
     public function __construct(
         protected ProductService $productService,
     ) {}
+
+    /**
+     * Display a listing of products (admin panel).
+     */
+    public function adminIndex(Request $request): View|JsonResponse
+    {
+        $products = $this->productService->getProducts(
+            $request->all(),
+            $request->integer('per_page', 20)
+        );
+
+        $categories = Category::where('type', 'product')->orderBy('name')->get();
+
+        return view('admin.pages.products', compact('products', 'categories'));
+    }
 
     /**
      * Display a listing of products.
@@ -57,12 +73,24 @@ class ProductController extends Controller
             'price' => ['required', 'numeric', 'min:0'],
             'stock' => ['required', 'integer', 'min:0'],
             'description' => ['nullable', 'string'],
-            'image' => ['nullable', 'string'],
+            'image' => ['nullable'],
             'source' => ['nullable', 'in:karya,preloved'],
             'condition' => ['nullable', 'in:baru,mulus,layak'],
             'artisan_name' => ['nullable', 'string', 'max:255'],
             'is_featured' => ['nullable', 'boolean'],
         ]);
+
+        if ($request->hasFile('image')) {
+            $request->validate([
+                'image' => ['file', 'image', 'max:5120'],
+            ]);
+            $file = $request->file('image');
+            $mime = $file->getClientMimeType() ?: $file->getMimeType() ?: 'image/jpeg';
+            $base64 = base64_encode(file_get_contents($file->getRealPath()));
+            $validated['image'] = "data:{$mime};base64,{$base64}";
+        } elseif (! is_string($validated['image'] ?? null)) {
+            $validated['image'] = null;
+        }
 
         $product = $this->productService->createDataProduct($validated);
 
@@ -87,13 +115,25 @@ class ProductController extends Controller
             'price' => ['sometimes', 'required', 'numeric', 'min:0'],
             'stock' => ['sometimes', 'required', 'integer', 'min:0'],
             'description' => ['nullable', 'string'],
-            'image' => ['nullable', 'string'],
+            'image' => ['nullable'],
             'source' => ['nullable', 'in:karya,preloved'],
             'condition' => ['nullable', 'in:baru,mulus,layak'],
             'artisan_name' => ['nullable', 'string', 'max:255'],
             'is_featured' => ['nullable', 'boolean'],
             'status' => ['nullable', 'in:ready,minimal_stock,empty'],
         ]);
+
+        if ($request->hasFile('image')) {
+            $request->validate([
+                'image' => ['file', 'image', 'max:5120'],
+            ]);
+            $file = $request->file('image');
+            $mime = $file->getClientMimeType() ?: $file->getMimeType() ?: 'image/jpeg';
+            $base64 = base64_encode(file_get_contents($file->getRealPath()));
+            $validated['image'] = "data:{$mime};base64,{$base64}";
+        } elseif (! is_string($validated['image'] ?? null) || empty($validated['image'])) {
+            unset($validated['image']);
+        }
 
         $updated = $this->productService->updateDataProduct($product, $validated);
 

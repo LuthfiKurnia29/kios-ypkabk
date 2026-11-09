@@ -29,7 +29,7 @@ class PurchaseController extends Controller
             return response()->json($purchases);
         }
 
-        return view('admin.pages.dashboard', compact('purchases'));
+        return view('admin.pages.purchases', compact('purchases'));
     }
 
     /**
