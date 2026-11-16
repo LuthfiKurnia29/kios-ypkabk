@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DonationController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseController;
@@ -24,6 +25,7 @@ Route::get('/products/{product}', [ProductController::class, 'show'])->name('pro
 // Public Guest Orders & Checkout (FR-06 / NFR-02)
 Route::post('/purchases', [PurchaseController::class, 'store'])->name('purchases.store');
 Route::get('/purchases/{purchase}', [PurchaseController::class, 'show'])->name('purchases.show');
+Route::post('/purchases/{purchase}/payment-proof', [PurchaseController::class, 'uploadPaymentProof'])->name('purchases.upload-proof');
 
 // Public Donations Form (FR-04)
 Route::post('/donations', [DonationController::class, 'store'])->name('donations.store');
@@ -53,6 +55,11 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::post('/admin/products', [ProductController::class, 'store'])->name('admin.products.store');
     Route::put('/admin/products/{product}', [ProductController::class, 'update'])->name('admin.products.update');
     Route::delete('/admin/products/{product}', [ProductController::class, 'destroy'])->name('admin.products.destroy');
+
+    Route::get('/admin/categories', [CategoryController::class, 'index'])->name('admin.categories.index');
+    Route::post('/admin/categories', [CategoryController::class, 'store'])->name('admin.categories.store');
+    Route::put('/admin/categories/{category}', [CategoryController::class, 'update'])->name('admin.categories.update');
+    Route::delete('/admin/categories/{category}', [CategoryController::class, 'destroy'])->name('admin.categories.destroy');
 
     Route::get('/admin/purchases', [PurchaseController::class, 'index'])->name('admin.purchases.index');
     Route::patch('/admin/purchases/{purchase}/status', [PurchaseController::class, 'updateStatus'])->name('admin.purchases.update-status');

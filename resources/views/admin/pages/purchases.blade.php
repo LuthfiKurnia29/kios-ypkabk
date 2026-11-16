@@ -30,6 +30,7 @@
                             <th class="px-5 py-3.5">Nama Pembeli</th>
                             <th class="px-5 py-3.5">No. WhatsApp</th>
                             <th class="px-5 py-3.5">Total Belanja</th>
+                            <th class="px-5 py-3.5">Bukti Bayar</th>
                             <th class="px-5 py-3.5">Status</th>
                             <th class="px-5 py-3.5">Aksi</th>
                         </tr>
@@ -60,6 +61,16 @@
                                     Rp {{ number_format($purchase->total_price, 0, ',', '.') }}
                                 </td>
                                 <td class="px-5 py-4 whitespace-nowrap">
+                                    @if($purchase->payment_proof)
+                                        <a href="{{ asset('storage/'.$purchase->payment_proof) }}" target="_blank" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 font-semibold text-[11px] transition-colors" title="Lihat Foto Bukti Transfer">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                            <span>Lihat Bukti</span>
+                                        </a>
+                                    @else
+                                        <span class="text-gray-400 text-[11px] italic">Belum diunggah</span>
+                                    @endif
+                                </td>
+                                <td class="px-5 py-4 whitespace-nowrap">
                                     <span class="px-2.5 py-1 rounded-full text-[10px] font-bold {{ $purchase->status === 'paid' || $purchase->status === 'completed' ? 'bg-emerald-100 text-emerald-800' : ($purchase->status === 'cancelled' ? 'bg-rose-100 text-rose-800' : 'bg-amber-100 text-amber-800') }}">
                                         {{ strtoupper($purchase->status) }}
                                     </span>
@@ -78,7 +89,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="px-5 py-12 text-center">
+                                <td colspan="8" class="px-5 py-12 text-center">
                                     <div class="flex flex-col items-center gap-2 text-gray-400">
                                         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>

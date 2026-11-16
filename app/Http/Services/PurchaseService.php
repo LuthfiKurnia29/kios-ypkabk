@@ -202,4 +202,98 @@ class PurchaseService extends BaseService
 
         return (bool) $order->delete();
     }
+
+    /**
+     * Save uploaded payment proof for a purchase order.
+     */
+    public function savePaymentProof(Purchase|int|string $purchase, string $path): Purchase
+    {
+        $order = $this->getPurchase($purchase);
+
+        $order->update([
+            'payment_proof' => $path,
+            'payment_method' => 'qris',
+        ]);
+
+        LogPurchase::create([
+            'purchase_id' => $order->id,
+            'action' => 'payment_proof_uploaded',
+            'desc' => 'Bukti pembayaran diunggah oleh pembeli.',
+        ]);
+
+        return $order->fresh(['user', 'detailPurchases.product', 'logPurchases']);
+    }
+
+    /**
+     * Generate dynamic QRIS EMVCo string payload from base static QRIS.
+     */
+    public function generateDynamicQris(float|int $amount, ?string $baseQris = null): string
+    {
+        $baseQris = $baseQris ?: config('services.qris.base_string');
+
+        // Default standard EMVCo static QRIS for KIOS MANDIRI YPKABK
+        if (empty($baseQris)) {
+            $baseQris = '00020101021126600016ID.CO.QRIS.WWW0118936009990000000000021000000000000303UMI51440014ID.CO.QRIS.WWW02150000000000000000303UMI5204581453033605802ID5920KIOS MANDIRI YPKABK6008SIDOARJO61056121862070703A016304';
+        }
+
+        // 1. Strip existing CRC tag (Tag 63) if present
+        $payload = preg_replace('/6304[A-Fa-f0-9]{4}$/', '', trim($baseQris));
+        if (str_ends_with($payload, '6304')) {
+            $payload = substr($payload, 0, -4);
+        }
+
+        // 2. Set Point of Initiation to Dynamic (Tag 01: '12')
+        if (str_contains($payload, '010211')) {
+            $payload = str_replace('010211', '010212', $payload);
+        } elseif (! str_contains($payload, '010212')) {
+            if (str_starts_with($payload, '000201')) {
+                $payload = '000201010212'.substr($payload, 6);
+            }
+        }
+
+        // 3. Remove existing tag 54 if present (format: 54LLVALUE)
+        $payload = preg_replace('/54\d{2}[0-9.]+(\d{2})?/', '', $payload);
+
+        // 4. Format amount tag (Tag 54)
+        $amountInt = max(0, (int) round($amount));
+        $amountStr = (string) $amountInt;
+        $amountLen = str_pad((string) strlen($amountStr), 2, '0', STR_PAD_LEFT);
+        $tag54 = '54'.$amountLen.$amountStr;
+
+        // Insert tag 54 before tag 58 (Country code)
+        if (str_contains($payload, '5802ID')) {
+            $payload = str_replace('5802ID', $tag54.'5802ID', $payload);
+        } else {
+            $payload .= $tag54;
+        }
+
+        // 5. Append Tag 6304 (CRC placeholder)
+        $payloadToHash = $payload.'6304';
+
+        // 6. Compute CRC16-CCITT (False: poly 0x1021, init 0xFFFF)
+        $crc = $this->calculateCrc16Ccitt($payloadToHash);
+
+        return $payloadToHash.strtoupper(str_pad(dechex($crc), 4, '0', STR_PAD_LEFT));
+    }
+
+    /**
+     * Calculate CRC16-CCITT (False / XMODEM variant: poly 0x1021, init 0xFFFF).
+     */
+    protected function calculateCrc16Ccitt(string $str): int
+    {
+        $crc = 0xFFFF;
+        $len = strlen($str);
+        for ($i = 0; $i < $len; $i++) {
+            $crc ^= (ord($str[$i]) << 8);
+            for ($j = 0; $j < 8; $j++) {
+                if ($crc & 0x8000) {
+                    $crc = (($crc << 1) ^ 0x1021) & 0xFFFF;
+                } else {
+                    $crc = ($crc << 1) & 0xFFFF;
+                }
+            }
+        }
+
+        return $crc;
+    }
 }

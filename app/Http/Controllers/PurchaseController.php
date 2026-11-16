@@ -73,13 +73,52 @@ class PurchaseController extends Controller
         $purchase = $this->purchaseService->createPurchase($customerData, $validated['items']);
 
         if ($request->wantsJson()) {
+            $qrisPayload = $this->purchaseService->generateDynamicQris($purchase->total_price);
+
             return response()->json([
                 'message' => 'Pesanan berhasil dibuat.',
                 'data' => $purchase,
+                'qris' => [
+                    'payload' => $qrisPayload,
+                    'total_price' => (float) $purchase->total_price,
+                    'formatted_price' => 'Rp '.number_format($purchase->total_price, 0, ',', '.'),
+                    'upload_proof_url' => route('purchases.upload-proof', $purchase->order_code),
+                ],
             ], 201);
         }
 
         return redirect()->back()->with('success', "Pesanan {$purchase->order_code} berhasil dibuat.");
+    }
+
+    /**
+     * Upload payment proof for the specified purchase order.
+     */
+    public function uploadPaymentProof(Request $request, Purchase|int|string $purchase): JsonResponse|RedirectResponse
+    {
+        $request->validate([
+            'payment_proof' => ['required', 'file', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+        ]);
+
+        $order = $this->purchaseService->getPurchase($purchase);
+
+        $file = $request->file('payment_proof');
+        $filename = 'proof-'.$order->order_code.'-'.time().'.'.$file->getClientOriginalExtension();
+        $path = $file->storeAs('payment_proofs', $filename, 'public');
+
+        $updatedOrder = $this->purchaseService->savePaymentProof($order, $path);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Bukti pembayaran berhasil diunggah.',
+                'data' => [
+                    'order_code' => $updatedOrder->order_code,
+                    'payment_proof' => asset('storage/'.$path),
+                ],
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Bukti pembayaran berhasil diunggah.');
     }
 
     /**
