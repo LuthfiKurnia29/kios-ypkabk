@@ -26,11 +26,15 @@ class AdminNavigationTest extends TestCase
 
         $response->assertOk();
         $response->assertSee(route('admin.dashboard'));
+        $response->assertSee(route('admin.products.index'));
+        $response->assertSee(route('admin.categories.index'));
         $response->assertSee(route('admin.purchases.index'));
         $response->assertSee(route('admin.donations.index'));
         $response->assertSee(route('katalog'));
         $response->assertSee(route('home'));
         $response->assertSee('Dashboard');
+        $response->assertSee('Kelola Produk');
+        $response->assertSee('Kelola Kategori');
         $response->assertSee('Pesanan');
         $response->assertSee('Transaksi');
         $response->assertSee('Donasi Masuk');

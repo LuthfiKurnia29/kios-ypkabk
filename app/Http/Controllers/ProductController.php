@@ -26,7 +26,7 @@ class ProductController extends Controller
             $request->integer('per_page', 20)
         );
 
-        $categories = Category::where('type', 'product')->orderBy('name')->get();
+        $categories = Category::get();
 
         return view('admin.pages.products', compact('products', 'categories'));
     }

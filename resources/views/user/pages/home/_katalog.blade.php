@@ -23,7 +23,7 @@
 
         {{-- Grid 4 Produk Menggunakan Komponen <x-product-card> --}}
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-            @if(isset($featuredProducts) && $featuredProducts->count() > 0)
+            @if(isset($featuredProducts))
                 @foreach($featuredProducts as $product)
                     <x-product-card :product="$product" button-label="Pilih Produk" />
                 @endforeach
@@ -57,15 +57,6 @@
                             'artisan_name' => 'Set 3 Buku',
                             'description' => 'Tiga buku dongeng bergambar anak, kondisi rapi dan bersih.',
                             'image' => 'images/pict-4.webp',
-                        ],
-                        [
-                            'id' => 4,
-                            'name' => 'Gelang Manik Pelangi',
-                            'price' => 25000,
-                            'source' => 'karya',
-                            'artisan_name' => 'Sentra Mojokerto',
-                            'description' => 'Dirangkai oleh Nabila (14 th, Down Syndrome) dalam latihan kemandirian.',
-                            'image' => 'images/pict-1.webp',
                         ],
                     ];
                 @endphp

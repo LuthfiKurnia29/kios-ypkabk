@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Donation;
 use App\Models\Product;
 use App\Models\Purchase;
@@ -15,6 +16,7 @@ class AdminController extends Controller
     public function dashboard(): View
     {
         $totalProducts = Product::count();
+        $totalCategories = Category::count();
         $todayPurchases = Purchase::whereDate('created_at', today())->count();
         $totalDonations = Donation::count();
         $monthlyRevenue = Purchase::whereIn('status', ['paid', 'completed'])
@@ -34,6 +36,7 @@ class AdminController extends Controller
 
         return view('admin.pages.dashboard', compact(
             'totalProducts',
+            'totalCategories',
             'todayPurchases',
             'totalDonations',
             'monthlyRevenue',

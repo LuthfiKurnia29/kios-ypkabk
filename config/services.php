@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'qris' => [
+        'base_string' => env('QRIS_BASE_STRING'),
+        'merchant_name' => env('QRIS_MERCHANT_NAME', 'KIOS MANDIRI YPKABK'),
+    ],
+
 ];

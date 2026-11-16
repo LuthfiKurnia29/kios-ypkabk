@@ -58,18 +58,23 @@
                 <p class="mt-1.5 text-xs text-purple-600 font-medium">Kelola donasi masuk →</p>
             </a>
 
-            <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
+            <a href="{{ route('admin.products.index') }}" class="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 hover:border-primary hover:shadow-md transition-all group">
                 <div class="flex items-center justify-between mb-3">
                     <p class="text-sm font-medium text-gray-500">Total Produk Katalog</p>
-                    <div class="w-9 h-9 rounded-xl bg-orange-50 flex items-center justify-center">
+                    <div class="w-9 h-9 rounded-xl bg-orange-50 flex items-center justify-center group-hover:bg-orange-100 transition-colors">
                         <svg class="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
                         </svg>
                     </div>
                 </div>
                 <p class="text-3xl font-bold text-gray-900">{{ $totalProducts ?? 0 }}</p>
-                <p class="mt-1.5 text-xs text-gray-400 font-medium">Produk aktif di katalog</p>
-            </div>
+                <div class="mt-1.5 flex items-center justify-between text-xs">
+                    <span class="text-orange-600 font-medium">Kelola produk →</span>
+                    @if(isset($totalCategories))
+                        <span class="text-gray-400">({{ $totalCategories }} kategori)</span>
+                    @endif
+                </div>
+            </a>
         </div>
 
         {{-- Quick Actions --}}
