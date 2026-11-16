@@ -84,4 +84,51 @@ class UserController extends Controller
             'donationCategories'
         ));
     }
+
+    /**
+     * Display the public Unboxing Gallery page.
+     */
+    public function unboxing(): View
+    {
+        // TODO(backend): Hubungkan ke model Unboxing::where('is_visible', true)->latest('recorded_at')->get() setelah migrasi & model dibuat.
+        $unboxingVideos = collect([
+            [
+                'title' => 'Unboxing 3 Box Pakaian Balita Bunda Melati',
+                'recorded_at' => '2025-07-12',
+                'platform' => 'instagram',
+                'url' => 'https://www.instagram.com/p/C8unboxing1/',
+                'is_visible' => true,
+            ],
+            [
+                'title' => 'Buka Paket Alat Lukis & Kuas untuk Kelas Seni ABK',
+                'recorded_at' => '2025-07-08',
+                'platform' => 'youtube',
+                'url' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+                'is_visible' => true,
+            ],
+            [
+                'title' => 'Unboxing Buku Cerita Bergambar Sahabat Istimewa',
+                'recorded_at' => '2025-07-03',
+                'platform' => 'instagram',
+                'url' => 'https://www.instagram.com/p/C8unboxing2/',
+                'is_visible' => true,
+            ],
+            [
+                'title' => 'Paket Mainan Sensori & Balok Kayu Edukatif',
+                'recorded_at' => '2025-06-28',
+                'platform' => 'instagram',
+                'url' => 'https://www.instagram.com/p/C8unboxing3/',
+                'is_visible' => false,
+            ],
+            [
+                'title' => 'Dokumentasi Serah Terima Meja Kursi Belajar Sentra',
+                'recorded_at' => '2025-06-20',
+                'platform' => 'youtube',
+                'url' => 'https://youtu.be/kJQP7kiw5Fk',
+                'is_visible' => true,
+            ],
+        ])->filter(fn (array $item): bool => $item['is_visible'] === true)->values();
+
+        return view('user.pages.unboxing', compact('unboxingVideos'));
+    }
 }

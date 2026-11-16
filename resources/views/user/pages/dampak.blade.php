@@ -56,122 +56,134 @@
     breadcrumb="Beranda / Dampak & Transparansi"
 />
 
-{{-- 1. Satu Baris 3 Angka Besar Dipisah Garis Tipis Vertikal (Tanpa Kartu) --}}
-<section class="w-full bg-[#FFFBF7] py-12 lg:py-16 border-b border-[#2B2430]/10">
+{{-- 1. Tiga Kartu Statistik Dampak Sejajar --}}
+<section class="w-full bg-krem py-12 lg:py-16 border-b border-teks/10">
     <div class="max-w-[1200px] mx-auto px-6">
-        <div class="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-[#2B2430]/15">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             @foreach($summaryMetrics as $metric)
-                <div class="py-6 md:py-2 md:px-8 first:pl-0 last:pr-0 space-y-1">
-                    <div class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-primary tracking-tight">
-                        {{ $metric['value'] }}
+                <div class="bg-white rounded-[12px] p-6 sm:p-8 border border-teks/10 shadow-xs flex flex-col justify-between space-y-3">
+                    <div class="space-y-2">
+                        <div class="text-3xl sm:text-4xl font-bold tracking-tight text-primary">
+                            {{ $metric['value'] }}
+                        </div>
+                        <h3 class="font-semibold text-base sm:text-lg leading-snug text-teks">
+                            {{ $metric['label'] }}
+                        </h3>
                     </div>
-                    <p class="text-xs sm:text-sm text-[#2B2430]/75 font-medium">
-                        {{ $metric['label'] }}
-                    </p>
                 </div>
             @endforeach
         </div>
     </div>
 </section>
 
-{{-- 2. Laporan Dana: Dropdown Periode, 3 Ringkasan, dan 1 Grafik Batang Sederhana --}}
-<section class="w-full bg-[#FDEEF4] py-16 lg:py-20">
+{{-- 2. Laporan Dana: Satu Kartu Putih Berisi Pemilih Periode di Kanan Atas, 3 Angka, & Grafik --}}
+<section class="w-full bg-pink-pucat py-12 lg:py-16">
     <div class="max-w-[1200px] mx-auto px-6 space-y-8">
-        {{-- Header & Dropdown Periode --}}
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#2B2430]/10">
-            <h2 class="text-2xl sm:text-3xl font-extrabold text-[#2B2430] tracking-tight">
-                Laporan dana
-            </h2>
-            <div class="flex items-center gap-2">
-                <label for="period-select" class="text-xs font-semibold text-[#2B2430]/70 shrink-0">
-                    Pilih periode:
-                </label>
-                <select id="period-select" class="px-3 py-1.5 rounded-[8px] bg-white border border-[#2B2430]/20 text-xs font-semibold text-[#2B2430] focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer">
-                    <option value="mei-2024">Mei 2024</option>
-                    <option value="apr-2024">April 2024</option>
-                    <option value="mar-2024">Maret 2024</option>
-                </select>
-            </div>
-        </div>
+        {{-- Judul Seksi --}}
+        <h2 class="text-2xl sm:text-3xl font-bold text-teks tracking-tight">
+            Laporan dana
+        </h2>
 
-        {{-- 3 Ringkasan: Total Pemasukan, Total Penggunaan, Saldo --}}
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            <div class="bg-white rounded-[12px] p-6 border border-[#2B2430]/10 space-y-1 shadow-xs">
-                <span class="text-xs font-semibold text-[#2B2430]/60">Total pemasukan</span>
-                <div class="text-2xl lg:text-3xl font-extrabold text-[#2B2430]">
-                    Rp {{ number_format($financialData['income'], 0, ',', '.') }}
-                </div>
-            </div>
-            <div class="bg-white rounded-[12px] p-6 border border-[#2B2430]/10 space-y-1 shadow-xs">
-                <span class="text-xs font-semibold text-[#2B2430]/60">Total penggunaan</span>
-                <div class="text-2xl lg:text-3xl font-extrabold text-[#2B2430]">
-                    Rp {{ number_format($financialData['expense'], 0, ',', '.') }}
-                </div>
-            </div>
-            <div class="bg-white rounded-[12px] p-6 border border-[#2B2430]/10 space-y-1 shadow-xs">
-                <span class="text-xs font-semibold text-[#2B2430]/60">Saldo</span>
-                <div class="text-2xl lg:text-3xl font-extrabold text-primary">
-                    Rp {{ number_format($financialData['balance'], 0, ',', '.') }}
-                </div>
-            </div>
-        </div>
-
-        {{-- Grafik Batang Pemasukan vs Penggunaan Per Bulan (HTML/CSS Murni) --}}
-        <div class="bg-white rounded-[12px] p-6 sm:p-8 border border-[#2B2430]/10 space-y-6 shadow-xs">
-            <div class="flex items-center gap-6 text-xs font-semibold text-[#2B2430]/80">
-                <div class="flex items-center gap-2">
-                    <span class="w-3.5 h-3.5 rounded-xs bg-primary inline-block"></span>
-                    <span>Pemasukan</span>
-                </div>
-                <div class="flex items-center gap-2">
-                    <span class="w-3.5 h-3.5 rounded-xs bg-sky-400 inline-block"></span>
-                    <span>Penggunaan</span>
+        {{-- Satu Kartu Putih Terpadu --}}
+        <div class="bg-white rounded-[12px] p-6 sm:p-8 border border-teks/10 shadow-xs space-y-8">
+            {{-- Header Kartu: Keterangan & Pemilih Periode di Kanan Atas --}}
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-teks/10">
+                <span class="text-xs uppercase tracking-wider font-semibold text-primary">
+                    Ringkasan Transparansi Arus Kas
+                </span>
+                <div class="flex items-center gap-2 self-start sm:self-auto">
+                    <label for="period-select" class="text-xs font-semibold text-teks/70 shrink-0">
+                        Pilih periode:
+                    </label>
+                    <select id="period-select" class="px-3 py-1.5 rounded-[8px] bg-krem border border-teks/20 text-xs font-semibold text-teks focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer">
+                        <option value="mei-2024">Mei 2024</option>
+                        <option value="apr-2024">April 2024</option>
+                        <option value="mar-2024">Maret 2024</option>
+                    </select>
                 </div>
             </div>
 
-            <div class="h-56 sm:h-64 flex items-end justify-between gap-3 sm:gap-6 pt-6 border-b border-[#2B2430]/15 pb-2">
-                @php
-                    $maxVal = 16000000;
-                @endphp
-                @foreach($financialData['monthly'] as $m)
-                    @php
-                        $hInc = round(($m['income'] / $maxVal) * 100);
-                        $hExp = round(($m['expense'] / $maxVal) * 100);
-                    @endphp
-                    <div class="flex-1 flex flex-col items-center h-full justify-end">
-                        <div class="w-full flex items-end justify-center gap-1.5 sm:gap-2 h-full">
-                            <div style="height: {{ $hInc }}%;"
-                                 class="w-4 sm:w-8 bg-primary rounded-t-[4px] transition-all"
-                                 title="Pemasukan {{ $m['month'] }}: Rp {{ number_format($m['income'], 0, ',', '.') }}">
-                            </div>
-                            <div style="height: {{ $hExp }}%;"
-                                 class="w-4 sm:w-8 bg-sky-400 rounded-t-[4px] transition-all"
-                                 title="Penggunaan {{ $m['month'] }}: Rp {{ number_format($m['expense'], 0, ',', '.') }}">
-                            </div>
-                        </div>
-                        <span class="text-xs font-medium text-[#2B2430]/75 mt-3">{{ $m['month'] }}</span>
+            {{-- 3 Angka: Total Pemasukan, Total Penggunaan, Saldo --}}
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                <div class="space-y-1">
+                    <span class="text-xs font-semibold text-teks/60 block">Total pemasukan</span>
+                    <div class="text-xl sm:text-2xl font-bold text-teks">
+                        Rp {{ number_format($financialData['income'], 0, ',', '.') }}
                     </div>
-                @endforeach
+                </div>
+                <div class="space-y-1">
+                    <span class="text-xs font-semibold text-teks/60 block">Total penggunaan</span>
+                    <div class="text-xl sm:text-2xl font-bold text-teks">
+                        Rp {{ number_format($financialData['expense'], 0, ',', '.') }}
+                    </div>
+                </div>
+                <div class="space-y-1">
+                    <span class="text-xs font-semibold text-teks/60 block">Saldo</span>
+                    <div class="text-xl sm:text-2xl font-bold text-primary">
+                        Rp {{ number_format($financialData['balance'], 0, ',', '.') }}
+                    </div>
+                </div>
+            </div>
+
+            {{-- Grafik Batang di Bawahnya --}}
+            <div class="pt-6 border-t border-teks/10 space-y-6">
+                {{-- Legend --}}
+                <div class="flex items-center gap-6 text-xs font-semibold text-teks/80">
+                    <div class="flex items-center gap-2">
+                        <span class="w-3.5 h-3.5 rounded-xs bg-primary inline-block"></span>
+                        <span>Pemasukan</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="w-3.5 h-3.5 rounded-xs bg-sky-400 inline-block"></span>
+                        <span>Penggunaan</span>
+                    </div>
+                </div>
+
+                {{-- Grafik Batang Pemasukan vs Penggunaan Per Bulan --}}
+                <div class="h-52 sm:h-60 flex items-end justify-between gap-3 sm:gap-6 pt-6 border-b border-teks/15 pb-2">
+                    @php
+                        $maxVal = 16000000;
+                    @endphp
+                    @foreach($financialData['monthly'] as $m)
+                        @php
+                            $hInc = round(($m['income'] / $maxVal) * 100);
+                            $hExp = round(($m['expense'] / $maxVal) * 100);
+                        @endphp
+                        <div class="flex-1 flex flex-col items-center h-full justify-end">
+                            <div class="w-full flex items-end justify-center gap-1.5 sm:gap-2 h-full">
+                                <div style="height: {{ $hInc }}%;"
+                                     class="w-4 sm:w-8 bg-primary rounded-t-[4px] transition-all"
+                                     title="Pemasukan {{ $m['month'] }}: Rp {{ number_format($m['income'], 0, ',', '.') }}">
+                                </div>
+                                <div style="height: {{ $hExp }}%;"
+                                     class="w-4 sm:w-8 bg-sky-400 rounded-t-[4px] transition-all"
+                                     title="Penggunaan {{ $m['month'] }}: Rp {{ number_format($m['expense'], 0, ',', '.') }}">
+                                </div>
+                            </div>
+                            <span class="text-xs font-medium text-teks/75 mt-3">{{ $m['month'] }}</span>
+                        </div>
+                    @endforeach
+                </div>
             </div>
         </div>
     </div>
 </section>
 
-{{-- 3. Laporan untuk Diunduh (4 Baris) --}}
-<section class="w-full bg-[#FFFBF7] py-16 lg:py-20">
-    <div class="max-w-[1200px] mx-auto px-6 space-y-8">
-        <h2 class="text-2xl sm:text-3xl font-extrabold text-[#2B2430] tracking-tight">
+{{-- 3. Laporan untuk Diunduh: Kartu Per Dokumen --}}
+<section class="w-full bg-krem py-12 lg:py-16 pb-20">
+    <div class="max-w-[1200px] mx-auto px-6 space-y-6">
+        <h2 class="text-2xl sm:text-3xl font-bold text-teks tracking-tight">
             Laporan untuk diunduh
         </h2>
 
-        <div class="divide-y divide-[#2B2430]/10 border-y border-[#2B2430]/10">
+        <div class="space-y-4">
             @foreach($downloadableReports as $report)
-                <div class="py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div class="space-y-1">
-                        <h3 class="font-bold text-sm sm:text-base text-[#2B2430]">
+                <div class="bg-white rounded-[12px] p-5 sm:p-6 border border-teks/10 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div class="space-y-1 min-w-0">
+                        <h3 class="font-bold text-sm sm:text-base text-teks">
                             {{ $report['title'] }}
                         </h3>
-                        <p class="text-xs text-[#2B2430]/60">
+                        <p class="text-xs text-teks/60">
                             {{ $report['date'] }} &bull; {{ $report['size'] }}
                         </p>
                     </div>

@@ -3,11 +3,12 @@
     $isBeranda = request()->routeIs('home', 'user.home');
     $isKatalog = request()->routeIs('katalog', 'products.*');
     $isDampak = request()->routeIs('dampak');
+    $isUnboxing = request()->routeIs('unboxing');
     $isCaraDonasi = request()->routeIs('cara-donasi');
     $isKontak = request()->routeIs('kontak');
 @endphp
 
-<header id="main-header" class="fixed top-0 inset-x-0 z-50 bg-[#FFFBF7] border-b border-[#2B2430]/10 transition-all">
+<header id="main-header" class="fixed top-0 inset-x-0 z-50 bg-krem border-b border-teks/10 transition-all">
     <div class="max-w-[1200px] mx-auto px-6">
         <div class="flex items-center justify-between h-[72px]">
 
@@ -29,6 +30,10 @@
                 <a href="{{ route('dampak') }}"
                    class="inline-flex items-center h-[72px] border-b-2 transition-colors {{ $isDampak ? 'border-primary text-primary font-semibold' : 'border-transparent text-teks/80 hover:text-primary font-medium' }}">
                     Dampak
+                </a>
+                <a href="{{ route('unboxing') }}"
+                   class="inline-flex items-center h-[72px] border-b-2 transition-colors {{ $isUnboxing ? 'border-primary text-primary font-semibold' : 'border-transparent text-teks/80 hover:text-primary font-medium' }}">
+                    Unboxing
                 </a>
                 <a href="{{ route('cara-donasi') }}"
                    class="inline-flex items-center h-[72px] border-b-2 transition-colors {{ $isCaraDonasi ? 'border-primary text-primary font-semibold' : 'border-transparent text-teks/80 hover:text-primary font-medium' }}">
@@ -69,7 +74,7 @@
     </div>
 
     {{-- Mobile Drawer Menu --}}
-    <div id="mobile-menu" class="hidden lg:hidden border-t border-[#2B2430]/10 bg-[#FFFBF7] shadow-lg transition-all">
+    <div id="mobile-menu" class="hidden lg:hidden border-t border-teks/10 bg-krem shadow-lg transition-all">
         <div class="px-6 py-4 space-y-3">
             <nav class="flex flex-col space-y-1">
                 <a href="{{ route('home') }}"
@@ -84,6 +89,10 @@
                    class="px-3 py-2.5 rounded-lg text-sm transition-colors {{ $isDampak ? 'text-primary font-semibold bg-pink-pucat' : 'text-teks/80 hover:text-primary hover:bg-pink-pucat/50 font-medium' }}">
                     Dampak
                 </a>
+                <a href="{{ route('unboxing') }}"
+                   class="px-3 py-2.5 rounded-lg text-sm transition-colors {{ $isUnboxing ? 'text-primary font-semibold bg-pink-pucat' : 'text-teks/80 hover:text-primary hover:bg-pink-pucat/50 font-medium' }}">
+                    Unboxing
+                </a>
                 <a href="{{ route('cara-donasi') }}"
                    class="px-3 py-2.5 rounded-lg text-sm transition-colors {{ $isCaraDonasi ? 'text-primary font-semibold bg-pink-pucat' : 'text-teks/80 hover:text-primary hover:bg-pink-pucat/50 font-medium' }}">
                     Cara Donasi
@@ -94,7 +103,7 @@
                 </a>
             </nav>
 
-            <div class="pt-2 border-t border-[#2B2430]/10">
+            <div class="pt-2 border-t border-teks/10">
                 <button type="button"
                         onclick="openDonationModal()"
                         class="w-full h-[44px] flex items-center justify-center rounded-[8px] bg-primary hover:bg-primary/90 text-white font-semibold text-sm transition-all active:scale-95 shadow-xs">

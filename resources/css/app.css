@@ -15,6 +15,16 @@
     --color-pink-pucat: #FDEEF4;
     --color-krem: #FFFBF7;
 
+    /* === Design Tokens: Admin Layout (PDF Acuan Desain) === */
+    --color-admin-bg: #FFF7F9;
+    --color-admin-sidebar: #FBEAF0;
+    --color-admin-topbar: #FFFFFF;
+    --color-admin-border: #F0D5DF;
+    --color-admin-muted: #5C5262;
+
+    /* === Design Tokens: Radius === */
+    --radius-admin-item: 0.75rem;
+
     /* === Design Tokens: Colors (Lama) === */
     --color-butter: #FBF0B8;
     --color-cream: #FFFBE6;

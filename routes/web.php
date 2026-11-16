@@ -15,6 +15,7 @@ Route::get('/user', [UserController::class, 'index'])->name('user.home');
 Route::get('/katalog', [UserController::class, 'katalog'])->name('katalog');
 Route::get('/tentang-kami', [UserController::class, 'tentang'])->name('tentang');
 Route::get('/transparansi', [UserController::class, 'transparansi'])->name('transparansi');
+Route::get('/galeri-unboxing', [UserController::class, 'unboxing'])->name('unboxing');
 
 // Products (Public read-only)
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
