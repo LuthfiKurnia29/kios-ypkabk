@@ -19,6 +19,21 @@
             </span>
         </div>
 
+        {{-- Flash message --}}
+        @if(session('success'))
+            <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm flex items-center justify-between shadow-xs">
+                <div class="flex items-center gap-2.5">
+                    <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <span class="font-medium">{{ session('success') }}</span>
+                </div>
+                <button type="button" onclick="this.parentElement.remove()" class="text-emerald-500 hover:text-emerald-700">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+        @endif
+
         {{-- Tabel Pesanan --}}
         <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
             <div class="overflow-x-auto">
@@ -32,7 +47,7 @@
                             <th class="px-5 py-3.5">Total Belanja</th>
                             <th class="px-5 py-3.5">Bukti Bayar</th>
                             <th class="px-5 py-3.5">Status</th>
-                            <th class="px-5 py-3.5">Aksi</th>
+                            <th class="px-5 py-3.5 text-right">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100 font-medium">
@@ -75,16 +90,41 @@
                                         {{ strtoupper($purchase->status) }}
                                     </span>
                                 </td>
-                                <td class="px-5 py-4 whitespace-nowrap">
-                                    <form method="POST" action="{{ route('admin.purchases.update-status', $purchase) }}" class="flex items-center gap-2">
-                                        @csrf
-                                        @method('PATCH')
-                                        <select name="status" onchange="this.form.submit()" class="text-xs rounded-lg border border-gray-200 px-2 py-1.5 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary/30 cursor-pointer">
-                                            @foreach(['pending', 'paid', 'completed', 'cancelled'] as $s)
-                                                <option value="{{ $s }}" {{ $purchase->status === $s ? 'selected' : '' }}>{{ ucfirst($s) }}</option>
-                                            @endforeach
-                                        </select>
-                                    </form>
+                                <td class="px-5 py-4 whitespace-nowrap text-right">
+                                    <div class="flex flex-col items-end gap-1.5">
+                                        {{-- Update Status --}}
+                                        <form method="POST" action="{{ route('admin.purchases.update-status', $purchase) }}" class="flex items-center gap-2">
+                                            @csrf
+                                            @method('PATCH')
+                                            <select name="status" onchange="this.form.submit()" class="text-xs rounded-lg border border-gray-200 px-2 py-1.5 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary/30 cursor-pointer">
+                                                @foreach(['pending', 'paid', 'completed', 'cancelled'] as $s)
+                                                    <option value="{{ $s }}" {{ $purchase->status === $s ? 'selected' : '' }}>{{ ucfirst($s) }}</option>
+                                                @endforeach
+                                            </select>
+                                        </form>
+
+                                        {{-- Tombol Minta Ulasan via WhatsApp jika Paid / Completed --}}
+                                        @if(in_array($purchase->status, ['paid', 'completed']))
+                                            @if($purchase->review)
+                                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gray-100 text-gray-500 border border-gray-200 text-[11px] font-semibold cursor-not-allowed whitespace-nowrap" title="Transaksi ini sudah memberikan ulasan">
+                                                    <svg class="w-3 h-3 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                                    Sudah diulas
+                                                </span>
+                                            @else
+                                                @php
+                                                    $waLink = \App\Support\ReviewRequestLink::forPurchase($purchase);
+                                                @endphp
+                                                @if($waLink)
+                                                    <a href="{{ $waLink }}" target="_blank"
+                                                        class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 text-[11px] font-semibold hover:bg-emerald-100 transition whitespace-nowrap"
+                                                        title="Kirim tautan ulasan via WhatsApp">
+                                                        <svg class="w-3 h-3 text-emerald-600" fill="currentColor" viewBox="0 0 24 24"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0012.04 2z"/></svg>
+                                                        Minta Ulasan
+                                                    </a>
+                                                @endif
+                                            @endif
+                                        @endif
+                                    </div>
                                 </td>
                             </tr>
                         @empty
@@ -112,4 +152,3 @@
 
     </div>
 @endsection
-

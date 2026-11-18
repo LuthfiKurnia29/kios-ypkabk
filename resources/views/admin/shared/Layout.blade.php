@@ -19,6 +19,8 @@
             request()->routeIs('admin.products.*') => 'Kelola Produk',
             request()->routeIs('admin.purchases.*') => 'Daftar Pesanan & Transaksi',
             request()->routeIs('admin.donations.*') => 'Daftar Donasi Preloved Masuk',
+            request()->routeIs('admin.site-content.*') => 'Kelola Konten Situs',
+            request()->routeIs('admin.reviews.*') => 'Kelola Ulasan & Testimoni',
             request()->routeIs('admin.dashboard') => 'Dashboard Ringkasan',
             default => 'Panel Admin'
         };
@@ -43,6 +45,9 @@
         $reportsHasRoute = Route::has('admin.reports.index');
         $reportsUrl = $reportsHasRoute ? route('admin.reports.index') : '#';
         $isReports = $reportsHasRoute && request()->routeIs('admin.reports.*');
+
+        $isSiteContent = request()->routeIs('admin.site-content.*');
+        $isReviews = request()->routeIs('admin.reviews.*');
     @endphp
 
     {{-- Mobile Sidebar Backdrop --}}
@@ -121,6 +126,20 @@
                    @if($isReports) aria-current="page" @endif
                    class="block px-4 py-2.5 rounded-xl font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 {{ $isReports ? 'bg-primary text-white shadow-xs font-semibold' : 'text-teks hover:text-primary hover:bg-white/60' }}">
                     Laporan
+                </a>
+
+                {{-- 7. Konten Situs --}}
+                <a href="{{ route('admin.site-content.edit') }}"
+                   @if($isSiteContent) aria-current="page" @endif
+                   class="block px-4 py-2.5 rounded-xl font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 {{ $isSiteContent ? 'bg-primary text-white shadow-xs font-semibold' : 'text-teks hover:text-primary hover:bg-white/60' }}">
+                    Konten Situs
+                </a>
+
+                {{-- 8. Ulasan & Testimoni --}}
+                <a href="{{ route('admin.reviews.index') }}"
+                   @if($isReviews) aria-current="page" @endif
+                   class="block px-4 py-2.5 rounded-xl font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 {{ $isReviews ? 'bg-primary text-white shadow-xs font-semibold' : 'text-teks hover:text-primary hover:bg-white/60' }}">
+                    Ulasan & Testimoni
                 </a>
             </nav>
 

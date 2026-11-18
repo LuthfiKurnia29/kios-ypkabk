@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Str;
 
 class Purchase extends Model
 {
@@ -45,5 +47,31 @@ class Purchase extends Model
     public function logPurchases(): HasMany
     {
         return $this->hasMany(LogPurchase::class);
+    }
+
+    /**
+     * Review submitted for this purchase.
+     */
+    public function review(): HasOne
+    {
+        return $this->hasOne(Review::class);
+    }
+
+    /**
+     * Get or generate the review invitation URL for this purchase.
+     * Only valid for paid or completed orders.
+     */
+    public function reviewUrl(): ?string
+    {
+        if (! in_array($this->status, ['paid', 'completed'], true)) {
+            return null;
+        }
+
+        if (empty($this->review_token)) {
+            $this->review_token = Str::random(40);
+            $this->saveQuietly();
+        }
+
+        return route('reviews.create', ['token' => $this->review_token]);
     }
 }

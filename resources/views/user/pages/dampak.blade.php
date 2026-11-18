@@ -2,12 +2,7 @@
 
 @section('content')
 @php
-    // TODO: nanti diganti $impactMetrics dari backend controller
-    $summaryMetrics = [
-        ['value' => '1.420+', 'label' => 'Barang layak pakai tersalurkan'],
-        ['value' => '38', 'label' => 'ABK terlatih mandiri'],
-        ['value' => 'Rp 84,5 Jt', 'label' => 'Dana terapi terkumpul'],
-    ];
+    $cards = $summaryCards ?? app(\App\Http\Services\SiteStatsService::class)->getSummaryCards();
 
     // TODO: nanti diganti data laporan keuangan riil per periode dari backend
     $financialData = [
@@ -60,7 +55,7 @@
 <section class="w-full bg-krem py-12 lg:py-16 border-b border-teks/10">
     <div class="max-w-[1200px] mx-auto px-6">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            @foreach($summaryMetrics as $metric)
+            @foreach($cards as $metric)
                 <div class="bg-white rounded-[12px] p-6 sm:p-8 border border-teks/10 shadow-xs flex flex-col justify-between space-y-3">
                     <div class="space-y-2">
                         <div class="text-3xl sm:text-4xl font-bold tracking-tight text-primary">

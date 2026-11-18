@@ -189,6 +189,8 @@ class PurchaseService extends BaseService
                 'desc' => $notes ?? "Status pesanan diubah dari {$previousStatus} ke {$newStatus}.",
             ]);
 
+            SiteStatsService::clearCache();
+
             return $order->fresh(['user', 'detailPurchases.product', 'logPurchases']);
         });
     }

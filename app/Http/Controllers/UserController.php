@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Services\ProductService;
+use App\Http\Services\SiteStatsService;
 use App\Models\Category;
 use App\Models\Donation;
 use App\Models\ImpactMetric;
@@ -16,6 +17,7 @@ class UserController extends Controller
 {
     public function __construct(
         protected ProductService $productService,
+        protected SiteStatsService $siteStatsService,
     ) {}
 
     /**
@@ -24,13 +26,13 @@ class UserController extends Controller
     public function index(): View
     {
         $featuredProducts = $this->productService->getFeaturedProducts(4);
-        $impactMetrics = ImpactMetric::where('is_active', true)->orderBy('order')->get();
+        $summaryCards = $this->siteStatsService->getSummaryCards();
         $reviews = Review::active()->get();
         $donationCategories = Category::where('is_active', true)->get();
 
         return view('user.pages.home', compact(
             'featuredProducts',
-            'impactMetrics',
+            'summaryCards',
             'reviews',
             'donationCategories'
         ));
@@ -130,5 +132,15 @@ class UserController extends Controller
         ])->filter(fn (array $item): bool => $item['is_visible'] === true)->values();
 
         return view('user.pages.unboxing', compact('unboxingVideos'));
+    }
+
+    /**
+     * Display the impact and transparency overview page.
+     */
+    public function dampak(): View
+    {
+        $summaryCards = $this->siteStatsService->getSummaryCards();
+
+        return view('user.pages.dampak', compact('summaryCards'));
     }
 }

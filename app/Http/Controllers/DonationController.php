@@ -44,6 +44,7 @@ class DonationController extends Controller
             'category_id' => ['nullable', 'exists:categories,id'],
             'category_name' => ['nullable', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:1000'],
+            'item_count' => ['nullable', 'integer', 'min:1', 'max:1000'],
         ]);
 
         $donation = $this->donationService->createDonation($validated);
@@ -66,9 +67,11 @@ class DonationController extends Controller
     {
         $validated = $request->validate([
             'status' => ['required', 'in:pending,confirmed,picked_up,received,rejected'],
+            'item_count' => ['nullable', 'integer', 'min:1', 'max:1000'],
         ]);
 
-        $updated = $this->donationService->updateDonationStatus($donation, $validated['status']);
+        $itemCount = $request->filled('item_count') ? $request->integer('item_count') : null;
+        $updated = $this->donationService->updateDonationStatus($donation, $validated['status'], $itemCount);
 
         if ($request->wantsJson()) {
             return response()->json([

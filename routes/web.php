@@ -7,6 +7,7 @@ use App\Http\Controllers\DonationController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\SiteContentController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -32,7 +33,13 @@ Route::post('/donations', [DonationController::class, 'store'])->name('donations
 
 // Reviews
 Route::get('/reviews', [ReviewController::class, 'index'])->name('reviews.index');
-Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+Route::redirect('/tulis-ulasan', '/')->name('tulis-ulasan');
+Route::get('/ulasan/{token}', [ReviewController::class, 'create'])
+    ->middleware('throttle:30,1')
+    ->name('reviews.create');
+Route::post('/ulasan/{token}', [ReviewController::class, 'store'])
+    ->middleware('throttle:10,1')
+    ->name('reviews.submit');
 
 // Admin Auth Only (No public registration per NFR-02)
 Route::get('/login', [AuthController::class, 'login'])->name('login');
@@ -66,9 +73,21 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
     Route::get('/admin/donations', [DonationController::class, 'index'])->name('admin.donations.index');
     Route::patch('/admin/donations/{donation}/status', [DonationController::class, 'updateStatus'])->name('admin.donations.update-status');
+
+    // Site Content Management
+    Route::get('/admin/site-content', [SiteContentController::class, 'edit'])->name('admin.site-content.edit');
+    Route::put('/admin/site-content', [SiteContentController::class, 'update'])->name('admin.site-content.update');
+    Route::put('/admin/site-content/hero', [SiteContentController::class, 'updateHero'])->name('admin.site-content.update-hero');
+    Route::put('/admin/site-content/abk', [SiteContentController::class, 'updateAbk'])->name('admin.site-content.update-abk');
+
+    // Reviews Management (Curated)
+    Route::get('/admin/reviews', [SiteContentController::class, 'reviewsIndex'])->name('admin.reviews.index');
+    Route::patch('/admin/reviews/{review}/toggle', [SiteContentController::class, 'toggleReview'])->name('admin.reviews.toggle');
+    Route::patch('/admin/reviews/{review}/order', [SiteContentController::class, 'updateReviewOrder'])->name('admin.reviews.order');
+    Route::delete('/admin/reviews/{review}', [SiteContentController::class, 'destroyReview'])->name('admin.reviews.destroy');
 });
 
 // --- Halaman statis frontend ---
-Route::view('/dampak', 'user.pages.dampak')->name('dampak');
+Route::get('/dampak', [UserController::class, 'dampak'])->name('dampak');
 Route::view('/cara-donasi', 'user.pages.cara-donasi')->name('cara-donasi');
 Route::view('/kontak', 'user.pages.kontak')->name('kontak');

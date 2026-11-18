@@ -81,32 +81,43 @@ class DonationService extends BaseService
             $categoryName = $category?->name;
         }
 
-        return Donation::create([
+        $donation = Donation::create([
             'donor_name' => trim($data['donor_name']),
             'donor_phone' => trim($data['donor_phone']),
             'donor_city' => trim($data['donor_city']),
             'category_id' => $data['category_id'] ?? null,
             'category_name' => $categoryName,
             'description' => $data['description'] ?? null,
+            'item_count' => isset($data['item_count']) ? max(1, (int) $data['item_count']) : 1,
             'status' => $data['status'] ?? 'pending',
             'received_at' => ($data['status'] ?? null) === 'received' ? now() : null,
         ]);
+
+        SiteStatsService::clearCache();
+
+        return $donation;
     }
 
     /**
      * Update the donation status.
      */
-    public function updateDonationStatus(Donation|int $donation, string $status): Donation
+    public function updateDonationStatus(Donation|int $donation, string $status, ?int $itemCount = null): Donation
     {
         $targetDonation = $this->getDonation($donation);
 
         $attributes = ['status' => $status];
+
+        if ($itemCount !== null && $itemCount > 0) {
+            $attributes['item_count'] = $itemCount;
+        }
 
         if ($status === 'received' && $targetDonation->received_at === null) {
             $attributes['received_at'] = now();
         }
 
         $targetDonation->update($attributes);
+
+        SiteStatsService::clearCache();
 
         return $targetDonation->fresh('category');
     }
@@ -118,6 +129,10 @@ class DonationService extends BaseService
     {
         $targetDonation = $this->getDonation($donation);
 
-        return (bool) $targetDonation->delete();
+        $result = (bool) $targetDonation->delete();
+
+        SiteStatsService::clearCache();
+
+        return $result;
     }
 }
