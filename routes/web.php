@@ -6,6 +6,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DonationController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\UnboxingController;
 use App\Http\Controllers\UserController;
@@ -74,6 +75,8 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::put('/admin/unboxing/{unboxing}', [UnboxingController::class, 'update'])->name('admin.unboxing.update');
     Route::delete('/admin/unboxing/{unboxing}', [UnboxingController::class, 'destroy'])->name('admin.unboxing.destroy');
     Route::patch('/admin/unboxing/{unboxing}/toggle-visibility', [UnboxingController::class, 'toggleVisibility'])->name('admin.unboxing.toggle-visibility');
+
+    Route::get('/admin/laporan', [ReportController::class, 'index'])->name('admin.reports.index');
 });
 
 // --- Halaman statis frontend ---
