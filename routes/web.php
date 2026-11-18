@@ -7,6 +7,7 @@ use App\Http\Controllers\DonationController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\UnboxingController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -16,6 +17,7 @@ Route::get('/user', [UserController::class, 'index'])->name('user.home');
 Route::get('/katalog', [UserController::class, 'katalog'])->name('katalog');
 Route::get('/tentang-kami', [UserController::class, 'tentang'])->name('tentang');
 Route::get('/transparansi', [UserController::class, 'transparansi'])->name('transparansi');
+Route::get('/dampak', [UserController::class, 'dampak'])->name('dampak');
 Route::get('/galeri-unboxing', [UserController::class, 'unboxing'])->name('unboxing');
 
 // Products (Public read-only)
@@ -66,9 +68,14 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
     Route::get('/admin/donations', [DonationController::class, 'index'])->name('admin.donations.index');
     Route::patch('/admin/donations/{donation}/status', [DonationController::class, 'updateStatus'])->name('admin.donations.update-status');
+
+    Route::get('/admin/unboxing', [UnboxingController::class, 'index'])->name('admin.unboxing.index');
+    Route::post('/admin/unboxing', [UnboxingController::class, 'store'])->name('admin.unboxing.store');
+    Route::put('/admin/unboxing/{unboxing}', [UnboxingController::class, 'update'])->name('admin.unboxing.update');
+    Route::delete('/admin/unboxing/{unboxing}', [UnboxingController::class, 'destroy'])->name('admin.unboxing.destroy');
+    Route::patch('/admin/unboxing/{unboxing}/toggle-visibility', [UnboxingController::class, 'toggleVisibility'])->name('admin.unboxing.toggle-visibility');
 });
 
 // --- Halaman statis frontend ---
-Route::view('/dampak', 'user.pages.dampak')->name('dampak');
 Route::view('/cara-donasi', 'user.pages.cara-donasi')->name('cara-donasi');
 Route::view('/kontak', 'user.pages.kontak')->name('kontak');

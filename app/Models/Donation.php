@@ -30,4 +30,3 @@ class Donation extends Model
         return $this->belongsTo(Category::class);
     }
 }
-
