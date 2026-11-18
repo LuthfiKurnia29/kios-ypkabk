@@ -20,6 +20,7 @@
             request()->routeIs('admin.purchases.*') => 'Daftar Pesanan & Transaksi',
             request()->routeIs('admin.donations.*') => 'Daftar Donasi Preloved Masuk',
             request()->routeIs('admin.dashboard') => 'Dashboard Ringkasan',
+            request()->routeIs('admin.reports.*') => 'Laporan & Statistik',
             default => 'Panel Admin'
         };
 
