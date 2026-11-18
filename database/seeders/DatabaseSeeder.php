@@ -39,6 +39,7 @@ class DatabaseSeeder extends Seeder
             ReviewSeeder::class,
             ImpactMetricSeeder::class,
             SiteSettingSeeder::class,
+            UnboxingSeeder::class,
         ]);
     }
 }

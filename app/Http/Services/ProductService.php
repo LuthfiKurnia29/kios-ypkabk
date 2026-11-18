@@ -200,6 +200,7 @@ class ProductService extends BaseService
             ->latest()
             ->limit($limit)
             ->get();
+
         return $data;
     }
 
