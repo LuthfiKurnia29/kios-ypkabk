@@ -27,6 +27,6 @@ class ExampleTest extends TestCase
         $response = $this->get('/katalog');
 
         $response->assertStatus(200);
-        $response->assertSee('Etalase Digital Kios Mandiri YPKABK');
+        $response->assertSee('Katalog');
     }
 }

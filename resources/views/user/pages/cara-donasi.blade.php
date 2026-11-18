@@ -52,8 +52,8 @@
     </div>
 </section>
 
-{{-- 2. Barang yang Diterima dan Tidak Diterima (Latar bg-pink-pucat) --}}
-<section class="w-full bg-pink-pucat py-12 lg:py-16">
+{{-- 2. Barang yang Diterima dan Tidak Diterima (Latar bg-krem, bukan pink) --}}
+<section class="w-full bg-krem py-12 lg:py-16 border-t border-teks/10">
     <div class="max-w-[1200px] mx-auto px-6 space-y-8">
         <h2 class="text-2xl sm:text-3xl font-bold text-teks tracking-tight">
             Barang yang diterima dan tidak diterima
@@ -124,7 +124,7 @@
 </section>
 
 {{-- 3. Cara Menyerahkan Barang (Latar bg-krem, Dua Kolom) --}}
-<section class="w-full bg-krem py-12 lg:py-16">
+<section class="w-full bg-krem py-12 lg:py-16 border-t border-teks/10">
     <div class="max-w-[1200px] mx-auto px-6 space-y-8">
         <h2 class="text-2xl sm:text-3xl font-bold text-teks tracking-tight">
             Cara menyerahkan barang
@@ -176,7 +176,6 @@
                         </li>
                         <li class="flex items-start gap-2">
                             <span class="text-primary font-bold">&bull;</span>
-                            {{-- TODO: syarat minimal 5 barang adalah contoh, sesuaikan kebijakan yayasan --}}
                             <span class="leading-relaxed">Minimal 5 barang layak pakai untuk setiap penjemputan.</span>
                         </li>
                     </ul>
@@ -185,22 +184,6 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-</section>
-
-{{-- 4. Blok Penutup: Sudah Siap Mendonasikan Barang? --}}
-<section class="w-full bg-pink-pucat py-12 lg:py-16 text-center">
-    <div class="max-w-[1200px] mx-auto px-6 space-y-6">
-        <h2 class="text-2xl sm:text-3xl font-bold text-teks tracking-tight">
-            Sudah siap mendonasikan barang?
-        </h2>
-        <div>
-            <button type="button"
-                    onclick="openDonationModal()"
-                    class="inline-flex items-center justify-center px-8 h-[44px] rounded-[8px] bg-primary hover:bg-primary/90 text-white font-semibold text-sm transition-all active:scale-[0.98] shadow-xs cursor-pointer">
-                Donasikan Barang
-            </button>
         </div>
     </div>
 </section>

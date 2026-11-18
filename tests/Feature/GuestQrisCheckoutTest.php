@@ -110,7 +110,7 @@ class GuestQrisCheckoutTest extends TestCase
             ],
         ]);
 
-        $file = UploadedFile::fake()->image('struk-transfer.jpg', 600, 800);
+        $file = UploadedFile::fake()->create('struk-transfer.jpg', 600, 'image/jpeg');
 
         $response = $this->postJson(route('purchases.upload-proof', $purchase->order_code), [
             'payment_proof' => $file,

@@ -26,19 +26,27 @@ class AdminNavigationTest extends TestCase
 
         $response->assertOk();
         $response->assertSee(route('admin.dashboard'));
-        $response->assertSee(route('admin.products.index'));
-        $response->assertSee(route('admin.categories.index'));
         $response->assertSee(route('admin.purchases.index'));
         $response->assertSee(route('admin.donations.index'));
-        $response->assertSee(route('katalog'));
+        $response->assertSee(route('admin.reports.index'));
+        $response->assertSee(route('admin.products.index'));
+        $response->assertSee(route('admin.unboxing.index'));
+        $response->assertSee(route('admin.site-content.edit'));
+        $response->assertSee(route('admin.reviews.index'));
         $response->assertSee(route('home'));
         $response->assertSee('Dashboard');
-        $response->assertSee('Kelola Produk');
-        $response->assertSee('Kelola Kategori');
+        $response->assertSee('Operasional');
         $response->assertSee('Pesanan');
-        $response->assertSee('Transaksi');
         $response->assertSee('Donasi Masuk');
-        $response->assertSee('Logout Keluar');
+        $response->assertSee('Laporan');
+        $response->assertSee('Katalog & Konten', false);
+        $response->assertSee('Produk');
+        $response->assertSee('Galeri Unboxing');
+        $response->assertSee('Konten Situs');
+        $response->assertSee('Komunikasi');
+        $response->assertSee('Pesan Masuk');
+        $response->assertSee('Ulasan & Testimoni', false);
+        $response->assertSee('Keluar');
     }
 
     public function test_admin_purchases_page_renders_cleanly_with_active_state(): void
@@ -57,7 +65,7 @@ class AdminNavigationTest extends TestCase
         $response->assertOk();
         $response->assertSee('ORD-TEST-NAV-1');
         $response->assertSee('Budi Navigasi');
-        $response->assertSee('Daftar Pesanan & Transaksi');
+        $response->assertSee('Pesanan');
     }
 
     public function test_admin_donations_page_renders_cleanly_with_active_state(): void
@@ -75,6 +83,6 @@ class AdminNavigationTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('Donatur Dermawan');
-        $response->assertSee('Daftar Donasi Preloved Masuk');
+        $response->assertSee('Donasi Masuk');
     }
 }

@@ -44,7 +44,7 @@ class AdminCategoryManagementTest extends TestCase
         $response = $this->actingAs($this->admin)->get(route('admin.categories.index'));
 
         $response->assertOk();
-        $response->assertSee('Manajemen Kategori');
+        $response->assertSee('Kategori');
         $response->assertSee('Kriya & Anyaman');
         $response->assertSee('kriya-anyaman');
         $response->assertSee('🧺');

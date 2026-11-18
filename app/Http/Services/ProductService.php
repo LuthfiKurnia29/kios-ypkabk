@@ -197,6 +197,7 @@ class ProductService extends BaseService
     public function getFeaturedProducts(int $limit = 4): Collection
     {
         $data = Product::with('category')
+            ->available()
             ->latest()
             ->limit($limit)
             ->get();

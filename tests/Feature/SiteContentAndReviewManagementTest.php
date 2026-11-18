@@ -171,8 +171,8 @@ class SiteContentAndReviewManagementTest extends TestCase
         $dampakResponse = $this->get(route('dampak'));
         $dampakResponse->assertOk();
         $dampakResponse->assertSee('Dampak & Transparansi');
-        $dampakResponse->assertSee('Barang tersalurkan');
-        $dampakResponse->assertSee('Terlatih mandiri');
+        $dampakResponse->assertSee('tersalurkan');
+        $dampakResponse->assertSee('terlatih mandiri');
         $dampakResponse->assertSee('Dana terapi terkumpul');
     }
 

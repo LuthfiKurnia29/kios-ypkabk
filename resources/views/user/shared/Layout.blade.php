@@ -8,6 +8,10 @@
 
     <meta name="description" content="Kios Mandiri mengelola donasi preloved layak pakai dan karya kreatif anak berkebutuhan khusus binaan Yayasan Peduli Kasih ABK (YPKABK) untuk membiayai ruang terapi gratis dan pelatihan vokasi mandiri.">
 
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/favicon-32.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('images/favicon-180.png') }}">
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=baloo-2:400,600,700,800&family=nunito:400,500,600,700&family=plus-jakarta-sans:400,500,600,700&display=swap" rel="stylesheet" />

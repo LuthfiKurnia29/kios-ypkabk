@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AdminExportRequest;
+use App\Http\Services\ExportService;
 use App\Http\Services\PurchaseService;
 use App\Models\Purchase;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class PurchaseController extends Controller
 {
@@ -141,5 +144,17 @@ class PurchaseController extends Controller
         }
 
         return redirect()->back()->with('success', 'Status pesanan berhasil diperbarui.');
+    }
+
+    /**
+     * Export purchase orders to Excel or PDF.
+     */
+    public function export(AdminExportRequest $request, ExportService $exportService): SymfonyResponse
+    {
+        $validated = $request->validated();
+        $range = $exportService->resolveDateRange($validated['period_type'], $validated['period']);
+        $data = $exportService->getPurchasesData($range['start'], $range['end']);
+
+        return $exportService->export('purchases', $validated['format'], $range, $data);
     }
 }

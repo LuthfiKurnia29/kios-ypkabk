@@ -3,9 +3,11 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DonationController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\SiteContentController;
 use App\Http\Controllers\UnboxingController;
@@ -21,7 +23,10 @@ Route::get('/transparansi', [UserController::class, 'transparansi'])->name('tran
 Route::get('/dampak', [UserController::class, 'dampak'])->name('dampak');
 Route::get('/galeri-unboxing', [UserController::class, 'unboxing'])->name('unboxing');
 Route::view('/cara-donasi', 'user.pages.cara-donasi')->name('cara-donasi');
-Route::view('/kontak', 'user.pages.kontak')->name('kontak');
+Route::get('/kontak', fn () => view('user.pages.kontak'))->name('kontak');
+Route::post('/kontak', [ContactController::class, 'store'])
+    ->middleware('throttle:5,1')
+    ->name('contact.store');
 
 // Products (Public read-only)
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
@@ -73,9 +78,11 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::delete('/admin/categories/{category}', [CategoryController::class, 'destroy'])->name('admin.categories.destroy');
 
     Route::get('/admin/purchases', [PurchaseController::class, 'index'])->name('admin.purchases.index');
+    Route::get('/admin/purchases/export', [PurchaseController::class, 'export'])->name('admin.purchases.export');
     Route::patch('/admin/purchases/{purchase}/status', [PurchaseController::class, 'updateStatus'])->name('admin.purchases.update-status');
 
     Route::get('/admin/donations', [DonationController::class, 'index'])->name('admin.donations.index');
+    Route::get('/admin/donations/export', [DonationController::class, 'export'])->name('admin.donations.export');
     Route::patch('/admin/donations/{donation}/status', [DonationController::class, 'updateStatus'])->name('admin.donations.update-status');
 
     // Site Content Management
@@ -96,4 +103,18 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::put('/admin/unboxing/{unboxing}', [UnboxingController::class, 'update'])->name('admin.unboxing.update');
     Route::delete('/admin/unboxing/{unboxing}', [UnboxingController::class, 'destroy'])->name('admin.unboxing.destroy');
     Route::patch('/admin/unboxing/{unboxing}/toggle-visibility', [UnboxingController::class, 'toggleVisibility'])->name('admin.unboxing.toggle-visibility');
+
+    // Reports / Expenses Management
+    Route::get('/admin/reports', [ReportController::class, 'index'])->name('admin.reports.index');
+    Route::get('/admin/reports/income', [ReportController::class, 'income'])->name('admin.reports.income');
+    Route::get('/admin/reports/export', [ReportController::class, 'export'])->name('admin.reports.export');
+    Route::post('/admin/reports', [ReportController::class, 'store'])->name('admin.reports.store');
+    Route::put('/admin/reports/{expense}', [ReportController::class, 'update'])->name('admin.reports.update');
+    Route::delete('/admin/reports/{expense}', [ReportController::class, 'destroy'])->name('admin.reports.destroy');
+
+    // Contact Messages Management
+    Route::get('/admin/messages', [ContactController::class, 'adminIndex'])->name('admin.messages.index');
+    Route::get('/admin/messages/{message}', [ContactController::class, 'adminShow'])->name('admin.messages.show');
+    Route::patch('/admin/messages/{message}/toggle-read', [ContactController::class, 'toggleRead'])->name('admin.messages.toggle-read');
+    Route::delete('/admin/messages/{message}', [ContactController::class, 'destroy'])->name('admin.messages.destroy');
 });

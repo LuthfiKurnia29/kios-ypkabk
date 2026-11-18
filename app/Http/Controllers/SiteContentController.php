@@ -14,27 +14,16 @@ use Illuminate\View\View;
 class SiteContentController extends Controller
 {
     /**
-     * Show the site-content editor (Hero, ABK Terlatih, Ringkasan Keterbukaan & Ulasan).
+     * Show the site-content editor (Hero, ABK Terlatih).
      */
     public function edit(): View
     {
         $settings = SiteSetting::pluck('value', 'key');
         $heroImageUrl = self::resolveHeroImageUrl($settings->get('hero_image'));
 
-        $statsService = app(SiteStatsService::class);
-        $stats = $statsService->getStats();
-
-        $totalReviews = Review::count();
-        $activeReviewsCount = Review::where('is_active', true)->count();
-        $pendingReviewsCount = Review::where('is_active', false)->count();
-
         return view('admin.pages.site-content', compact(
             'settings',
-            'heroImageUrl',
-            'stats',
-            'totalReviews',
-            'activeReviewsCount',
-            'pendingReviewsCount'
+            'heroImageUrl'
         ));
     }
 
