@@ -3,11 +3,13 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DonationController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\SiteContentController;
 use App\Http\Controllers\UnboxingController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -20,6 +22,11 @@ Route::get('/tentang-kami', [UserController::class, 'tentang'])->name('tentang')
 Route::get('/transparansi', [UserController::class, 'transparansi'])->name('transparansi');
 Route::get('/dampak', [UserController::class, 'dampak'])->name('dampak');
 Route::get('/galeri-unboxing', [UserController::class, 'unboxing'])->name('unboxing');
+Route::view('/cara-donasi', 'user.pages.cara-donasi')->name('cara-donasi');
+Route::get('/kontak', fn () => view('user.pages.kontak'))->name('kontak');
+Route::post('/kontak', [ContactController::class, 'store'])
+    ->middleware('throttle:5,1')
+    ->name('contact.store');
 
 // Products (Public read-only)
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
@@ -35,7 +42,13 @@ Route::post('/donations', [DonationController::class, 'store'])->name('donations
 
 // Reviews
 Route::get('/reviews', [ReviewController::class, 'index'])->name('reviews.index');
-Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+Route::redirect('/tulis-ulasan', '/')->name('tulis-ulasan');
+Route::get('/ulasan/{token}', [ReviewController::class, 'create'])
+    ->middleware('throttle:30,1')
+    ->name('reviews.create');
+Route::post('/ulasan/{token}', [ReviewController::class, 'store'])
+    ->middleware('throttle:10,1')
+    ->name('reviews.submit');
 
 // Admin Auth Only (No public registration per NFR-02)
 Route::get('/login', [AuthController::class, 'login'])->name('login');
@@ -65,20 +78,43 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::delete('/admin/categories/{category}', [CategoryController::class, 'destroy'])->name('admin.categories.destroy');
 
     Route::get('/admin/purchases', [PurchaseController::class, 'index'])->name('admin.purchases.index');
+    Route::get('/admin/purchases/export', [PurchaseController::class, 'export'])->name('admin.purchases.export');
     Route::patch('/admin/purchases/{purchase}/status', [PurchaseController::class, 'updateStatus'])->name('admin.purchases.update-status');
 
     Route::get('/admin/donations', [DonationController::class, 'index'])->name('admin.donations.index');
+    Route::get('/admin/donations/export', [DonationController::class, 'export'])->name('admin.donations.export');
     Route::patch('/admin/donations/{donation}/status', [DonationController::class, 'updateStatus'])->name('admin.donations.update-status');
 
+    // Site Content Management
+    Route::get('/admin/site-content', [SiteContentController::class, 'edit'])->name('admin.site-content.edit');
+    Route::put('/admin/site-content', [SiteContentController::class, 'update'])->name('admin.site-content.update');
+    Route::put('/admin/site-content/hero', [SiteContentController::class, 'updateHero'])->name('admin.site-content.update-hero');
+    Route::put('/admin/site-content/abk', [SiteContentController::class, 'updateAbk'])->name('admin.site-content.update-abk');
+
+    // Reviews Management (Curated)
+    Route::get('/admin/reviews', [SiteContentController::class, 'reviewsIndex'])->name('admin.reviews.index');
+    Route::patch('/admin/reviews/{review}/toggle', [SiteContentController::class, 'toggleReview'])->name('admin.reviews.toggle');
+    Route::patch('/admin/reviews/{review}/order', [SiteContentController::class, 'updateReviewOrder'])->name('admin.reviews.order');
+    Route::delete('/admin/reviews/{review}', [SiteContentController::class, 'destroyReview'])->name('admin.reviews.destroy');
+
+    // Unboxing Management
     Route::get('/admin/unboxing', [UnboxingController::class, 'index'])->name('admin.unboxing.index');
     Route::post('/admin/unboxing', [UnboxingController::class, 'store'])->name('admin.unboxing.store');
     Route::put('/admin/unboxing/{unboxing}', [UnboxingController::class, 'update'])->name('admin.unboxing.update');
     Route::delete('/admin/unboxing/{unboxing}', [UnboxingController::class, 'destroy'])->name('admin.unboxing.destroy');
     Route::patch('/admin/unboxing/{unboxing}/toggle-visibility', [UnboxingController::class, 'toggleVisibility'])->name('admin.unboxing.toggle-visibility');
 
-    Route::get('/admin/laporan', [ReportController::class, 'index'])->name('admin.reports.index');
-});
+    // Reports / Expenses Management
+    Route::get('/admin/reports', [ReportController::class, 'index'])->name('admin.reports.index');
+    Route::get('/admin/reports/income', [ReportController::class, 'income'])->name('admin.reports.income');
+    Route::get('/admin/reports/export', [ReportController::class, 'export'])->name('admin.reports.export');
+    Route::post('/admin/reports', [ReportController::class, 'store'])->name('admin.reports.store');
+    Route::put('/admin/reports/{expense}', [ReportController::class, 'update'])->name('admin.reports.update');
+    Route::delete('/admin/reports/{expense}', [ReportController::class, 'destroy'])->name('admin.reports.destroy');
 
-// --- Halaman statis frontend ---
-Route::view('/cara-donasi', 'user.pages.cara-donasi')->name('cara-donasi');
-Route::view('/kontak', 'user.pages.kontak')->name('kontak');
+    // Contact Messages Management
+    Route::get('/admin/messages', [ContactController::class, 'adminIndex'])->name('admin.messages.index');
+    Route::get('/admin/messages/{message}', [ContactController::class, 'adminShow'])->name('admin.messages.show');
+    Route::patch('/admin/messages/{message}/toggle-read', [ContactController::class, 'toggleRead'])->name('admin.messages.toggle-read');
+    Route::delete('/admin/messages/{message}', [ContactController::class, 'destroy'])->name('admin.messages.destroy');
+});

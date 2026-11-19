@@ -15,7 +15,7 @@ class AuthenticationTest extends TestCase
         $response = $this->get('/login');
 
         $response->assertOk();
-        $response->assertSee('Masuk ke akun Anda');
+        $response->assertSee('Login Admin');
     }
 
     public function test_user_can_login_and_is_redirected_to_home(): void

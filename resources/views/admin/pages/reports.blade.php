@@ -1,277 +1,303 @@
 @extends('admin.shared.Layout')
 
-@section('title', 'Laporan & Statistik')
+@section('title', 'Laporan Pengeluaran')
 
 @section('content')
-    <div class="space-y-6">
+<div class="space-y-5">
 
-        {{-- Page Header + Filter --}}
-        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div>
-                    <h2 class="text-xl font-bold text-gray-900">Laporan & Statistik</h2>
-                    <p class="mt-1 text-sm text-gray-500">Ringkasan penjualan dan donasi berdasarkan periode yang dipilih.</p>
-                </div>
-
-                {{-- Filter Periode --}}
-                <form method="GET" action="{{ route('admin.reports.index') }}" class="flex items-center gap-2 flex-wrap">
-                    <select name="bulan"
-                            class="text-sm border border-gray-200 rounded-xl px-3 py-2 bg-gray-50 font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary cursor-pointer">
-                        @foreach(range(1, 12) as $m)
-                            <option value="{{ $m }}" @selected($m === $bulan)>
-                                {{ \Carbon\Carbon::create()->month($m)->translatedFormat('F') }}
-                            </option>
-                        @endforeach
-                    </select>
-
-                    <select name="tahun"
-                            class="text-sm border border-gray-200 rounded-xl px-3 py-2 bg-gray-50 font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary cursor-pointer">
-                        @foreach(range(now()->year, 2024, -1) as $y)
-                            <option value="{{ $y }}" @selected($y === $tahun)>{{ $y }}</option>
-                        @endforeach
-                    </select>
-
-                    <button type="submit"
-                            class="px-4 py-2 rounded-xl bg-primary text-white text-sm font-semibold hover:bg-primary/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40">
-                        Tampilkan
-                    </button>
-                </form>
-            </div>
-
-            <p class="mt-3 text-xs text-gray-400">
-                Menampilkan data periode:
-                <span class="font-semibold text-gray-600">
-                    {{ \Carbon\Carbon::create($tahun, $bulan)->translatedFormat('F Y') }}
-                </span>
-            </p>
+    {{-- Alert Flash Message --}}
+    @if(session('success'))
+        <div class="p-3.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm flex items-center justify-between">
+            <span class="font-medium">{{ session('success') }}</span>
+            <button type="button" onclick="this.parentElement.remove()" class="text-emerald-500 hover:text-emerald-700" aria-label="Tutup">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
         </div>
+    @endif
 
-        {{-- Penjualan & Donasi - Summary Cards --}}
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-            {{-- === BLOK PENJUALAN === --}}
-            <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-                <div class="px-6 py-4 border-b border-gray-100 flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-xl bg-emerald-50 flex items-center justify-center shrink-0">
-                        <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-gray-900 text-sm">Laporan Penjualan</h3>
-                        <p class="text-xs text-gray-400">{{ \Carbon\Carbon::create($tahun, $bulan)->translatedFormat('F Y') }}</p>
-                    </div>
-                </div>
-
-                <div class="p-6 grid grid-cols-2 gap-4">
-                    <div class="bg-gray-50 rounded-xl p-4">
-                        <p class="text-xs font-medium text-gray-500 mb-1">Total Transaksi</p>
-                        <p class="text-3xl font-bold text-gray-900">{{ $totalTransaksi }}</p>
-                        <p class="text-xs text-gray-400 mt-1">pesanan masuk</p>
-                    </div>
-                    <div class="bg-emerald-50 rounded-xl p-4">
-                        <p class="text-xs font-medium text-emerald-700 mb-1">Total Pendapatan</p>
-                        <p class="text-xl font-bold text-emerald-700">Rp {{ number_format($totalPendapatan, 0, ',', '.') }}</p>
-                        <p class="text-xs text-emerald-600 mt-1">dari {{ $totalPaid }} pesanan lunas</p>
-                    </div>
-                    <div class="bg-amber-50 rounded-xl p-4">
-                        <p class="text-xs font-medium text-amber-700 mb-1">Menunggu Pembayaran</p>
-                        <p class="text-3xl font-bold text-amber-700">{{ $totalPending }}</p>
-                        <p class="text-xs text-amber-600 mt-1">pesanan pending</p>
-                    </div>
-                    <div class="bg-rose-50 rounded-xl p-4">
-                        <p class="text-xs font-medium text-rose-700 mb-1">Dibatalkan</p>
-                        <p class="text-3xl font-bold text-rose-700">{{ $totalCancelled }}</p>
-                        <p class="text-xs text-rose-600 mt-1">pesanan cancelled</p>
-                    </div>
-                </div>
-            </div>
-
-            {{-- === BLOK DONASI === --}}
-            <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-                <div class="px-6 py-4 border-b border-gray-100 flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-xl bg-purple-50 flex items-center justify-center shrink-0">
-                        <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-gray-900 text-sm">Laporan Donasi Barang</h3>
-                        <p class="text-xs text-gray-400">{{ \Carbon\Carbon::create($tahun, $bulan)->translatedFormat('F Y') }}</p>
-                    </div>
-                </div>
-
-                <div class="p-6 grid grid-cols-2 gap-4">
-                    <div class="bg-gray-50 rounded-xl p-4">
-                        <p class="text-xs font-medium text-gray-500 mb-1">Total Donasi Masuk</p>
-                        <p class="text-3xl font-bold text-gray-900">{{ $totalDonasi }}</p>
-                        <p class="text-xs text-gray-400 mt-1">donasi barang</p>
-                    </div>
-                    <div class="bg-blue-50 rounded-xl p-4">
-                        <p class="text-xs font-medium text-blue-700 mb-1">Sudah Diterima</p>
-                        <p class="text-3xl font-bold text-blue-700">{{ $donasiDiterima }}</p>
-                        <p class="text-xs text-blue-600 mt-1">barang diterima</p>
-                    </div>
-                    <div class="bg-amber-50 rounded-xl p-4">
-                        <p class="text-xs font-medium text-amber-700 mb-1">Sedang Diproses</p>
-                        <p class="text-3xl font-bold text-amber-700">{{ $donasiPending }}</p>
-                        <p class="text-xs text-amber-600 mt-1">pending / konfirmasi</p>
-                    </div>
-                    <div class="bg-rose-50 rounded-xl p-4">
-                        <p class="text-xs font-medium text-rose-700 mb-1">Ditolak</p>
-                        <p class="text-3xl font-bold text-rose-700">{{ $donasiDitolak }}</p>
-                        <p class="text-xs text-rose-600 mt-1">donasi ditolak</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        {{-- Top 5 Produk Terlaku --}}
-        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-xl bg-orange-50 flex items-center justify-center shrink-0">
-                        <svg class="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-gray-900 text-sm">Top 5 Produk Terlaku</h3>
-                        <p class="text-xs text-gray-400">Berdasarkan pesanan lunas bulan ini</p>
-                    </div>
-                </div>
-                <a href="{{ route('admin.products.index') }}" class="text-xs font-semibold text-primary hover:underline">
-                    Lihat semua produk →
-                </a>
-            </div>
-
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-xs text-gray-700">
-                    <thead class="bg-gray-50 font-bold text-gray-500 uppercase tracking-wider text-[11px]">
-                        <tr>
-                            <th class="px-6 py-3.5">#</th>
-                            <th class="px-6 py-3.5">Nama Produk</th>
-                            <th class="px-6 py-3.5 text-right">Terjual (unit)</th>
-                            <th class="px-6 py-3.5 text-right">Total Pendapatan</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-100 font-medium">
-                        @forelse($topProduk as $index => $item)
-                            <tr class="hover:bg-gray-50 transition-colors">
-                                <td class="px-6 py-4">
-                                    <span class="inline-flex w-6 h-6 items-center justify-center rounded-lg
-                                        {{ $index === 0 ? 'bg-amber-100 text-amber-700' : ($index === 1 ? 'bg-gray-100 text-gray-600' : ($index === 2 ? 'bg-orange-100 text-orange-600' : 'bg-gray-50 text-gray-400')) }}
-                                        font-bold text-[11px]">
-                                        {{ $index + 1 }}
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 font-semibold text-gray-900">
-                                    {{ $item->product?->name ?? '—' }}
-                                </td>
-                                <td class="px-6 py-4 text-right font-bold text-gray-900">
-                                    {{ number_format($item->total_terjual, 0, ',', '.') }} unit
-                                </td>
-                                <td class="px-6 py-4 text-right font-bold text-emerald-700">
-                                    Rp {{ number_format($item->total_pendapatan, 0, ',', '.') }}
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="4" class="px-6 py-10 text-center text-sm text-gray-400">
-                                    Belum ada transaksi lunas di periode ini.
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        {{-- Tabel Ringkasan Per Bulan (12 bulan terakhir) --}}
-        <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
-
-            {{-- Penjualan per Bulan --}}
-            <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-                <div class="px-6 py-4 border-b border-gray-100">
-                    <h3 class="font-bold text-gray-900 text-sm">Tren Penjualan — 12 Bulan Terakhir</h3>
-                    <p class="text-xs text-gray-400 mt-0.5">Jumlah transaksi dan pendapatan per bulan</p>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs text-gray-700">
-                        <thead class="bg-gray-50 font-bold text-gray-500 uppercase tracking-wider text-[11px]">
-                            <tr>
-                                <th class="px-5 py-3.5">Bulan</th>
-                                <th class="px-5 py-3.5 text-right">Transaksi</th>
-                                <th class="px-5 py-3.5 text-right">Pendapatan</th>
-                                <th class="px-5 py-3.5 text-right">Dibatal</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-100 font-medium">
-                            @foreach($penjualanPerBulan as $row)
-                                <tr class="hover:bg-gray-50 transition-colors {{ $row['bulan'] === \Carbon\Carbon::create($tahun, $bulan)->translatedFormat('M Y') ? 'bg-primary/5' : '' }}">
-                                    <td class="px-5 py-3.5 font-semibold text-gray-700 whitespace-nowrap">
-                                        {{ $row['bulan'] }}
-                                        @if($row['bulan'] === \Carbon\Carbon::create($tahun, $bulan)->translatedFormat('M Y'))
-                                            <span class="ml-1 text-[10px] font-bold text-primary">(dipilih)</span>
-                                        @endif
-                                    </td>
-                                    <td class="px-5 py-3.5 text-right text-gray-900">{{ $row['total'] }}</td>
-                                    <td class="px-5 py-3.5 text-right font-bold text-emerald-700">
-                                        @if($row['pendapatan'] > 0)
-                                            Rp {{ number_format($row['pendapatan'], 0, ',', '.') }}
-                                        @else
-                                            <span class="text-gray-300">—</span>
-                                        @endif
-                                    </td>
-                                    <td class="px-5 py-3.5 text-right {{ $row['cancelled'] > 0 ? 'text-rose-600 font-bold' : 'text-gray-300' }}">
-                                        {{ $row['cancelled'] > 0 ? $row['cancelled'] : '—' }}
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            {{-- Donasi per Bulan --}}
-            <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-                <div class="px-6 py-4 border-b border-gray-100">
-                    <h3 class="font-bold text-gray-900 text-sm">Tren Donasi — 12 Bulan Terakhir</h3>
-                    <p class="text-xs text-gray-400 mt-0.5">Jumlah donasi masuk per bulan</p>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs text-gray-700">
-                        <thead class="bg-gray-50 font-bold text-gray-500 uppercase tracking-wider text-[11px]">
-                            <tr>
-                                <th class="px-5 py-3.5">Bulan</th>
-                                <th class="px-5 py-3.5 text-right">Total</th>
-                                <th class="px-5 py-3.5 text-right">Diterima</th>
-                                <th class="px-5 py-3.5 text-right">Ditolak</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-100 font-medium">
-                            @foreach($donasiPerBulan as $row)
-                                <tr class="hover:bg-gray-50 transition-colors {{ $row['bulan'] === \Carbon\Carbon::create($tahun, $bulan)->translatedFormat('M Y') ? 'bg-primary/5' : '' }}">
-                                    <td class="px-5 py-3.5 font-semibold text-gray-700 whitespace-nowrap">
-                                        {{ $row['bulan'] }}
-                                        @if($row['bulan'] === \Carbon\Carbon::create($tahun, $bulan)->translatedFormat('M Y'))
-                                            <span class="ml-1 text-[10px] font-bold text-primary">(dipilih)</span>
-                                        @endif
-                                    </td>
-                                    <td class="px-5 py-3.5 text-right text-gray-900">{{ $row['total'] }}</td>
-                                    <td class="px-5 py-3.5 text-right {{ $row['diterima'] > 0 ? 'text-blue-600 font-bold' : 'text-gray-300' }}">
-                                        {{ $row['diterima'] > 0 ? $row['diterima'] : '—' }}
-                                    </td>
-                                    <td class="px-5 py-3.5 text-right {{ $row['ditolak'] > 0 ? 'text-rose-600 font-bold' : 'text-gray-300' }}">
-                                        {{ $row['ditolak'] > 0 ? $row['ditolak'] : '—' }}
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
+    {{-- Tabs Laporan --}}
+    <div class="flex items-center gap-2 border-b border-gray-200 pb-2" role="tablist" aria-label="Tab Laporan">
+        <a href="{{ route('admin.reports.income', ['periode' => $financialData['selected_period'] ?? '']) }}"
+           role="tab"
+           aria-selected="false"
+           class="px-4 py-2 rounded-md text-sm font-semibold text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition focus:outline-none focus:ring-2 focus:ring-primary/30">
+            Pemasukan
+        </a>
+        <a href="{{ route('admin.reports.index', ['periode' => $financialData['selected_period'] ?? '']) }}"
+           role="tab"
+           aria-selected="true"
+           class="px-4 py-2 rounded-md text-sm font-semibold bg-primary text-white transition focus:outline-none focus:ring-2 focus:ring-primary/30">
+            Pengeluaran
+        </a>
     </div>
+
+    {{-- Page Header --}}
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+            <h2 class="text-lg font-bold text-gray-900">Laporan Pengeluaran</h2>
+            <p class="text-sm text-gray-500 mt-0.5">Kelola data pengeluaran operasional dan pantau arus kas bulanan.</p>
+        </div>
+
+        {{-- Pemilih Periode --}}
+        <div class="flex items-center gap-2 self-start sm:self-auto">
+            <label for="admin-period-select" class="text-xs font-semibold text-gray-500 shrink-0">Periode:</label>
+            <select id="admin-period-select"
+                    onchange="window.location.search = '?periode=' + this.value"
+                    class="px-3 py-1.5 rounded-md border border-gray-200 text-sm text-gray-800 font-semibold focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition bg-white cursor-pointer">
+                @foreach($financialData['periods'] ?? [] as $period)
+                    <option value="{{ $period['key'] }}" {{ ($financialData['selected_period'] ?? '') === $period['key'] ? 'selected' : '' }}>
+                        {{ $period['label'] }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+    </div>
+
+    {{-- Export Controls --}}
+    @include('admin.partials._export-controls', [
+        'action' => route('admin.reports.export'),
+        'prefix' => 'reports-expense',
+        'currentPeriod' => $financialData['selected_period'] ?? null,
+    ])
+
+    {{-- Ringkasan Bulan Terpilih (3 Kartu) --}}
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="bg-white rounded-lg border border-gray-200 p-4">
+            <p class="text-xs font-semibold text-gray-500">Pemasukan Bulan Ini</p>
+            <p class="text-2xl font-bold text-gray-900 mt-1">
+                Rp {{ number_format($financialData['income'] ?? 0, 0, ',', '.') }}
+            </p>
+            <p class="text-xs text-gray-400 mt-1">Dari pesanan paid &amp; completed</p>
+        </div>
+        <div class="bg-white rounded-lg border border-gray-200 p-4">
+            <p class="text-xs font-semibold text-gray-500">Total Pengeluaran</p>
+            <p class="text-2xl font-bold text-gray-900 mt-1">
+                Rp {{ number_format($financialData['expense'] ?? 0, 0, ',', '.') }}
+            </p>
+            <p class="text-xs text-gray-400 mt-1">{{ $expenses->count() }} pos pengeluaran</p>
+        </div>
+        <div class="bg-white rounded-lg border border-gray-200 p-4">
+            <p class="text-xs font-semibold text-gray-500">Saldo Bulan Ini</p>
+            @php $balance = $financialData['balance'] ?? 0; @endphp
+            <p class="text-2xl font-bold text-gray-900 mt-1">
+                Rp {{ number_format($balance, 0, ',', '.') }}
+            </p>
+            <p class="text-xs text-gray-400 mt-1">Pemasukan dikurangi pengeluaran</p>
+        </div>
+    </div>
+
+    {{-- Form Tambah Pengeluaran --}}
+    <div class="bg-white rounded-lg border border-gray-200 p-5">
+        <h3 class="text-sm font-bold text-gray-900 mb-4">Tambah Pengeluaran</h3>
+        <form method="POST" action="{{ route('admin.reports.store') }}" id="form-tambah-expense" class="space-y-4">
+            @csrf
+            <input type="hidden" name="periode_redirect" value="{{ $financialData['selected_period'] ?? '' }}">
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 mb-1">Tanggal *</label>
+                    <input type="date" name="spent_at"
+                           value="{{ old('spent_at', now()->format('Y-m-d')) }}"
+                           max="{{ now()->format('Y-m-d') }}"
+                           class="w-full px-3 py-2 rounded-md border {{ $errors->has('spent_at') ? 'border-rose-400' : 'border-gray-200' }} text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition">
+                    @error('spent_at')
+                        <p class="text-[11px] text-rose-600 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 mb-1">Keterangan *</label>
+                    <input type="text" name="description"
+                           value="{{ old('description') }}"
+                           placeholder="Contoh: Pembelian alat terapi sensori"
+                           maxlength="255"
+                           class="w-full px-3 py-2 rounded-md border {{ $errors->has('description') ? 'border-rose-400' : 'border-gray-200' }} text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition">
+                    @error('description')
+                        <p class="text-[11px] text-rose-600 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 mb-1">Kategori <span class="font-normal text-gray-400">(opsional)</span></label>
+                    <input type="text" name="category"
+                           value="{{ old('category') }}"
+                           placeholder="Contoh: Operasional, Terapi, Logistik"
+                           maxlength="100"
+                           class="w-full px-3 py-2 rounded-md border border-gray-200 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 mb-1">Jumlah (Rp) *</label>
+                    <div class="relative flex items-center">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-xs font-semibold text-gray-500 pointer-events-none select-none">Rp</span>
+                        <input type="text"
+                               id="tambah-amount-display"
+                               value="{{ old('amount') ? number_format((int) old('amount'), 0, ',', '.') : '' }}"
+                               placeholder="0"
+                               inputmode="numeric"
+                               oninput="handleRupiahInput(this, 'tambah-amount-clean')"
+                               class="w-full pl-9 pr-3 py-2 rounded-md border {{ $errors->has('amount') ? 'border-rose-400' : 'border-gray-200' }} text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition font-medium">
+                        <input type="hidden" name="amount" id="tambah-amount-clean" value="{{ old('amount', '') }}">
+                    </div>
+                    @error('amount')
+                        <p class="text-[11px] text-rose-600 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+            </div>
+
+            <div class="flex justify-end pt-2">
+                <button type="submit"
+                        class="px-4 py-2 rounded-md bg-primary text-white text-sm font-semibold hover:bg-primary/90 transition shadow-xs min-h-[38px]">
+                    Simpan Pengeluaran
+                </button>
+            </div>
+        </form>
+    </div>
+
+    {{-- Tabel Pengeluaran --}}
+    <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <div class="px-5 py-3.5 border-b border-gray-100 flex items-center justify-between">
+            <p class="text-xs font-semibold text-gray-500">{{ $expenses->count() }} pengeluaran tercatat pada periode ini</p>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs text-gray-700 divide-y divide-gray-100">
+                <thead class="bg-gray-50 font-bold text-gray-500 uppercase tracking-wider text-[11px]">
+                    <tr>
+                        <th class="px-5 py-3.5">Tanggal</th>
+                        <th class="px-5 py-3.5">Keterangan</th>
+                        <th class="px-5 py-3.5">Kategori</th>
+                        <th class="px-5 py-3.5">Jumlah</th>
+                        <th class="px-5 py-3.5 text-right">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100 font-medium">
+                    @forelse($expenses as $expense)
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="px-5 py-4 whitespace-nowrap text-gray-500">
+                                {{ $expense->spent_at->format('d M Y') }}
+                            </td>
+                            <td class="px-5 py-4 text-gray-800 max-w-xs">
+                                {{ $expense->description }}
+                            </td>
+                            <td class="px-5 py-4 whitespace-nowrap text-gray-500">
+                                {{ $expense->category ?: '—' }}
+                            </td>
+                            <td class="px-5 py-4 whitespace-nowrap font-semibold text-gray-900">
+                                Rp {{ number_format($expense->amount, 0, ',', '.') }}
+                            </td>
+                            <td class="px-5 py-4 whitespace-nowrap text-right">
+                                <div class="flex items-center justify-end gap-2">
+                                    <button type="button"
+                                            onclick="openEditExpenseModal({{ $expense->id }}, '{{ $expense->spent_at->format('Y-m-d') }}', {{ json_encode($expense->description) }}, {{ json_encode($expense->category ?? '') }}, {{ $expense->amount }})"
+                                            class="px-2.5 py-1 rounded-md text-blue-700 text-xs font-semibold hover:bg-blue-50 transition">
+                                        Ubah
+                                    </button>
+                                    <form method="POST" action="{{ route('admin.reports.destroy', $expense) }}" class="inline"
+                                          onsubmit="return confirm('Apakah Anda yakin ingin menghapus pengeluaran ini?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="px-2.5 py-1 rounded-md text-rose-700 text-xs font-semibold hover:bg-rose-50 transition">
+                                            Hapus
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5" class="px-5 py-8 text-center text-sm text-gray-500">
+                                Belum ada catatan pengeluaran untuk periode ini.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+{{-- Modal Ubah Pengeluaran --}}
+<div id="modal-edit-expense" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-lg p-6 space-y-4">
+        <div class="flex items-center justify-between">
+            <h3 class="text-sm font-bold text-gray-900">Ubah Pengeluaran</h3>
+            <button type="button" onclick="closeEditExpenseModal()" class="text-gray-400 hover:text-gray-600" aria-label="Tutup">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <form id="form-edit-expense" method="POST" action="" class="space-y-4">
+            @csrf
+            @method('PUT')
+            <input type="hidden" name="periode_redirect" value="{{ $financialData['selected_period'] ?? '' }}">
+
+            <div>
+                <label class="block text-xs font-semibold text-gray-500 mb-1">Tanggal *</label>
+                <input type="date" name="spent_at" id="edit-spent-at"
+                       max="{{ now()->format('Y-m-d') }}"
+                       class="w-full px-3 py-2 rounded-md border border-gray-200 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition" required>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-gray-500 mb-1">Keterangan *</label>
+                <input type="text" name="description" id="edit-description" maxlength="255"
+                       class="w-full px-3 py-2 rounded-md border border-gray-200 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition" required>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-gray-500 mb-1">Kategori <span class="font-normal text-gray-400">(opsional)</span></label>
+                <input type="text" name="category" id="edit-category" maxlength="100"
+                       class="w-full px-3 py-2 rounded-md border border-gray-200 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-gray-500 mb-1">Jumlah (Rp) *</label>
+                <div class="relative flex items-center">
+                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-xs font-semibold text-gray-500 pointer-events-none select-none">Rp</span>
+                    <input type="text" id="edit-amount-display"
+                           inputmode="numeric"
+                           oninput="handleRupiahInput(this, 'edit-amount-clean')"
+                           placeholder="0"
+                           class="w-full pl-9 pr-3 py-2 rounded-md border border-gray-200 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition font-medium" required>
+                    <input type="hidden" name="amount" id="edit-amount-clean">
+                </div>
+            </div>
+            <div class="flex justify-end gap-3 pt-2">
+                <button type="button" onclick="closeEditExpenseModal()" class="px-4 py-2 rounded-md border border-gray-200 text-sm font-semibold text-gray-600 hover:bg-gray-50 transition">Batal</button>
+                <button type="submit" class="px-4 py-2 rounded-md bg-primary text-white text-sm font-semibold hover:bg-primary/90 transition">Simpan Perubahan</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function handleRupiahInput(displayInput, cleanInputId) {
+    const raw = displayInput.value.replace(/\D/g, '');
+    const cleanInput = document.getElementById(cleanInputId);
+    if (cleanInput) {
+        cleanInput.value = raw;
+    }
+    displayInput.value = raw ? new Intl.NumberFormat('id-ID').format(parseInt(raw, 10)) : '';
+}
+
+function openEditExpenseModal(id, spentAt, description, category, amount) {
+    document.getElementById('form-edit-expense').action = '/admin/reports/' + id;
+    document.getElementById('edit-spent-at').value = spentAt;
+    document.getElementById('edit-description').value = description;
+    document.getElementById('edit-category').value = category || '';
+    const formatted = amount ? new Intl.NumberFormat('id-ID').format(amount) : '';
+    document.getElementById('edit-amount-display').value = formatted;
+    document.getElementById('edit-amount-clean').value = amount;
+    const modal = document.getElementById('modal-edit-expense');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+}
+
+function closeEditExpenseModal() {
+    const modal = document.getElementById('modal-edit-expense');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+}
+
+document.getElementById('modal-edit-expense')?.addEventListener('click', function(e) {
+    if (e.target === this) closeEditExpenseModal();
+});
+</script>
 @endsection

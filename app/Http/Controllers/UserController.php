@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Services\ProductService;
+use App\Http\Services\SiteStatsService;
 use App\Models\Category;
 use App\Models\Donation;
 use App\Models\ImpactMetric;
@@ -18,6 +19,7 @@ class UserController extends Controller
 {
     public function __construct(
         protected ProductService $productService,
+        protected SiteStatsService $siteStatsService,
     ) {}
 
     /**
@@ -26,13 +28,13 @@ class UserController extends Controller
     public function index(): View
     {
         $featuredProducts = $this->productService->getFeaturedProducts(4);
-        $impactMetrics = ImpactMetric::where('is_active', true)->orderBy('order')->get();
+        $summaryCards = $this->siteStatsService->getSummaryCards();
         $reviews = Review::active()->get();
         $donationCategories = Category::where('is_active', true)->get();
 
         return view('user.pages.home', compact(
             'featuredProducts',
-            'impactMetrics',
+            'summaryCards',
             'reviews',
             'donationCategories'
         ));
@@ -92,6 +94,7 @@ class UserController extends Controller
      */
     public function dampak(Request $request): View
     {
+        $summaryCards = $this->siteStatsService->getSummaryCards();
         $impactMetrics = ImpactMetric::where('is_active', true)->orderBy('order')->get();
 
         if ($impactMetrics->isEmpty()) {
@@ -149,6 +152,7 @@ class UserController extends Controller
         $lastUpdated = $latestDate ? Carbon::parse($latestDate)->translatedFormat('d F Y') : '15 Mei 2024';
 
         return view('user.pages.dampak', compact(
+            'summaryCards',
             'impactMetrics',
             'financialData',
             'downloadableReports',

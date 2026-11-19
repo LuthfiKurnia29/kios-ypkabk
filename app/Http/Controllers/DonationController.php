@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AdminExportRequest;
 use App\Http\Services\DonationService;
+use App\Http\Services\ExportService;
 use App\Models\Donation;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class DonationController extends Controller
 {
@@ -44,6 +47,7 @@ class DonationController extends Controller
             'category_id' => ['nullable', 'exists:categories,id'],
             'category_name' => ['nullable', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:1000'],
+            'item_count' => ['nullable', 'integer', 'min:1', 'max:1000'],
         ]);
 
         $donation = $this->donationService->createDonation($validated);
@@ -66,9 +70,11 @@ class DonationController extends Controller
     {
         $validated = $request->validate([
             'status' => ['required', 'in:pending,confirmed,picked_up,received,rejected'],
+            'item_count' => ['nullable', 'integer', 'min:1', 'max:1000'],
         ]);
 
-        $updated = $this->donationService->updateDonationStatus($donation, $validated['status']);
+        $itemCount = $request->filled('item_count') ? $request->integer('item_count') : null;
+        $updated = $this->donationService->updateDonationStatus($donation, $validated['status'], $itemCount);
 
         if ($request->wantsJson()) {
             return response()->json([
@@ -79,5 +85,17 @@ class DonationController extends Controller
         }
 
         return redirect()->back()->with('success', 'Status donasi berhasil diperbarui.');
+    }
+
+    /**
+     * Export donations to Excel or PDF.
+     */
+    public function export(AdminExportRequest $request, ExportService $exportService): SymfonyResponse
+    {
+        $validated = $request->validated();
+        $range = $exportService->resolveDateRange($validated['period_type'], $validated['period']);
+        $data = $exportService->getDonationsData($range['start'], $range['end']);
+
+        return $exportService->export('donations', $validated['format'], $range, $data);
     }
 }

@@ -38,6 +38,7 @@ class DatabaseSeeder extends Seeder
             ProductSeeder::class,
             ReviewSeeder::class,
             ImpactMetricSeeder::class,
+            SiteSettingSeeder::class,
             UnboxingSeeder::class,
         ]);
     }

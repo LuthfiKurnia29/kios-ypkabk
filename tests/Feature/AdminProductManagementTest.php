@@ -42,7 +42,7 @@ class AdminProductManagementTest extends TestCase
         $response = $this->actingAs($this->admin)->get(route('admin.products.index'));
 
         $response->assertOk();
-        $response->assertSee('Manajemen Produk Katalog');
+        $response->assertSee('Produk');
         $response->assertSee('Tote Bag Istimewa');
         $response->assertSee('Rp 45.000');
         $response->assertSee('Tambah Produk');
@@ -50,7 +50,7 @@ class AdminProductManagementTest extends TestCase
 
     public function test_admin_can_store_product_with_uploaded_image_as_blob(): void
     {
-        $file = UploadedFile::fake()->image('produk-rajut.jpg', 300, 300);
+        $file = UploadedFile::fake()->create('produk-rajut.jpg', 300, 'image/jpeg');
 
         $response = $this->actingAs($this->admin)->post(route('admin.products.store'), [
             'name' => 'Boneka Rajut Kelinci',

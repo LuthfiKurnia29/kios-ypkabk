@@ -2,133 +2,125 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\DetailPurchase;
+use App\Http\Requests\AdminExportRequest;
+use App\Http\Requests\StoreReportRequest;
+use App\Http\Requests\UpdateReportRequest;
+use App\Http\Services\ExportService;
+use App\Http\Services\FinancialReportService;
 use App\Models\Donation;
+use App\Models\Expense;
 use App\Models\Purchase;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class ReportController extends Controller
 {
-    /**
-     * Display the reports overview page (admin-only).
-     */
+    public function __construct(
+        protected FinancialReportService $financialReportService,
+    ) {}
+
     public function index(Request $request): View
     {
-        $bulan = (int) $request->get('bulan', now()->month);
-        $tahun = (int) $request->get('tahun', now()->year);
+        $selectedPeriod = $request->query('periode');
+        $financialData = $this->financialReportService->getReportData($selectedPeriod);
 
-        // Clamp to valid values
-        $bulan = max(1, min(12, $bulan));
-        $tahun = max(2020, min((int) now()->year + 1, $tahun));
+        $activePeriod = $financialData['selected_period'];
+        [$year, $month] = array_map('intval', explode('-', $activePeriod));
 
-        // --- Laporan Penjualan ---
-        $purchaseQuery = Purchase::whereMonth('created_at', $bulan)
-            ->whereYear('created_at', $tahun);
-
-        $totalTransaksi = (clone $purchaseQuery)->count();
-        $totalPendapatan = (clone $purchaseQuery)
-            ->whereIn('status', ['paid', 'completed'])
-            ->sum('total_price');
-        $totalPending = (clone $purchaseQuery)->where('status', 'pending')->count();
-        $totalCancelled = (clone $purchaseQuery)->where('status', 'cancelled')->count();
-        $totalPaid = (clone $purchaseQuery)->whereIn('status', ['paid', 'completed'])->count();
-
-        // Top 5 produk terlaku dalam periode
-        $topProduk = DetailPurchase::with('product')
-            ->whereHas('purchase', function ($q) use ($bulan, $tahun) {
-                $q->whereIn('status', ['paid', 'completed'])
-                    ->whereMonth('created_at', $bulan)
-                    ->whereYear('created_at', $tahun);
-            })
-            ->selectRaw('product_id, SUM(quantity) as total_terjual, SUM(total_price) as total_pendapatan')
-            ->groupBy('product_id')
-            ->orderByDesc('total_terjual')
-            ->limit(5)
+        $expenses = Expense::whereYear('spent_at', $year)
+            ->whereMonth('spent_at', $month)
+            ->orderByDesc('spent_at')
+            ->orderByDesc('id')
             ->get();
 
-        // Ringkasan penjualan per bulan (12 bulan terakhir)
-        $penjualanPerBulan = $this->getPenjualanPerBulan();
+        return view('admin.pages.reports', compact('financialData', 'expenses', 'selectedPeriod'));
+    }
 
-        // --- Laporan Donasi ---
-        $donationQuery = Donation::whereMonth('created_at', $bulan)
-            ->whereYear('created_at', $tahun);
+    public function income(Request $request): View
+    {
+        $selectedPeriod = $request->query('periode');
+        $financialData = $this->financialReportService->getReportData($selectedPeriod);
 
-        $totalDonasi = (clone $donationQuery)->count();
-        $donasiDiterima = (clone $donationQuery)->where('status', 'received')->count();
-        $donasiPending = (clone $donationQuery)->whereIn('status', ['pending', 'confirmed', 'picked_up'])->count();
-        $donasiDitolak = (clone $donationQuery)->where('status', 'rejected')->count();
+        $activePeriod = $financialData['selected_period'];
+        [$year, $month] = array_map('intval', explode('-', $activePeriod));
 
-        // Ringkasan donasi per bulan (12 bulan terakhir)
-        $donasiPerBulan = $this->getDonasiPerBulan();
+        $purchases = Purchase::whereIn('status', ['paid', 'completed'])
+            ->whereYear('created_at', $year)
+            ->whereMonth('created_at', $month)
+            ->orderByDesc('created_at')
+            ->orderByDesc('id')
+            ->get();
 
-        return view('admin.pages.reports', compact(
-            'bulan',
-            'tahun',
-            'totalTransaksi',
-            'totalPendapatan',
-            'totalPending',
-            'totalCancelled',
-            'totalPaid',
-            'topProduk',
-            'penjualanPerBulan',
-            'totalDonasi',
-            'donasiDiterima',
-            'donasiPending',
-            'donasiDitolak',
-            'donasiPerBulan',
+        $donations = Donation::with('category')
+            ->where('status', 'received')
+            ->where(function ($query) use ($year, $month) {
+                $query->where(function ($q) use ($year, $month) {
+                    $q->whereNotNull('received_at')
+                        ->whereYear('received_at', $year)
+                        ->whereMonth('received_at', $month);
+                })->orWhere(function ($q) use ($year, $month) {
+                    $q->whereNull('received_at')
+                        ->whereYear('created_at', $year)
+                        ->whereMonth('created_at', $month);
+                });
+            })
+            ->orderByDesc('received_at')
+            ->orderByDesc('created_at')
+            ->get();
+
+        $totalDonationItems = (int) $donations->sum('item_count');
+
+        return view('admin.pages.reports-income', compact(
+            'financialData',
+            'purchases',
+            'donations',
+            'totalDonationItems',
+            'selectedPeriod',
+            'activePeriod'
         ));
     }
 
-    /**
-     * Collect monthly sales summary for the past 12 months.
-     *
-     * @return array<int, array{bulan: string, total: int, pendapatan: float, cancelled: int}>
-     */
-    private function getPenjualanPerBulan(): array
+    public function store(StoreReportRequest $request): RedirectResponse
     {
-        $rows = [];
-        for ($i = 11; $i >= 0; $i--) {
-            $date = now()->subMonths($i);
-            $m = (int) $date->month;
-            $y = (int) $date->year;
+        Expense::create($request->validated());
 
-            $q = Purchase::whereMonth('created_at', $m)->whereYear('created_at', $y);
+        FinancialReportService::clearCache();
 
-            $rows[] = [
-                'bulan' => $date->translatedFormat('M Y'),
-                'total' => (clone $q)->count(),
-                'pendapatan' => (float) (clone $q)->whereIn('status', ['paid', 'completed'])->sum('total_price'),
-                'cancelled' => (clone $q)->where('status', 'cancelled')->count(),
-            ];
-        }
+        return redirect()->route('admin.reports.index', ['periode' => $request->input('periode_redirect')])
+            ->with('success', 'Pengeluaran berhasil ditambahkan.');
+    }
 
-        return $rows;
+    public function update(UpdateReportRequest $request, Expense $expense): RedirectResponse
+    {
+        $expense->update($request->validated());
+
+        FinancialReportService::clearCache();
+
+        return redirect()->route('admin.reports.index', ['periode' => $request->input('periode_redirect')])
+            ->with('success', 'Pengeluaran berhasil diperbarui.');
+    }
+
+    public function destroy(Expense $expense): RedirectResponse
+    {
+        $expense->delete();
+
+        FinancialReportService::clearCache();
+
+        return redirect()->route('admin.reports.index')
+            ->with('success', 'Pengeluaran berhasil dihapus.');
     }
 
     /**
-     * Collect monthly donation summary for the past 12 months.
-     *
-     * @return array<int, array{bulan: string, total: int, diterima: int, ditolak: int}>
+     * Export financial report (income & expense) to Excel or PDF.
      */
-    private function getDonasiPerBulan(): array
+    public function export(AdminExportRequest $request, ExportService $exportService): SymfonyResponse
     {
-        $rows = [];
-        for ($i = 11; $i >= 0; $i--) {
-            $date = now()->subMonths($i);
-            $m = (int) $date->month;
-            $y = (int) $date->year;
+        $validated = $request->validated();
+        $range = $exportService->resolveDateRange($validated['period_type'], $validated['period']);
+        $data = $exportService->getReportsData($range['start'], $range['end']);
 
-            $q = Donation::whereMonth('created_at', $m)->whereYear('created_at', $y);
-
-            $rows[] = [
-                'bulan' => $date->translatedFormat('M Y'),
-                'total' => (clone $q)->count(),
-                'diterima' => (clone $q)->where('status', 'received')->count(),
-                'ditolak' => (clone $q)->where('status', 'rejected')->count(),
-            ];
-        }
-
-        return $rows;
+        return $exportService->export('reports', $validated['format'], $range, $data);
     }
 }

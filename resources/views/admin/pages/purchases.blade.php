@@ -1,26 +1,31 @@
 @extends('admin.shared.Layout')
 
-@section('title', 'Pesanan & Transaksi')
+@section('title', 'Pesanan')
 
 @section('content')
     <div class="space-y-5">
 
         {{-- Page Header --}}
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div>
-                <h2 class="text-lg font-bold text-gray-900">Daftar Pesanan & Transaksi</h2>
-                <p class="text-sm text-gray-500 mt-0.5">Semua pesanan pembeli yang masuk via website atau WhatsApp.</p>
-            </div>
-            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-50 text-blue-700 text-xs font-semibold self-start sm:self-auto">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-                </svg>
-                {{ $purchases->total() }} total pesanan
-            </span>
+        <div>
+            <h2 class="text-lg font-bold text-gray-900">Pesanan & Transaksi</h2>
+            <p class="text-sm text-gray-500 mt-0.5">Semua pesanan pembeli yang masuk via website atau WhatsApp.</p>
         </div>
 
+        {{-- Export Controls --}}
+        @include('admin.partials._export-controls', ['action' => route('admin.purchases.export'), 'prefix' => 'purchases'])
+
+        {{-- Flash message --}}
+        @if(session('success'))
+            <div class="p-3.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm flex items-center justify-between">
+                <span>{{ session('success') }}</span>
+                <button type="button" onclick="this.parentElement.remove()" class="text-emerald-600 hover:text-emerald-800 text-xs font-medium cursor-pointer">
+                    Tutup
+                </button>
+            </div>
+        @endif
+
         {{-- Tabel Pesanan --}}
-        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-xs text-gray-700 divide-y divide-gray-200">
                     <thead class="bg-gray-50 font-bold text-gray-500 uppercase tracking-wider text-[11px]">
@@ -32,15 +37,15 @@
                             <th class="px-5 py-3.5">Total Belanja</th>
                             <th class="px-5 py-3.5">Bukti Bayar</th>
                             <th class="px-5 py-3.5">Status</th>
-                            <th class="px-5 py-3.5">Aksi</th>
+                            <th class="px-5 py-3.5 text-right">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100 font-medium">
                         @forelse($purchases as $purchase)
                             <tr class="hover:bg-gray-50 transition-colors">
-                                <td class="px-5 py-4 whitespace-nowrap text-gray-400">
+                                <td class="px-5 py-4 whitespace-nowrap text-gray-500">
                                     {{ $purchase->created_at->format('d M Y') }}<br>
-                                    <span class="text-[11px]">{{ $purchase->created_at->format('H:i') }}</span>
+                                    <span class="text-[11px] text-gray-400">{{ $purchase->created_at->format('H:i') }}</span>
                                 </td>
                                 <td class="px-5 py-4 whitespace-nowrap font-mono font-bold text-gray-900 text-xs">
                                     {{ $purchase->order_code }}
@@ -52,8 +57,7 @@
                                     @endif
                                 </td>
                                 <td class="px-5 py-4 whitespace-nowrap">
-                                    <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $purchase->customer_phone) }}" target="_blank" class="text-emerald-600 hover:underline font-medium flex items-center gap-1">
-                                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0012.04 2z"/></svg>
+                                    <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $purchase->customer_phone) }}" target="_blank" class="text-emerald-700 hover:underline font-medium">
                                         {{ $purchase->customer_phone }}
                                     </a>
                                 </td>
@@ -62,40 +66,56 @@
                                 </td>
                                 <td class="px-5 py-4 whitespace-nowrap">
                                     @if($purchase->payment_proof)
-                                        <a href="{{ asset('storage/'.$purchase->payment_proof) }}" target="_blank" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 font-semibold text-[11px] transition-colors" title="Lihat Foto Bukti Transfer">
-                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                            <span>Lihat Bukti</span>
+                                        <a href="{{ asset('storage/'.$purchase->payment_proof) }}" target="_blank" class="px-2 py-1 rounded border border-gray-200 text-gray-700 hover:bg-gray-50 text-[11px] font-medium transition-colors" title="Lihat Foto Bukti Transfer">
+                                            Lihat Bukti
                                         </a>
                                     @else
-                                        <span class="text-gray-400 text-[11px] italic">Belum diunggah</span>
+                                        <span class="text-gray-400 text-[11px]">Belum diunggah</span>
                                     @endif
                                 </td>
                                 <td class="px-5 py-4 whitespace-nowrap">
-                                    <span class="px-2.5 py-1 rounded-full text-[10px] font-bold {{ $purchase->status === 'paid' || $purchase->status === 'completed' ? 'bg-emerald-100 text-emerald-800' : ($purchase->status === 'cancelled' ? 'bg-rose-100 text-rose-800' : 'bg-amber-100 text-amber-800') }}">
-                                        {{ strtoupper($purchase->status) }}
+                                    <span class="text-xs font-medium {{ $purchase->status === 'paid' || $purchase->status === 'completed' ? 'text-emerald-700' : ($purchase->status === 'cancelled' ? 'text-rose-700' : 'text-amber-700') }}">
+                                        {{ ucfirst($purchase->status) }}
                                     </span>
                                 </td>
-                                <td class="px-5 py-4 whitespace-nowrap">
-                                    <form method="POST" action="{{ route('admin.purchases.update-status', $purchase) }}" class="flex items-center gap-2">
-                                        @csrf
-                                        @method('PATCH')
-                                        <select name="status" onchange="this.form.submit()" class="text-xs rounded-lg border border-gray-200 px-2 py-1.5 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary/30 cursor-pointer">
-                                            @foreach(['pending', 'paid', 'completed', 'cancelled'] as $s)
-                                                <option value="{{ $s }}" {{ $purchase->status === $s ? 'selected' : '' }}>{{ ucfirst($s) }}</option>
-                                            @endforeach
-                                        </select>
-                                    </form>
+                                <td class="px-5 py-4 whitespace-nowrap text-right">
+                                    <div class="flex flex-col items-end gap-1.5">
+                                        {{-- Update Status --}}
+                                        <form method="POST" action="{{ route('admin.purchases.update-status', $purchase) }}" class="flex items-center gap-2">
+                                            @csrf
+                                            @method('PATCH')
+                                            <select name="status" onchange="this.form.submit()" class="text-xs rounded-md border border-gray-200 px-2 py-1 bg-white text-gray-700 focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer">
+                                                @foreach(['pending', 'paid', 'completed', 'cancelled'] as $s)
+                                                    <option value="{{ $s }}" {{ $purchase->status === $s ? 'selected' : '' }}>{{ ucfirst($s) }}</option>
+                                                @endforeach
+                                            </select>
+                                        </form>
+
+                                        {{-- Tombol Minta Ulasan via WhatsApp jika Paid / Completed --}}
+                                        @if(in_array($purchase->status, ['paid', 'completed']))
+                                            @if($purchase->review)
+                                                <span class="text-[11px] text-gray-500 font-medium">
+                                                    Sudah diulas
+                                                </span>
+                                            @else
+                                                @php
+                                                    $waLink = \App\Support\ReviewRequestLink::forPurchase($purchase);
+                                                @endphp
+                                                @if($waLink)
+                                                    <a href="{{ $waLink }}" target="_blank"
+                                                        class="text-[11px] font-medium text-emerald-700 hover:underline">
+                                                        Minta Ulasan
+                                                    </a>
+                                                @endif
+                                            @endif
+                                        @endif
+                                    </div>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="8" class="px-5 py-12 text-center">
-                                    <div class="flex flex-col items-center gap-2 text-gray-400">
-                                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-                                        </svg>
-                                        <p class="text-sm font-medium">Belum ada transaksi pesanan yang masuk.</p>
-                                    </div>
+                                <td colspan="8" class="px-5 py-10 text-center text-sm text-gray-500">
+                                    Belum ada transaksi pesanan yang masuk.
                                 </td>
                             </tr>
                         @endforelse
@@ -112,4 +132,3 @@
 
     </div>
 @endsection
-

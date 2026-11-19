@@ -40,24 +40,31 @@
                            class="w-full px-3.5 py-2.5 rounded-xl border border-ink/20 focus:outline-none focus:ring-2 focus:ring-sun">
                 </div>
             </div>
-            <div>
-                <label class="block mb-1 text-ink font-semibold">Kategori Barang Donasi *</label>
-                <select name="category_id" class="w-full px-3.5 py-2.5 rounded-xl border border-ink/20 focus:outline-none focus:ring-2 focus:ring-sun bg-white">
-                    @if(isset($donationCategories) && $donationCategories->count() > 0)
-                        @foreach($donationCategories as $cat)
-                            <option value="{{ $cat->id }}">{{ $cat->name }}</option>
-                        @endforeach
-                    @else
-                        <option value="">Pakaian Anak / Dewasa Layak Pakai</option>
-                        <option value="">Buku Bacaan / Ensiklopedia</option>
-                        <option value="">Mainan Edukatif / Puzzle</option>
-                        <option value="">Bahan Prakarya (Kain / Benang / Kanvas)</option>
-                        <option value="">Peralatan Terapi / Lainnya</option>
-                    @endif
-                </select>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                    <label class="block mb-1 text-ink font-semibold">Kategori Barang Donasi *</label>
+                    <select name="category_id" class="w-full px-3.5 py-2.5 rounded-xl border border-ink/20 focus:outline-none focus:ring-2 focus:ring-sun bg-white">
+                        @if(isset($donationCategories) && $donationCategories->count() > 0)
+                            @foreach($donationCategories as $cat)
+                                <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                            @endforeach
+                        @else
+                            <option value="">Pakaian Anak / Dewasa Layak Pakai</option>
+                            <option value="">Buku Bacaan / Ensiklopedia</option>
+                            <option value="">Mainan Edukatif / Puzzle</option>
+                            <option value="">Bahan Prakarya (Kain / Benang / Kanvas)</option>
+                            <option value="">Peralatan Terapi / Lainnya</option>
+                        @endif
+                    </select>
+                </div>
+                <div>
+                    <label class="block mb-1 text-ink font-semibold">Perkiraan Jumlah Barang *</label>
+                    <input type="number" name="item_count" min="1" max="1000" value="1" required placeholder="Contoh: 5"
+                           class="w-full px-3.5 py-2.5 rounded-xl border border-ink/20 focus:outline-none focus:ring-2 focus:ring-sun">
+                </div>
             </div>
             <div>
-                <label class="block mb-1 text-ink font-semibold">Perkiraan Jumlah / Deskripsi Singkat</label>
+                <label class="block mb-1 text-ink font-semibold">Deskripsi Singkat / Catatan</label>
                 <textarea name="description" rows="2"
                           placeholder="Contoh: 2 kardus pakaian anak usia 3-6 tahun, kondisi bersih dan layak."
                           class="w-full px-3.5 py-2.5 rounded-xl border border-ink/20 focus:outline-none focus:ring-2 focus:ring-sun"></textarea>

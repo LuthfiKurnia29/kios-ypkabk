@@ -4,8 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@hasSection('title')@yield('title') — @endif{{ $title ?? 'Admin' }} — {{ config('app.name', 'Kios Mandiri YPKABK') }}</title>
+    <title>@hasSection('title')@yield('title')@else{{ $title ?? $computedHeaderTitle }}@endif</title>
     
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/favicon-32.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('images/favicon-180.png') }}">
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=plus-jakarta-sans:400,500,600,700,800&display=swap" rel="stylesheet" />
@@ -16,12 +20,18 @@
 
     @php
         $computedHeaderTitle = $title ?? match(true) {
-            request()->routeIs('admin.products.*') => 'Kelola Produk',
-            request()->routeIs('admin.purchases.*') => 'Daftar Pesanan & Transaksi',
-            request()->routeIs('admin.donations.*') => 'Daftar Donasi Preloved Masuk',
-            request()->routeIs('admin.dashboard') => 'Dashboard Ringkasan',
-            request()->routeIs('admin.reports.*') => 'Laporan & Statistik',
-            default => 'Panel Admin'
+            request()->routeIs('admin.products.*') => 'Produk',
+            request()->routeIs('admin.categories.*') => 'Kategori Produk',
+            request()->routeIs('admin.purchases.*') => 'Pesanan',
+            request()->routeIs('admin.donations.*') => 'Donasi Masuk',
+            request()->routeIs('admin.reports.income') => 'Laporan Pemasukan',
+            request()->routeIs('admin.reports.*') => 'Laporan Pengeluaran',
+            request()->routeIs('admin.messages.*') => 'Pesan Masuk',
+            request()->routeIs('admin.site-content.*') => 'Konten Situs',
+            request()->routeIs('admin.reviews.*') => 'Ulasan & Testimoni',
+            request()->routeIs('admin.unboxing.*') => 'Galeri Unboxing',
+            request()->routeIs('admin.dashboard') => 'Dashboard',
+            default => 'Dashboard'
         };
 
         $userName = auth()->user()->name ?? 'Admin';
@@ -44,6 +54,16 @@
         $reportsHasRoute = Route::has('admin.reports.index');
         $reportsUrl = $reportsHasRoute ? route('admin.reports.index') : '#';
         $isReports = $reportsHasRoute && request()->routeIs('admin.reports.*');
+
+        $messagesHasRoute = Route::has('admin.messages.index');
+        $messagesUrl = $messagesHasRoute ? route('admin.messages.index') : '#';
+        $isMessages = $messagesHasRoute && request()->routeIs('admin.messages.*');
+        $newMessagesCount = $messagesHasRoute && \Illuminate\Support\Facades\Schema::hasTable('contact_messages')
+            ? \App\Models\ContactMessage::where('status', 'new')->count()
+            : 0;
+
+        $isSiteContent = request()->routeIs('admin.site-content.*');
+        $isReviews = request()->routeIs('admin.reviews.*');
     @endphp
 
     {{-- Mobile Sidebar Backdrop --}}
@@ -79,50 +99,94 @@
             </div>
 
             {{-- Navigation --}}
-            <nav aria-label="Menu admin" class="flex-1 px-4 space-y-1.5 overflow-y-auto text-sm">
-                {{-- 1. Dashboard --}}
-                <a href="{{ route('admin.dashboard') }}"
-                   @if($isDashboard) aria-current="page" @endif
-                   class="block px-4 py-2.5 rounded-xl font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 {{ $isDashboard ? 'bg-primary text-white shadow-xs font-semibold' : 'text-teks hover:text-primary hover:bg-white/60' }}">
-                    Dashboard
-                </a>
+            <nav aria-label="Menu admin" class="flex-1 px-4 space-y-4 overflow-y-auto text-sm">
+                {{-- Dashboard --}}
+                <div>
+                    <a href="{{ route('admin.dashboard') }}"
+                       @if($isDashboard) aria-current="page" @endif
+                       class="block px-3.5 py-2 rounded-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 {{ $isDashboard ? 'bg-primary text-white font-semibold' : 'text-teks hover:text-primary hover:bg-white/60' }}">
+                        Dashboard
+                    </a>
+                </div>
 
-                {{-- 2. Produk --}}
-                <a href="{{ route('admin.products.index') }}"
-                   @if($isProducts) aria-current="page" @endif
-                   class="block px-4 py-2.5 rounded-xl font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 {{ $isProducts ? 'bg-primary text-white shadow-xs font-semibold' : 'text-teks hover:text-primary hover:bg-white/60' }}">
-                    Produk
-                </a>
+                {{-- OPERASIONAL --}}
+                <div class="space-y-1" aria-label="Menu Operasional">
+                    <p class="px-3.5 text-[11px] font-semibold uppercase tracking-wider text-admin-muted">Operasional</p>
 
-                {{-- 3. Pesanan --}}
-                <a href="{{ route('admin.purchases.index') }}"
-                   @if($isPurchases) aria-current="page" @endif
-                   class="block px-4 py-2.5 rounded-xl font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 {{ $isPurchases ? 'bg-primary text-white shadow-xs font-semibold' : 'text-teks hover:text-primary hover:bg-white/60' }}">
-                    Pesanan
-                </a>
+                    {{-- Pesanan --}}
+                    <a href="{{ route('admin.purchases.index') }}"
+                       @if($isPurchases) aria-current="page" @endif
+                       class="block px-3.5 py-2 rounded-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 {{ $isPurchases ? 'bg-primary text-white font-semibold' : 'text-teks hover:text-primary hover:bg-white/60' }}">
+                        Pesanan
+                    </a>
 
-                {{-- 4. Donasi Masuk --}}
-                <a href="{{ route('admin.donations.index') }}"
-                   @if($isDonations) aria-current="page" @endif
-                   class="block px-4 py-2.5 rounded-xl font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 {{ $isDonations ? 'bg-primary text-white shadow-xs font-semibold' : 'text-teks hover:text-primary hover:bg-white/60' }}">
-                    Donasi Masuk
-                </a>
+                    {{-- Donasi Masuk --}}
+                    <a href="{{ route('admin.donations.index') }}"
+                       @if($isDonations) aria-current="page" @endif
+                       class="block px-3.5 py-2 rounded-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 {{ $isDonations ? 'bg-primary text-white font-semibold' : 'text-teks hover:text-primary hover:bg-white/60' }}">
+                        Donasi Masuk
+                    </a>
 
-                {{-- 5. Galeri Unboxing --}}
-                <a href="{{ $unboxingUrl }}"
-                   @if(!$unboxingHasRoute) aria-disabled="true" @endif
-                   @if($isUnboxing) aria-current="page" @endif
-                   class="block px-4 py-2.5 rounded-xl font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 {{ $isUnboxing ? 'bg-primary text-white shadow-xs font-semibold' : 'text-teks hover:text-primary hover:bg-white/60' }}">
-                    Galeri Unboxing
-                </a>
+                    {{-- Laporan --}}
+                    <a href="{{ $reportsUrl }}"
+                       @if(!$reportsHasRoute) aria-disabled="true" @endif
+                       @if($isReports) aria-current="page" @endif
+                       class="block px-3.5 py-2 rounded-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 {{ $isReports ? 'bg-primary text-white font-semibold' : 'text-teks hover:text-primary hover:bg-white/60' }}">
+                        Laporan
+                    </a>
+                </div>
 
-                {{-- 6. Laporan --}}
-                <a href="{{ $reportsUrl }}"
-                   @if(!$reportsHasRoute) aria-disabled="true" @endif
-                   @if($isReports) aria-current="page" @endif
-                   class="block px-4 py-2.5 rounded-xl font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 {{ $isReports ? 'bg-primary text-white shadow-xs font-semibold' : 'text-teks hover:text-primary hover:bg-white/60' }}">
-                    Laporan
-                </a>
+                {{-- KATALOG & KONTEN --}}
+                <div class="space-y-1" aria-label="Menu Katalog & Konten">
+                    <p class="px-3.5 text-[11px] font-semibold uppercase tracking-wider text-admin-muted">Katalog & Konten</p>
+
+                    {{-- Produk --}}
+                    <a href="{{ route('admin.products.index') }}"
+                       @if($isProducts) aria-current="page" @endif
+                       class="block px-3.5 py-2 rounded-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 {{ $isProducts ? 'bg-primary text-white font-semibold' : 'text-teks hover:text-primary hover:bg-white/60' }}">
+                        Produk
+                    </a>
+
+                    {{-- Galeri Unboxing --}}
+                    <a href="{{ $unboxingUrl }}"
+                       @if(!$unboxingHasRoute) aria-disabled="true" @endif
+                       @if($isUnboxing) aria-current="page" @endif
+                       class="block px-3.5 py-2 rounded-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 {{ $isUnboxing ? 'bg-primary text-white font-semibold' : 'text-teks hover:text-primary hover:bg-white/60' }}">
+                        Galeri Unboxing
+                    </a>
+
+                    {{-- Konten Situs --}}
+                    <a href="{{ route('admin.site-content.edit') }}"
+                       @if($isSiteContent) aria-current="page" @endif
+                       class="block px-3.5 py-2 rounded-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 {{ $isSiteContent ? 'bg-primary text-white font-semibold' : 'text-teks hover:text-primary hover:bg-white/60' }}">
+                        Konten Situs
+                    </a>
+                </div>
+
+                {{-- KOMUNIKASI --}}
+                <div class="space-y-1" aria-label="Menu Komunikasi">
+                    <p class="px-3.5 text-[11px] font-semibold uppercase tracking-wider text-admin-muted">Komunikasi</p>
+
+                    {{-- Pesan Masuk --}}
+                    <a href="{{ $messagesUrl }}"
+                       @if(!$messagesHasRoute) aria-disabled="true" @endif
+                       @if($isMessages) aria-current="page" @endif
+                       class="flex items-center justify-between px-3.5 py-2 rounded-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 {{ $isMessages ? 'bg-primary text-white font-semibold' : 'text-teks hover:text-primary hover:bg-white/60' }}">
+                        <span>Pesan Masuk</span>
+                        @if($newMessagesCount > 0 && !$isMessages)
+                            <span class="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-[10px] font-bold rounded-full bg-primary text-white">
+                                {{ $newMessagesCount > 99 ? '99+' : $newMessagesCount }}
+                            </span>
+                        @endif
+                    </a>
+
+                    {{-- Ulasan & Testimoni --}}
+                    <a href="{{ route('admin.reviews.index') }}"
+                       @if($isReviews) aria-current="page" @endif
+                       class="block px-3.5 py-2 rounded-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 {{ $isReviews ? 'bg-primary text-white font-semibold' : 'text-teks hover:text-primary hover:bg-white/60' }}">
+                        Ulasan & Testimoni
+                    </a>
+                </div>
             </nav>
 
             {{-- Sidebar Footer: Pemisah tipis 1px di atas "Keluar" --}}
@@ -193,19 +257,13 @@
                 @if (session('success') || session('error'))
                     <div class="px-6 lg:px-10 pt-6">
                         @if (session('success'))
-                            <div class="mb-4 px-4 py-3 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-sm flex items-center gap-2 shadow-xs" role="alert">
-                                <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                                </svg>
+                            <div class="mb-4 px-4 py-3 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-lg text-sm" role="alert">
                                 <span>{{ session('success') }}</span>
                             </div>
                         @endif
 
                         @if (session('error'))
-                            <div class="mb-4 px-4 py-3 bg-rose-50 border border-rose-200 text-rose-800 rounded-xl text-sm flex items-center gap-2 shadow-xs" role="alert">
-                                <svg class="w-4 h-4 text-rose-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
+                            <div class="mb-4 px-4 py-3 bg-rose-50 border border-rose-200 text-rose-800 rounded-lg text-sm" role="alert">
                                 <span>{{ session('error') }}</span>
                             </div>
                         @endif
