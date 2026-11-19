@@ -215,5 +215,21 @@ class AdminUnboxingAndReportTest extends TestCase
         $response->assertOk();
         $response->assertSee('Paket Donasi Kursi Roda Lipat');
         $response->assertDontSee('Paket Rahasia Tidak Tampil');
+        $response->assertSee('1 video dokumentasi');
+        $response->assertSee('Tonton di YouTube');
+        $response->assertDontSee('Unboxing 3 Box Pakaian Balita Bunda Melati');
+    }
+
+    public function test_public_unboxing_page_handles_empty_state_without_dummy_data(): void
+    {
+        Unboxing::query()->delete();
+
+        $response = $this->get(route('unboxing'));
+
+        $response->assertOk();
+        $response->assertSee('0 video dokumentasi');
+        $response->assertSee('Belum ada dokumentasi unboxing');
+        $response->assertDontSee('Unboxing 3 Box Pakaian Balita Bunda Melati');
+        $response->assertDontSee('Buka Paket Alat Lukis & Kuas untuk Kelas Seni ABK');
     }
 }

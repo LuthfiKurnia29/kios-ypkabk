@@ -68,11 +68,8 @@
         {{-- Tautan Lengkap ke Cara Donasi --}}
         <div class="pt-2">
             <a href="{{ route('cara-donasi') }}"
-               class="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:text-primary/80 transition-colors">
-                <span>Lihat panduan lengkap barang yang dapat didonasikan</span>
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-                </svg>
+               class="inline-flex items-center text-sm font-semibold text-primary hover:text-primary/80 transition-colors">
+                <span>Lihat panduan lengkap barang yang dapat didonasikan &rarr;</span>
             </a>
         </div>
 

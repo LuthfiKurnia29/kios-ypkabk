@@ -20,20 +20,43 @@ class SiteSetting extends Model
      */
     public const HERO_IMAGE_PATH = 'hero';
 
+    public const ALL_CACHE_KEY = 'site_settings_all';
+
     private const CACHE_PREFIX = 'site_setting:';
 
-    private const CACHE_TTL = 300;
+    private const CACHE_TTL = 3600;
+
+    /**
+     * Per-request memoization of public settings to avoid repeated queries.
+     *
+     * @var array<string, string>|null
+     */
+    private static ?array $publicSettingsCache = null;
+
+    /**
+     * Get all settings as key-value pairs (cached for 1 hour per requirement).
+     *
+     * @return array<string, mixed>
+     */
+    public static function getAllSettings(): array
+    {
+        return Cache::remember('site_settings_all', 3600, function () {
+            try {
+                return static::pluck('value', 'key')->toArray();
+            } catch (\Throwable) {
+                return [];
+            }
+        });
+    }
 
     /**
      * Get a setting value by key with an optional default.
      */
     public static function get(string $key, mixed $default = null): mixed
     {
-        return Cache::remember(
-            self::CACHE_PREFIX.$key,
-            self::CACHE_TTL,
-            fn () => static::where('key', $key)->value('value') ?? $default
-        );
+        $all = static::getAllSettings();
+
+        return array_key_exists($key, $all) && $all[$key] !== null ? $all[$key] : $default;
     }
 
     /**
@@ -47,6 +70,11 @@ class SiteSetting extends Model
         );
 
         Cache::forget(self::CACHE_PREFIX.$key);
+        Cache::forget('site_settings_all');
+        Cache::forget(self::ALL_CACHE_KEY);
+        Cache::forget('site_settings_all');
+        Cache::forget('site_settings:all_keyed');
+        static::resetPublicSettingsCache();
 
         return $setting;
     }
@@ -93,10 +121,84 @@ class SiteSetting extends Model
      */
     public static function clearCache(): void
     {
-        $keys = static::pluck('key');
+        try {
+            $keys = static::pluck('key');
 
-        foreach ($keys as $key) {
-            Cache::forget(self::CACHE_PREFIX.$key);
+            foreach ($keys as $key) {
+                Cache::forget(self::CACHE_PREFIX.$key);
+            }
+        } catch (\Throwable) {
         }
+
+        Cache::forget(self::ALL_CACHE_KEY);
+        Cache::forget('site_settings_all');
+        Cache::forget('site_settings:all_keyed');
+        static::resetPublicSettingsCache();
+    }
+
+    /**
+     * Format a phone number to international WhatsApp format (628...).
+     */
+    public static function formatWhatsappNumber(?string $phone): string
+    {
+        $cleaned = preg_replace('/\D+/', '', (string) $phone);
+
+        if (str_starts_with($cleaned, '0')) {
+            return '62'.substr($cleaned, 1);
+        }
+
+        if (str_starts_with($cleaned, '8')) {
+            return '62'.$cleaned;
+        }
+
+        return $cleaned ?: '6281234567890';
+    }
+
+    /**
+     * Get all public site settings with fallbacks.
+     * Result is memoized for the current request to avoid repeated queries.
+     *
+     * @return array<string, string>
+     */
+    public static function getPublicSettings(): array
+    {
+        if (static::$publicSettingsCache !== null) {
+            return static::$publicSettingsCache;
+        }
+
+        $rawWa = static::get('contact_whatsapp', '081234567890');
+        $formattedWa = static::formatWhatsappNumber($rawWa);
+
+        static::$publicSettingsCache = [
+            'footer_description' => static::get(
+                'footer_description',
+                'Toko amal dan galeri karya anak berkebutuhan khusus. 100% donasi dan hasil transaksi menopang ruang terapi dan vokasi berdaya di Jawa Timur.'
+            ),
+            'contact_whatsapp' => $rawWa,
+            'contact_whatsapp_formatted' => $formattedWa,
+            'contact_whatsapp_link' => 'https://wa.me/'.$formattedWa,
+            'contact_email' => static::get('contact_email', 'kios@ypkabk.org'),
+            'service_hours' => static::get('service_hours', 'Senin – Sabtu: 08.00 – 16.00 WIB'),
+            'sentra_sidoarjo_name' => static::get('sentra_sidoarjo_name', 'Sentra Kios Mandiri Sidoarjo'),
+            'sentra_sidoarjo_address' => static::get('sentra_sidoarjo_address', 'Jl. Wonocolo Pabrik Kulit No. 34, Sepanjang, Sidoarjo, Jawa Timur 61256'),
+            'sentra_sidoarjo_maps_url' => static::get('sentra_sidoarjo_maps_url', 'https://maps.google.com/?q=Sentra+Kios+Mandiri+YPKABK+Sidoarjo'),
+            'sentra_mojokerto_name' => static::get('sentra_mojokerto_name', 'Sentra Kios Mandiri Mojokerto'),
+            'sentra_mojokerto_address' => static::get('sentra_mojokerto_address', 'Jl. Raya Brangkal No. 12, Sooko, Mojokerto, Jawa Timur 61318'),
+            'sentra_mojokerto_maps_url' => static::get('sentra_mojokerto_maps_url', 'https://maps.google.com/?q=Sentra+Kios+Mandiri+YPKABK+Mojokerto'),
+            'social_instagram' => static::get('social_instagram', 'https://instagram.com/kiosmandiri.ypkabk'),
+            'social_youtube' => static::get('social_youtube', 'https://youtube.com/@ypkabk'),
+            'social_tiktok' => static::get('social_tiktok', 'https://tiktok.com/@kiosmandiri.ypkabk'),
+        ];
+
+        return static::$publicSettingsCache;
+    }
+
+    /**
+     * Reset the per-request memoized public settings.
+     * Called after settings are updated so the next read fetches fresh data.
+     */
+    public static function resetPublicSettingsCache(): void
+    {
+        static::$publicSettingsCache = null;
     }
 }

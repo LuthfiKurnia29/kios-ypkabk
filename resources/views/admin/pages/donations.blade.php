@@ -14,16 +14,6 @@
         {{-- Export Controls --}}
         @include('admin.partials._export-controls', ['action' => route('admin.donations.export'), 'prefix' => 'donations'])
 
-        {{-- Flash message --}}
-        @if(session('success'))
-            <div class="p-3.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm flex items-center justify-between">
-                <span>{{ session('success') }}</span>
-                <button type="button" onclick="this.parentElement.remove()" class="text-emerald-600 hover:text-emerald-800 text-xs font-medium cursor-pointer">
-                    Tutup
-                </button>
-            </div>
-        @endif
-
         {{-- Tabel Donasi --}}
         <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
             <div class="overflow-x-auto">
@@ -36,6 +26,7 @@
                             <th class="px-5 py-3.5">Kota Asal</th>
                             <th class="px-5 py-3.5">Kategori</th>
                             <th class="px-5 py-3.5 text-center">Jml Barang</th>
+                            <th class="px-5 py-3.5">Foto Barang</th>
                             <th class="px-5 py-3.5">Deskripsi Barang</th>
                             <th class="px-5 py-3.5">Status</th>
                             <th class="px-5 py-3.5 text-right">Aksi</th>
@@ -68,6 +59,27 @@
                                     <span class="font-medium text-gray-900">
                                         {{ $donation->item_count ?? 1 }} pcs
                                     </span>
+                                </td>
+                                <td class="px-5 py-4">
+                                    @php
+                                        $photos = $donation->item_photos_urls;
+                                    @endphp
+                                    @if(!empty($photos))
+                                        <div class="flex items-center gap-1.5 flex-wrap max-w-[160px]">
+                                            @foreach($photos as $index => $photoUrl)
+                                                <a href="{{ $photoUrl }}" target="_blank" rel="noopener noreferrer"
+                                                   class="block group relative w-10 h-10 rounded-lg overflow-hidden border border-gray-200 bg-gray-50 hover:ring-2 hover:ring-primary transition-all shrink-0"
+                                                   title="Foto {{ $index + 1 }} - Klik untuk melihat ukuran penuh">
+                                                    <img src="{{ $photoUrl }}" alt="Foto {{ $index + 1 }} {{ $donation->donor_name }}" class="w-full h-full object-cover">
+                                                    <span class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-[9px] text-white font-semibold transition-opacity">
+                                                        #{{ $index + 1 }}
+                                                    </span>
+                                                </a>
+                                            @endforeach
+                                        </div>
+                                    @else
+                                        <span class="text-gray-400 text-[11px]">Tanpa foto</span>
+                                    @endif
                                 </td>
                                 <td class="px-5 py-4 text-gray-600 max-w-[200px] truncate" title="{{ $donation->description }}">
                                     {{ $donation->description ?: '-' }}
@@ -123,7 +135,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="9" class="px-5 py-10 text-center text-sm text-gray-500">
+                                <td colspan="10" class="px-5 py-10 text-center text-sm text-gray-500">
                                     Belum ada formulir donasi barang yang masuk.
                                 </td>
                             </tr>

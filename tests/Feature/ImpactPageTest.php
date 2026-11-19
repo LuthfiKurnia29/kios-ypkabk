@@ -3,9 +3,12 @@
 namespace Tests\Feature;
 
 use App\Http\Services\FinancialReportService;
+use App\Http\Services\SiteStatsService;
+use App\Models\Donation;
 use App\Models\Expense;
 use App\Models\ImpactMetric;
 use App\Models\Purchase;
+use App\Models\SiteSetting;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
@@ -152,6 +155,64 @@ class ImpactPageTest extends TestCase
         $response->assertViewHas('financialData', function ($data) use ($periodKey) {
             return $data['selected_period'] === $periodKey
                 && $data['income'] === 1000000;
+        });
+    }
+
+    public function test_dampak_page_stat_cards_derive_from_database_models_when_impact_metrics_empty(): void
+    {
+        SiteStatsService::clearCache();
+        FinancialReportService::clearCache();
+
+        SiteSetting::set('abk_trained_count', '42', 'number');
+
+        Donation::create([
+            'donor_name' => 'Donatur Barang',
+            'donor_phone' => '081234567800',
+            'donor_city' => 'Sidoarjo',
+            'item_count' => 25,
+            'status' => 'received',
+            'received_at' => now(),
+        ]);
+
+        Purchase::create([
+            'order_code' => 'ORD-STAT-001',
+            'customer_name' => 'Pembeli Terapi',
+            'customer_phone' => '081234567801',
+            'total_price' => 500000,
+            'status' => 'paid',
+        ]);
+
+        $response = $this->get('/dampak');
+
+        $response->assertOk();
+        $response->assertSee('25');
+        $response->assertSee('42 ABK');
+        $response->assertSee('Rp 500.000');
+        $response->assertSee('Barang layak pakai tersalurkan');
+        $response->assertSee('ABK terlatih mandiri');
+        $response->assertSee('Dana terapi terkumpul');
+    }
+
+    public function test_received_donation_is_not_counted_in_rupiah_income_or_balance(): void
+    {
+        SiteStatsService::clearCache();
+        FinancialReportService::clearCache();
+
+        Donation::create([
+            'donor_name' => 'Donatur Pakaian',
+            'donor_phone' => '081234567802',
+            'donor_city' => 'Mojokerto',
+            'item_count' => 100,
+            'status' => 'received',
+            'received_at' => now(),
+        ]);
+
+        $response = $this->get('/dampak');
+
+        $response->assertOk();
+        $response->assertViewHas('financialData', function ($data) {
+            return $data['income'] === 0
+                && $data['balance'] === 0;
         });
     }
 }

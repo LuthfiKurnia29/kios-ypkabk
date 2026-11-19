@@ -253,18 +253,20 @@
             {{-- Area Konten (Hanya area ini yang bergulir, latar pink sangat muda) --}}
             <div class="flex-1 overflow-y-auto bg-admin-bg">
 
-                {{-- Flash Messages --}}
+                {{-- Flash Messages (Notifikasi Terpusat) --}}
                 @if (session('success') || session('error'))
                     <div class="px-6 lg:px-10 pt-6">
                         @if (session('success'))
-                            <div class="mb-4 px-4 py-3 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-lg text-sm" role="alert">
-                                <span>{{ session('success') }}</span>
+                            <div class="mb-4 px-4 py-3 bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-lg text-sm flex items-center justify-between gap-3 shadow-xs" role="alert">
+                                <span class="font-medium">{{ session('success') }}</span>
+                                <button type="button" onclick="this.closest('[role=alert]').remove()" class="text-emerald-700 hover:text-emerald-950 p-1 text-base leading-none font-bold cursor-pointer" aria-label="Tutup notifikasi">&times;</button>
                             </div>
                         @endif
 
                         @if (session('error'))
-                            <div class="mb-4 px-4 py-3 bg-rose-50 border border-rose-200 text-rose-800 rounded-lg text-sm" role="alert">
-                                <span>{{ session('error') }}</span>
+                            <div class="mb-4 px-4 py-3 bg-rose-50 border border-rose-200 text-rose-900 rounded-lg text-sm flex items-center justify-between gap-3 shadow-xs" role="alert">
+                                <span class="font-medium">{{ session('error') }}</span>
+                                <button type="button" onclick="this.closest('[role=alert]').remove()" class="text-rose-700 hover:text-rose-950 p-1 text-base leading-none font-bold cursor-pointer" aria-label="Tutup notifikasi">&times;</button>
                             </div>
                         @endif
                     </div>

@@ -1,5 +1,7 @@
 @extends('user.shared.Layout')
 
+@section('title', 'Dampak & Transparansi')
+
 @section('content')
 @php
     $cards = (isset($impactMetrics) && $impactMetrics->isNotEmpty()) ? $impactMetrics : ($summaryCards ?? app(\App\Http\Services\SiteStatsService::class)->getSummaryCards());
@@ -147,7 +149,4 @@
         </div>
     </div>
 </section>
-
-@include('user.pages.home._modal-donasi')
-@include('user.pages.home._scripts')
 @endsection

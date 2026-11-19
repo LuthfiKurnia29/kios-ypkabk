@@ -8,6 +8,7 @@ use App\Models\Review;
 use App\Models\SiteSetting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
@@ -71,6 +72,9 @@ class SiteContentController extends Controller
             }
         }
 
+        SiteSetting::clearCache();
+        Cache::forget('site_settings_all');
+
         return redirect()->route('admin.site-content.edit')
             ->with('success_hero', 'Pengaturan Hero berhasil disimpan.');
     }
@@ -89,6 +93,8 @@ class SiteContentController extends Controller
         ]);
 
         SiteSetting::set('abk_trained_count', (string) $validated['abk_trained_count'], 'number');
+        SiteSetting::clearCache();
+        Cache::forget('site_settings_all');
         SiteStatsService::clearCache();
 
         return redirect()->route('admin.site-content.edit')
@@ -130,8 +136,65 @@ class SiteContentController extends Controller
             SiteStatsService::clearCache();
         }
 
+        $infoKeys = [
+            'footer_description',
+            'contact_whatsapp',
+            'contact_email',
+            'service_hours',
+            'sentra_sidoarjo_name',
+            'sentra_sidoarjo_address',
+            'sentra_sidoarjo_maps_url',
+            'sentra_mojokerto_name',
+            'sentra_mojokerto_address',
+            'sentra_mojokerto_maps_url',
+            'social_instagram',
+            'social_youtube',
+            'social_tiktok',
+        ];
+
+        foreach ($infoKeys as $key) {
+            if ($request->has($key)) {
+                SiteSetting::set($key, $request->input($key));
+            }
+        }
+
+        SiteSetting::clearCache();
+        Cache::forget('site_settings_all');
+
         return redirect()->route('admin.site-content.edit')
             ->with('success', 'Konten situs berhasil diperbarui.');
+    }
+
+    /**
+     * Update contact, center, social media, and footer settings.
+     */
+    public function updateInfo(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'footer_description' => ['nullable', 'string', 'max:1000'],
+            'contact_whatsapp' => ['nullable', 'string', 'max:50'],
+            'contact_email' => ['nullable', 'string', 'max:100'],
+            'service_hours' => ['nullable', 'string', 'max:150'],
+            'sentra_sidoarjo_name' => ['nullable', 'string', 'max:100'],
+            'sentra_sidoarjo_address' => ['nullable', 'string', 'max:500'],
+            'sentra_sidoarjo_maps_url' => ['nullable', 'string', 'max:500'],
+            'sentra_mojokerto_name' => ['nullable', 'string', 'max:100'],
+            'sentra_mojokerto_address' => ['nullable', 'string', 'max:500'],
+            'sentra_mojokerto_maps_url' => ['nullable', 'string', 'max:500'],
+            'social_instagram' => ['nullable', 'string', 'max:255'],
+            'social_youtube' => ['nullable', 'string', 'max:255'],
+            'social_tiktok' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        foreach ($validated as $key => $value) {
+            SiteSetting::set($key, $value);
+        }
+
+        SiteSetting::clearCache();
+        Cache::forget('site_settings_all');
+
+        return redirect()->route('admin.site-content.edit')
+            ->with('success', 'Pengaturan kontak, sentra, dan footer berhasil disimpan.');
     }
 
     // ─── Reviews Management (Curated) ───────────────────────────────

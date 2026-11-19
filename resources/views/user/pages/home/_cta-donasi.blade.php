@@ -27,11 +27,14 @@
             </button>
 
             {{-- Tombol Chat WhatsApp Hotline --}}
-            <a href="https://wa.me/6281234567890"
+            @php
+                $siteCta = $siteSettings ?? \App\Models\SiteSetting::getPublicSettings();
+            @endphp
+            <a href="{{ $siteCta['contact_whatsapp_link'] ?? 'https://wa.me/6281234567890' }}"
                target="_blank"
                rel="noopener noreferrer"
                class="inline-flex items-center justify-center px-6 h-[44px] rounded-[8px] border border-white/60 text-white font-semibold text-sm hover:bg-white/10 transition-all active:scale-[0.98]">
-                Chat WhatsApp Hotline (+62 812-3456-7890)
+                Chat WhatsApp Hotline ({{ $siteCta['contact_whatsapp'] ?? '081234567890' }})
             </a>
         </div>
 

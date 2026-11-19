@@ -5,16 +5,6 @@
 @section('content')
 <div class="space-y-6">
 
-    {{-- Alert Flash Message --}}
-    @if(session('success'))
-        <div class="p-3.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm flex items-center justify-between">
-            <span class="font-medium">{{ session('success') }}</span>
-            <button type="button" onclick="this.parentElement.remove()" class="text-emerald-500 hover:text-emerald-700" aria-label="Tutup">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-            </button>
-        </div>
-    @endif
-
     {{-- Warning: Active Reviews > 6 --}}
     @if($hasMoreThanSixActive)
         <div class="p-4 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 text-sm flex items-start gap-3">

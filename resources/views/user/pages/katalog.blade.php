@@ -1,5 +1,7 @@
 @extends('user.shared.Layout')
 
+@section('title', 'Katalog')
+
 @section('content')
 @php
     $productList = (isset($products) && count($products) > 0) ? $products : [
@@ -116,10 +118,7 @@
             <div class="w-full flex items-center justify-between lg:hidden pb-2">
                 <button type="button"
                         id="open-filter-drawer-btn"
-                        class="inline-flex items-center gap-2 px-4 py-2.5 rounded-[8px] bg-white border border-[#2B2430]/15 text-sm font-semibold text-[#2B2430] shadow-xs active:scale-95 transition-all">
-                    <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
-                    </svg>
+                        class="inline-flex items-center px-4 py-2.5 rounded-[8px] bg-white border border-[#2B2430]/15 text-sm font-semibold text-[#2B2430] shadow-xs active:scale-95 transition-all">
                     <span>Filter Produk</span>
                 </button>
                 <span class="text-xs text-[#2B2430]/70 font-medium">
@@ -317,12 +316,7 @@
                 </div>
 
                 {{-- Kondisi Nyata: Produk Tidak Ditemukan Saat Filter Kosong --}}
-                <div id="no-products-found" class="hidden py-16 px-6 text-center space-y-4 bg-white rounded-[12px] border border-[#2B2430]/10 shadow-xs">
-                    <div class="w-12 h-12 mx-auto rounded-full bg-[#FDEEF4] text-primary flex items-center justify-center">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                        </svg>
-                    </div>
+                <div id="no-products-found" class="hidden py-14 px-6 text-center space-y-3 bg-white rounded-[12px] border border-[#2B2430]/10 shadow-xs">
                     <h3 class="text-lg sm:text-xl font-bold text-[#2B2430]">
                         Produk tidak ditemukan
                     </h3>
