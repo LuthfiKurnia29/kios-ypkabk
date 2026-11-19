@@ -3,11 +3,11 @@
 @section('title', 'Kontak')
 
 @section('content')
-{{-- Header Halaman (Komponen <x-page-header>) --}}
+{{-- Header Halaman --}}
 <x-page-header
-    title="Kontak"
-    subtitle="Hubungi kami untuk donasi, pembelian, atau kunjungan ke sentra."
-    pill="Balasan dalam 1x24 jam"
+    title="Kontak & Lokasi Sentra"
+    subtitle="Hubungi tim Kios Mandiri YPKABK untuk donasi barang preloved, pembelian produk vokasi, atau kunjungan ke sentra kami."
+    pill="Respon Cepat 1x24 Jam"
     breadcrumb="Beranda / Kontak"
 />
 
@@ -16,7 +16,7 @@
     <div class="max-w-[1200px] mx-auto px-6">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
 
-            {{-- Kolom Kiri (7 Kolom Desktop): Kartu Sentra & Peta Polos --}}
+            {{-- Kolom Kiri (7 Kolom Desktop): Kartu Sentra & Peta Interaktif Tabbed --}}
             <div class="lg:col-span-7 space-y-8">
                 <div class="space-y-2">
                     <span class="text-xs uppercase tracking-wider font-semibold text-primary block">
@@ -157,6 +157,7 @@
                         @enderror
                     </div>
 
+                    {{-- Nomor WhatsApp --}}
                     <div>
                         <label for="contact-phone" class="block text-xs font-semibold text-teks mb-1">
                             Nomor WhatsApp *
@@ -172,6 +173,19 @@
                         @enderror
                     </div>
 
+                    {{-- Email (Opsional) --}}
+                    <div>
+                        <label for="contact-email" class="block text-xs font-semibold text-teks mb-1.5">
+                            Alamat Email <span class="text-teks/50 font-normal">(Opsional)</span>
+                        </label>
+                        <input type="email"
+                               id="contact-email"
+                               placeholder="nama@email.com"
+                               class="w-full px-3.5 py-2.5 rounded-xl border border-teks/20 text-xs sm:text-sm text-teks focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                        <p id="error-email" class="text-[11px] text-rose-600 mt-1 hidden"></p>
+                    </div>
+
+                    {{-- Pesan Detail --}}
                     <div>
                         <label for="contact-message" class="block text-xs font-semibold text-teks mb-1">
                             Pesan Detail *
@@ -186,11 +200,47 @@
                         @enderror
                     </div>
 
+                    {{-- Tombol Kirim --}}
                     <button type="submit"
-                            class="w-full h-11 rounded-[8px] bg-primary hover:bg-primary/90 text-white font-semibold text-sm transition-all shadow-xs active:scale-[0.98]">
-                        Kirim Pesan
+                            id="btn-submit-contact"
+                            class="w-full h-11 rounded-xl bg-primary hover:bg-primary/90 text-white font-semibold text-sm transition-all shadow-xs active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer">
+                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                            <path d="M12.031 2c-5.508 0-9.984 4.477-9.984 9.984 0 1.76.459 3.473 1.332 4.987L2 22l5.176-1.356c1.464.8 3.111 1.22 4.855 1.22 5.508 0 9.984-4.477 9.984-9.984 0-5.508-4.476-9.98-9.984-9.98zm0 18.283c-1.508 0-2.986-.406-4.275-1.173l-.307-.183-3.176.833.847-3.096-.201-.321c-.84-1.339-1.284-2.887-1.284-4.459 0-4.57 3.718-8.287 8.287-8.287 4.57 0 8.288 3.717 8.288 8.287 0 4.571-3.718 8.288-8.288 8.288z"/>
+                        </svg>
+                        <span>Kirim via WhatsApp</span>
                     </button>
+                    <p class="text-[11px] text-teks/60 text-center">
+                        Informasi Anda dijaga kerahasiaannya dan hanya digunakan untuk komunikasi Kios Mandiri YPKABK.
+                    </p>
                 </form>
+
+                {{-- Alert Sukses / Fallback Modal Ringkas --}}
+                <div id="contact-success-box" class="hidden p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-900 space-y-3">
+                    <div class="flex items-start gap-2.5">
+                        <span class="text-base leading-none">✅</span>
+                        <div>
+                            <p class="font-bold">Format Pesan WhatsApp Telah Dibuat!</p>
+                            <p class="mt-0.5 text-emerald-800">
+                                Jika tab WhatsApp tidak terbuka secara otomatis, Anda dapat mengklik tombol di bawah atau menyalin pesan secara manual.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap gap-2 pt-1">
+                        <a id="btn-manual-wa"
+                           href="#"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           class="inline-flex items-center justify-center px-3.5 h-8 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs transition-colors">
+                            Buka WhatsApp
+                        </a>
+                        <button type="button"
+                                id="btn-copy-wa-text"
+                                class="inline-flex items-center justify-center px-3 h-8 rounded-lg border border-emerald-300 text-emerald-800 hover:bg-emerald-100 font-semibold text-xs transition-colors">
+                            Salin Pesan
+                        </button>
+                    </div>
+                </div>
+
             </div>
 
         </div>
