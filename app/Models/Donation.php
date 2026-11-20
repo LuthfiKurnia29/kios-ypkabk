@@ -12,7 +12,23 @@ class Donation extends Model
 {
     use HasFactory;
 
-    protected $guarded = ['id'];
+    protected $fillable = [
+        'donor_name',
+        'donor_phone',
+        'donor_city',
+        'category_id',
+        'category_name',
+        'item_count',
+        'item_photo_path',
+        'item_photos',
+        'description',
+        'status',
+        'admin_notes',
+        'received_at',
+        'review_token',
+        'created_at',
+        'updated_at',
+    ];
 
     /**
      * @return array<string, string>
@@ -22,7 +38,44 @@ class Donation extends Model
         return [
             'item_count' => 'integer',
             'received_at' => 'datetime',
+            'item_photos' => 'array',
         ];
+    }
+
+    /**
+     * Get the public URL for the primary donated item photo.
+     */
+    public function getItemPhotoUrlAttribute(): ?string
+    {
+        if (! empty($this->item_photos) && is_array($this->item_photos) && count($this->item_photos) > 0) {
+            return asset('storage/'.$this->item_photos[0]);
+        }
+
+        return $this->item_photo_path ? asset('storage/'.$this->item_photo_path) : null;
+    }
+
+    /**
+     * Get all public URLs for donated item photos.
+     *
+     * @return array<int, string>
+     */
+    public function getItemPhotosUrlsAttribute(): array
+    {
+        $urls = [];
+
+        if (! empty($this->item_photos) && is_array($this->item_photos)) {
+            foreach ($this->item_photos as $path) {
+                if ($path) {
+                    $urls[] = asset('storage/'.$path);
+                }
+            }
+        }
+
+        if (empty($urls) && $this->item_photo_path) {
+            $urls[] = asset('storage/'.$this->item_photo_path);
+        }
+
+        return $urls;
     }
 
     /**

@@ -1,5 +1,7 @@
 @extends('user.shared.Layout')
 
+@section('title', 'Kios Mandiri YPKABK')
+
 @section('content')
     {{-- 1. Hero (#FFFBF7) --}}
     @include('user.pages.home._hero')
@@ -20,7 +22,6 @@
     @include('user.pages.home._cta-donasi')
 
     {{-- Modal & Skrip Interaktif --}}
-    @include('user.pages.home._modal-donasi')
     @include('user.pages.home._modal-order')
     @include('user.pages.home._scripts')
 @endsection

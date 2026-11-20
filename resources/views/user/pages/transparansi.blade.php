@@ -1,5 +1,7 @@
 @extends('user.shared.Layout')
 
+@section('title', 'Transparansi & Donasi')
+
 @section('content')
 <div class="space-y-12 lg:space-y-16 pb-20 pt-24">
 

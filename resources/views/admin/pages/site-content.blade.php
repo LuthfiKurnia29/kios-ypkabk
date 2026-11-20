@@ -5,16 +5,6 @@
 @section('content')
 <div class="space-y-6">
 
-    {{-- Alert Flash Message Umum --}}
-    @if(session('success'))
-        <div class="p-3.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm flex items-center justify-between">
-            <span class="font-medium">{{ session('success') }}</span>
-            <button type="button" onclick="this.parentElement.remove()" class="text-emerald-500 hover:text-emerald-700" aria-label="Tutup">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-            </button>
-        </div>
-    @endif
-
     {{-- Page Header --}}
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
@@ -162,6 +152,147 @@
             <button type="submit"
                 class="px-5 py-2 rounded-md bg-primary text-white font-semibold text-sm hover:bg-primary/90 transition shadow-sm min-h-[40px]">
                 Simpan Jumlah ABK
+            </button>
+        </div>
+    </form>
+
+    {{-- CARD 3: Pengaturan Kontak, Sentra Fisik, Media Sosial, & Footer --}}
+    @php
+        $site = \App\Models\SiteSetting::getPublicSettings();
+    @endphp
+    <form action="{{ route('admin.site-content.update-info') }}" method="POST"
+        class="bg-white rounded-lg border border-gray-200 p-6 space-y-6">
+        @csrf
+        @method('PUT')
+
+        <div>
+            <h3 class="text-base font-bold text-gray-900">Kontak Resmi, Sentra Fisik, &amp; Footer</h3>
+            <p class="text-xs text-gray-500 mt-0.5">Pengaturan terpusat untuk hotline WhatsApp, email, jam layanan, alamat sentra, Google Maps, media sosial, dan deskripsi footer.</p>
+        </div>
+
+        {{-- 1. Deskripsi Footer --}}
+        <div class="space-y-1.5">
+            <label for="footer_description" class="block text-xs font-semibold text-gray-700">
+                Deskripsi Singkat Footer (Kolom Kiri)
+            </label>
+            <textarea id="footer_description" name="footer_description" rows="3"
+                class="w-full px-3.5 py-2 rounded-md border border-gray-200 text-xs sm:text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition leading-relaxed">{{ old('footer_description', $settings->get('footer_description') ?? $site['footer_description']) }}</textarea>
+            <p class="text-[11px] text-gray-400">Paragraf pengantar brand Kios Mandiri YPKABK di bagian bawah situs.</p>
+        </div>
+
+        {{-- 2. Hotline Kontak & Jam Layanan --}}
+        <div class="pt-4 border-t border-gray-100 space-y-3">
+            <h4 class="text-xs font-bold text-gray-900 uppercase tracking-wider text-primary">Hotline Kontak &amp; Operasional</h4>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="space-y-1">
+                    <label for="contact_whatsapp" class="block text-xs font-semibold text-gray-700">Nomor WhatsApp Admin</label>
+                    <input type="text" id="contact_whatsapp" name="contact_whatsapp"
+                        value="{{ old('contact_whatsapp', $settings->get('contact_whatsapp') ?? $site['contact_whatsapp']) }}"
+                        placeholder="081234567890"
+                        class="w-full px-3 py-2 rounded-md border border-gray-200 text-xs sm:text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition">
+                    <p class="text-[10px] text-gray-400">Otomatis dihubungkan ke wa.me/{62...}.</p>
+                </div>
+                <div class="space-y-1">
+                    <label for="contact_email" class="block text-xs font-semibold text-gray-700">Email Resmi</label>
+                    <input type="email" id="contact_email" name="contact_email"
+                        value="{{ old('contact_email', $settings->get('contact_email') ?? $site['contact_email']) }}"
+                        placeholder="kios@ypkabk.org"
+                        class="w-full px-3 py-2 rounded-md border border-gray-200 text-xs sm:text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition">
+                </div>
+                <div class="space-y-1">
+                    <label for="service_hours" class="block text-xs font-semibold text-gray-700">Jam Layanan</label>
+                    <input type="text" id="service_hours" name="service_hours"
+                        value="{{ old('service_hours', $settings->get('service_hours') ?? $site['service_hours']) }}"
+                        placeholder="Senin – Sabtu: 08.00 – 16.00 WIB"
+                        class="w-full px-3 py-2 rounded-md border border-gray-200 text-xs sm:text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition">
+                </div>
+            </div>
+        </div>
+
+        {{-- 3. Sentra Fisik 1 (Sidoarjo) --}}
+        <div class="pt-4 border-t border-gray-100 space-y-3">
+            <h4 class="text-xs font-bold text-gray-900 uppercase tracking-wider text-primary">Sentra Fisik 1 (Sidoarjo)</h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="space-y-1">
+                    <label for="sentra_sidoarjo_name" class="block text-xs font-semibold text-gray-700">Nama Sentra</label>
+                    <input type="text" id="sentra_sidoarjo_name" name="sentra_sidoarjo_name"
+                        value="{{ old('sentra_sidoarjo_name', $settings->get('sentra_sidoarjo_name') ?? $site['sentra_sidoarjo_name']) }}"
+                        class="w-full px-3 py-2 rounded-md border border-gray-200 text-xs sm:text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition">
+                </div>
+                <div class="space-y-1">
+                    <label for="sentra_sidoarjo_maps_url" class="block text-xs font-semibold text-gray-700">Link Google Maps</label>
+                    <input type="text" id="sentra_sidoarjo_maps_url" name="sentra_sidoarjo_maps_url"
+                        value="{{ old('sentra_sidoarjo_maps_url', $settings->get('sentra_sidoarjo_maps_url') ?? $site['sentra_sidoarjo_maps_url']) }}"
+                        placeholder="https://maps.google.com/?q=..."
+                        class="w-full px-3 py-2 rounded-md border border-gray-200 text-xs sm:text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition">
+                </div>
+                <div class="md:col-span-2 space-y-1">
+                    <label for="sentra_sidoarjo_address" class="block text-xs font-semibold text-gray-700">Alamat Lengkap Sidoarjo</label>
+                    <input type="text" id="sentra_sidoarjo_address" name="sentra_sidoarjo_address"
+                        value="{{ old('sentra_sidoarjo_address', $settings->get('sentra_sidoarjo_address') ?? $site['sentra_sidoarjo_address']) }}"
+                        class="w-full px-3 py-2 rounded-md border border-gray-200 text-xs sm:text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition">
+                </div>
+            </div>
+        </div>
+
+        {{-- 4. Sentra Fisik 2 (Mojokerto) --}}
+        <div class="pt-4 border-t border-gray-100 space-y-3">
+            <h4 class="text-xs font-bold text-gray-900 uppercase tracking-wider text-primary">Sentra Fisik 2 (Mojokerto)</h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="space-y-1">
+                    <label for="sentra_mojokerto_name" class="block text-xs font-semibold text-gray-700">Nama Sentra</label>
+                    <input type="text" id="sentra_mojokerto_name" name="sentra_mojokerto_name"
+                        value="{{ old('sentra_mojokerto_name', $settings->get('sentra_mojokerto_name') ?? $site['sentra_mojokerto_name']) }}"
+                        class="w-full px-3 py-2 rounded-md border border-gray-200 text-xs sm:text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition">
+                </div>
+                <div class="space-y-1">
+                    <label for="sentra_mojokerto_maps_url" class="block text-xs font-semibold text-gray-700">Link Google Maps</label>
+                    <input type="text" id="sentra_mojokerto_maps_url" name="sentra_mojokerto_maps_url"
+                        value="{{ old('sentra_mojokerto_maps_url', $settings->get('sentra_mojokerto_maps_url') ?? $site['sentra_mojokerto_maps_url']) }}"
+                        placeholder="https://maps.google.com/?q=..."
+                        class="w-full px-3 py-2 rounded-md border border-gray-200 text-xs sm:text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition">
+                </div>
+                <div class="md:col-span-2 space-y-1">
+                    <label for="sentra_mojokerto_address" class="block text-xs font-semibold text-gray-700">Alamat Lengkap Mojokerto</label>
+                    <input type="text" id="sentra_mojokerto_address" name="sentra_mojokerto_address"
+                        value="{{ old('sentra_mojokerto_address', $settings->get('sentra_mojokerto_address') ?? $site['sentra_mojokerto_address']) }}"
+                        class="w-full px-3 py-2 rounded-md border border-gray-200 text-xs sm:text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition">
+                </div>
+            </div>
+        </div>
+
+        {{-- 5. Media Sosial --}}
+        <div class="pt-4 border-t border-gray-100 space-y-3">
+            <h4 class="text-xs font-bold text-gray-900 uppercase tracking-wider text-primary">Tautan Media Sosial Resmi</h4>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="space-y-1">
+                    <label for="social_instagram" class="block text-xs font-semibold text-gray-700">Instagram URL</label>
+                    <input type="text" id="social_instagram" name="social_instagram"
+                        value="{{ old('social_instagram', $settings->get('social_instagram') ?? $site['social_instagram']) }}"
+                        placeholder="https://instagram.com/..."
+                        class="w-full px-3 py-2 rounded-md border border-gray-200 text-xs sm:text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition">
+                </div>
+                <div class="space-y-1">
+                    <label for="social_youtube" class="block text-xs font-semibold text-gray-700">YouTube URL</label>
+                    <input type="text" id="social_youtube" name="social_youtube"
+                        value="{{ old('social_youtube', $settings->get('social_youtube') ?? $site['social_youtube']) }}"
+                        placeholder="https://youtube.com/@..."
+                        class="w-full px-3 py-2 rounded-md border border-gray-200 text-xs sm:text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition">
+                </div>
+                <div class="space-y-1">
+                    <label for="social_tiktok" class="block text-xs font-semibold text-gray-700">TikTok URL</label>
+                    <input type="text" id="social_tiktok" name="social_tiktok"
+                        value="{{ old('social_tiktok', $settings->get('social_tiktok') ?? $site['social_tiktok']) }}"
+                        placeholder="https://tiktok.com/@..."
+                        class="w-full px-3 py-2 rounded-md border border-gray-200 text-xs sm:text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition">
+                </div>
+            </div>
+        </div>
+
+        <div class="pt-3 border-t border-gray-100 flex justify-end">
+            <button type="submit"
+                class="px-5 py-2 rounded-md bg-primary text-white font-semibold text-sm hover:bg-primary/90 transition shadow-sm min-h-[40px]">
+                Simpan Pengaturan Kontak &amp; Footer
             </button>
         </div>
     </form>

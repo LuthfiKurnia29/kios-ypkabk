@@ -7,7 +7,6 @@ use App\Models\Donation;
 use App\Models\Purchase;
 use App\Models\SiteSetting;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Schema;
 
 class SiteStatsService extends BaseService
 {
@@ -45,12 +44,7 @@ class SiteStatsService extends BaseService
             // 2. Barang tersalurkan = SUM(item_count) donasi received + SUM(quantity) detail_purchases paid/completed
             $donationsReceivedQuery = Donation::where('status', 'received');
             $donationsReceivedCount = (int) $donationsReceivedQuery->count();
-
-            if (Schema::hasColumn('donations', 'item_count')) {
-                $donationsItemsSum = (int) $donationsReceivedQuery->sum('item_count');
-            } else {
-                $donationsItemsSum = $donationsReceivedCount;
-            }
+            $donationsItemsSum = (int) $donationsReceivedQuery->sum('item_count');
 
             $soldItemsSum = (int) DetailPurchase::whereHas('purchase', function ($q) {
                 $q->whereIn('status', ['paid', 'completed']);

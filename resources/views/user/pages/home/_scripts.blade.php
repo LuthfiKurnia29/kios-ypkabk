@@ -1,64 +1,41 @@
 {{-- ========================================================
-     INLINE SCRIPTS: Modal, AJAX Form Submissions, QRIS & WhatsApp
+     INLINE SCRIPTS: Order Modal, AJAX Form Submissions, QRIS & WhatsApp
      ======================================================== --}}
 <script>
     // ========================================================
-    // DONATION MODAL LOGIC
+    // ORDER MODAL & QRIS DINAMIS / TRANSFER BANK LOGIC
     // ========================================================
-    function openDonationModal() {
-        const modal = document.getElementById('donation-modal');
-        if (modal) modal.classList.remove('hidden');
-    }
-
-    function closeDonationModal() {
-        const modal = document.getElementById('donation-modal');
-        if (modal) modal.classList.add('hidden');
-    }
-
-    async function handleDonationSubmit(e) {
-        e.preventDefault();
-        const form = e.target;
-        const btn = document.getElementById('donation-submit-btn');
-        const originalText = btn ? btn.innerHTML : 'Kirim Formulir Donasi';
-
-        if (btn) {
-            btn.disabled = true;
-            btn.innerHTML = '<span>Mengirim data...</span>';
+    const staticBankAccounts = {
+        'BCA': {
+            name: 'Bank BCA',
+            short_name: 'BCA',
+            number: '018-384-9900',
+            raw: '0183849900',
+            holder: 'Yayasan Peduli Kasih ABK'
+        },
+        'BRI': {
+            name: 'Bank BRI',
+            short_name: 'BRI',
+            number: '009-601-002-345-502',
+            raw: '009601002345502',
+            holder: 'Yayasan Peduli Kasih ABK'
+        },
+        'Mandiri': {
+            name: 'Bank Mandiri',
+            short_name: 'Mandiri',
+            number: '142-00-1988234-1',
+            raw: '1420019882341',
+            holder: 'Yayasan Peduli Kasih ABK'
+        },
+        'BNI': {
+            name: 'Bank BNI',
+            short_name: 'BNI',
+            number: '083-912-4567',
+            raw: '0839124567',
+            holder: 'Yayasan Peduli Kasih ABK'
         }
+    };
 
-        try {
-            const formData = new FormData(form);
-            const res = await fetch(form.action, {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: formData
-            });
-
-            const data = await res.json();
-
-            if (res.ok) {
-                alert(data.message || 'Terima kasih banyak! Tim Kios Mandiri YPKABK akan segera menghubungi nomor WhatsApp Anda untuk koordinasi donasi.');
-                form.reset();
-                closeDonationModal();
-            } else {
-                alert(data.message || 'Mohon lengkapi formulir dengan benar.');
-            }
-        } catch (err) {
-            alert('Terjadi kendala jaringan. Silakan hubungi kami langsung via WhatsApp atau coba sesaat lagi.');
-        } finally {
-            if (btn) {
-                btn.disabled = false;
-                btn.innerHTML = originalText;
-            }
-        }
-    }
-
-    // ========================================================
-    // ORDER MODAL & QRIS DINAMIS LOGIC
-    // ========================================================
     let currentOrder = {
         productId: null,
         title: '',
@@ -68,16 +45,94 @@
         orderCode: '',
         customerName: '',
         customerPhone: '',
+        paymentMethod: 'qris',
+        bankName: 'BCA',
+        orderUrl: '',
+        whatsappReceiptUrl: '',
         uploadProofUrl: '',
         qrisPayload: ''
     };
+
+    function selectPaymentMethod(method) {
+        const radio = document.querySelector(`input[name="payment_method"][value="${method}"]`);
+        if (radio) {
+            radio.checked = true;
+        }
+        togglePaymentMethodChoice(method);
+    }
+
+    function togglePaymentMethodChoice(method) {
+        currentOrder.paymentMethod = method;
+
+        const cardQris = document.getElementById('payment-card-qris');
+        const cardBank = document.getElementById('payment-card-bank');
+        const bankContainer = document.getElementById('bank-choice-container');
+        const btnText = document.getElementById('order-submit-btn-text');
+
+        if (method === 'bank_transfer') {
+            if (cardQris) {
+                cardQris.className = 'relative flex items-start gap-3 p-3.5 rounded-xl border-2 border-teks/15 hover:border-primary/50 bg-white cursor-pointer transition-all';
+            }
+            if (cardBank) {
+                cardBank.className = 'relative flex items-start gap-3 p-3.5 rounded-xl border-2 border-primary bg-primary/5 cursor-pointer transition-all';
+            }
+            if (bankContainer) {
+                bankContainer.classList.remove('hidden');
+            }
+            if (btnText) {
+                btnText.innerText = `Lanjut ke Transfer Bank (${currentOrder.bankName || 'BCA'})`;
+            }
+        } else {
+            if (cardQris) {
+                cardQris.className = 'relative flex items-start gap-3 p-3.5 rounded-xl border-2 border-primary bg-primary/5 cursor-pointer transition-all';
+            }
+            if (cardBank) {
+                cardBank.className = 'relative flex items-start gap-3 p-3.5 rounded-xl border-2 border-teks/15 hover:border-primary/50 bg-white cursor-pointer transition-all';
+            }
+            if (bankContainer) {
+                bankContainer.classList.add('hidden');
+            }
+            if (btnText) {
+                btnText.innerText = 'Lanjut ke Pembayaran QRIS';
+            }
+        }
+    }
+
+    function selectBankAccount(bankKey) {
+        currentOrder.bankName = bankKey;
+        const btnText = document.getElementById('order-submit-btn-text');
+        if (btnText && currentOrder.paymentMethod === 'bank_transfer') {
+            btnText.innerText = `Lanjut ke Transfer Bank (${bankKey})`;
+        }
+    }
+
+    function copyBankAccount() {
+        const bank = staticBankAccounts[currentOrder.bankName] || staticBankAccounts['BCA'];
+        navigator.clipboard.writeText(bank.raw).then(() => {
+            window.showAppToast(`Nomor rekening ${bank.name} (${bank.number}) berhasil disalin!`);
+        }).catch(() => {
+            window.showAppToast(`No Rekening: ${bank.number} a.n. ${bank.holder}`);
+        });
+    }
+
+    function sendOrderReceiptToWhatsapp() {
+        if (currentOrder.whatsappReceiptUrl) {
+            window.open(currentOrder.whatsappReceiptUrl, '_blank');
+            return;
+        }
+
+        const phone = currentOrder.customerPhone ? currentOrder.customerPhone.replace(/[^0-9]/g, '') : '';
+        const intlPhone = phone.startsWith('0') ? '62' + phone.slice(1) : phone;
+        const targetUrl = currentOrder.orderUrl || window.location.origin + '/purchases/' + currentOrder.orderCode;
+        const text = encodeURIComponent(`Halo, berikut adalah nota pesanan Anda di Kios Mandiri YPKABK:\nKode: ${currentOrder.orderCode}\nTotal: Rp ${currentOrder.totalPrice.toLocaleString('id-ID')}\nTautan: ${targetUrl}`);
+        window.open(`https://wa.me/${intlPhone}?text=${text}`, '_blank');
+    }
 
     function formatRupiah(num) {
         return 'Rp ' + Number(num || 0).toLocaleString('id-ID');
     }
 
     function openOrderModal(title, price, productId) {
-        // Parse numerical price (handles '45.000' or 45000)
         let cleanPrice = 0;
         if (typeof price === 'string') {
             cleanPrice = parseFloat(price.replace(/[^0-9]/g, '')) || 0;
@@ -93,6 +148,7 @@
         currentOrder.orderCode = '';
         currentOrder.uploadProofUrl = '';
         currentOrder.qrisPayload = '';
+        currentOrder.bankName = 'BCA';
 
         // Reset step view
         const step1 = document.getElementById('order-step-1');
@@ -102,6 +158,9 @@
         if (step1) step1.classList.remove('hidden');
         if (step2) step2.classList.add('hidden');
         if (step3) step3.classList.add('hidden');
+
+        // Reset method choice to QRIS
+        selectPaymentMethod('qris');
 
         // Reset proof preview & inputs
         const proofInput = document.getElementById('modal-proof-file');
@@ -149,28 +208,42 @@
         e.preventDefault();
         const form = e.target;
         const btn = document.getElementById('order-submit-btn');
-        const originalText = btn ? btn.innerHTML : 'Lanjut ke Pembayaran QRIS';
+        const originalText = btn ? btn.innerHTML : 'Lanjut ke Pembayaran';
 
         const productId = document.getElementById('modal-product-id')?.value;
         const quantity = currentOrder.quantity;
         const customerName = form.elements['customer_name']?.value?.trim();
         const customerPhone = form.elements['customer_phone']?.value?.trim();
-        const customerAddress = form.elements['customer_address']?.value?.trim();
+        const city = form.elements['city']?.value?.trim();
+        const district = form.elements['district']?.value?.trim();
+        const village = form.elements['village']?.value?.trim();
+        const streetAddress = form.elements['street_address']?.value?.trim();
+        const address = form.elements['address']?.value?.trim();
+        const paymentMethod = form.elements['payment_method']?.value || 'qris';
+        const bankName = form.elements['bank_name']?.value || 'BCA';
         const notes = form.elements['notes']?.value?.trim();
 
         currentOrder.customerName = customerName;
         currentOrder.customerPhone = customerPhone;
+        currentOrder.paymentMethod = paymentMethod;
+        currentOrder.bankName = bankName;
 
         if (btn) {
             btn.disabled = true;
-            btn.innerHTML = '<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline-block" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><span>Menyiapkan QRIS...</span>';
+            btn.innerHTML = '<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline-block" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><span>Menyiapkan Pembayaran...</span>';
         }
 
         try {
             const payload = {
                 customer_name: customerName,
                 customer_phone: customerPhone,
-                customer_address: customerAddress,
+                city: city,
+                district: district,
+                village: village,
+                street_address: streetAddress,
+                address: address,
+                payment_method: paymentMethod,
+                bank_name: paymentMethod === 'bank_transfer' ? bankName : null,
                 notes: notes,
                 items: [
                     {
@@ -198,6 +271,10 @@
 
             if (res.ok && result.data) {
                 currentOrder.orderCode = result.data.order_code;
+                currentOrder.paymentMethod = result.data.payment_method || paymentMethod;
+                currentOrder.bankName = result.data.bank_name || bankName;
+                currentOrder.orderUrl = result.order_url || `/purchases/${currentOrder.orderCode}`;
+                currentOrder.whatsappReceiptUrl = result.whatsapp_receipt_url || '';
                 currentOrder.totalPrice = result.qris ? result.qris.total_price : currentOrder.totalPrice;
                 currentOrder.uploadProofUrl = result.qris ? result.qris.upload_proof_url : `/purchases/${currentOrder.orderCode}/payment-proof`;
                 currentOrder.qrisPayload = result.qris ? result.qris.payload : '';
@@ -206,23 +283,56 @@
                 const qrisCodeEl = document.getElementById('modal-qris-order-code');
                 const qrisAmountEl = document.getElementById('modal-qris-amount-display');
                 const qrisImg = document.getElementById('modal-qris-image');
+                const badgeEl = document.getElementById('modal-pay-badge');
 
                 if (qrisCodeEl) qrisCodeEl.innerText = currentOrder.orderCode;
                 if (qrisAmountEl) qrisAmountEl.innerText = formatRupiah(currentOrder.totalPrice);
 
-                // Render QR Code via QRServer API generator
-                if (qrisImg && currentOrder.qrisPayload) {
-                    qrisImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=260x260&margin=10&data=${encodeURIComponent(currentOrder.qrisPayload)}`;
+                // Toggle QRIS vs Bank Container
+                const viewQris = document.getElementById('modal-view-qris');
+                const viewBank = document.getElementById('modal-view-bank');
+
+                if (currentOrder.paymentMethod === 'bank_transfer') {
+                    if (viewQris) viewQris.classList.add('hidden');
+                    if (viewBank) viewBank.classList.remove('hidden');
+
+                    const selectedBank = staticBankAccounts[currentOrder.bankName] || staticBankAccounts['BCA'];
+                    if (badgeEl) badgeEl.innerText = `Transfer ${selectedBank.name}`;
+
+                    const bankBadgeName = document.getElementById('modal-bank-badge-name');
+                    const bankAccDisplay = document.getElementById('modal-bank-acc-display');
+                    if (bankBadgeName) bankBadgeName.innerText = selectedBank.name;
+                    if (bankAccDisplay) bankAccDisplay.innerText = selectedBank.number;
+                } else {
+                    if (viewQris) viewQris.classList.remove('hidden');
+                    if (viewBank) viewBank.classList.add('hidden');
+                    if (badgeEl) badgeEl.innerText = 'Pembayaran QRIS Nasional';
+
+                    // Render QR Code via QRServer API generator
+                    if (qrisImg && currentOrder.qrisPayload) {
+                        qrisImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=260x260&margin=10&data=${encodeURIComponent(currentOrder.qrisPayload)}`;
+                    }
                 }
+
+                // Update Links to detailed order page
+                const detailLink = document.getElementById('modal-open-detail-link');
+                const successLink = document.getElementById('modal-success-page-link');
+                if (detailLink) detailLink.href = currentOrder.orderUrl;
+                if (successLink) successLink.href = currentOrder.orderUrl;
 
                 // Switch to Step 2
                 document.getElementById('order-step-1')?.classList.add('hidden');
                 document.getElementById('order-step-2')?.classList.remove('hidden');
             } else {
-                alert(result.message || 'Mohon periksa data pesanan Anda.');
+                window.showAppModal({
+                    title: 'Pesanan Belum Lengkap',
+                    message: result.message || 'Mohon periksa kembali formulir pesanan Anda.',
+                    type: 'error',
+                    closeText: 'Perbaiki'
+                });
             }
         } catch (err) {
-            alert('Terjadi kendala jaringan saat membuat pesanan. Silakan coba kembali.');
+            window.showAppToast('Terjadi kendala jaringan saat membuat pesanan. Silakan coba kembali.');
         } finally {
             if (btn) {
                 btn.disabled = false;
@@ -234,10 +344,9 @@
     function copyNominalAmount() {
         const amount = currentOrder.totalPrice.toString();
         navigator.clipboard.writeText(amount).then(() => {
-            alert(`Nominal Rp ${Number(amount).toLocaleString('id-ID')} berhasil disalin ke papan klip.`);
+            window.showAppToast(`Nominal Rp ${Number(amount).toLocaleString('id-ID')} berhasil disalin!`);
         }).catch(() => {
-            // Fallback
-            alert(`Nominal: Rp ${Number(amount).toLocaleString('id-ID')}`);
+            window.showAppToast(`Nominal: Rp ${Number(amount).toLocaleString('id-ID')}`);
         });
     }
 
@@ -275,7 +384,7 @@
         const file = fileInput?.files?.[0];
 
         if (!file) {
-            alert('Silakan pilih foto bukti transfer struk terlebih dahulu.');
+            window.showAppToast('Silakan pilih foto bukti transfer struk terlebih dahulu.');
             return;
         }
 
@@ -292,7 +401,6 @@
             formData.append('payment_proof', file);
 
             const csrfToken = document.querySelector('input[name="_token"]')?.value || '';
-
             const uploadUrl = currentOrder.uploadProofUrl || `/purchases/${currentOrder.orderCode}/payment-proof`;
 
             const res = await fetch(uploadUrl, {
@@ -308,7 +416,6 @@
             const result = await res.json();
 
             if (res.ok) {
-                // Switch to Step 3 (Success)
                 const successOrderCodeEl = document.getElementById('modal-success-order-code');
                 if (successOrderCodeEl) {
                     successOrderCodeEl.innerText = currentOrder.orderCode;
@@ -317,41 +424,21 @@
                 document.getElementById('order-step-2')?.classList.add('hidden');
                 document.getElementById('order-step-3')?.classList.remove('hidden');
             } else {
-                alert(result.message || 'Gagal mengunggah bukti pembayaran. Pastikan ukuran gambar di bawah 5MB.');
+                window.showAppModal({
+                    title: 'Gagal Mengunggah Bukti',
+                    message: result.message || 'Pastikan ukuran gambar di bawah 5MB dan berformat JPG, PNG, atau WebP.',
+                    type: 'error',
+                    closeText: 'Coba Lagi'
+                });
             }
         } catch (err) {
-            alert('Terjadi gangguan jaringan saat mengunggah bukti. Silakan kirimkan bukti langsung via chat WhatsApp.');
+            window.showAppToast('Terjadi gangguan saat mengunggah. Anda dapat mengirimkan bukti via WhatsApp.');
         } finally {
             if (btn) {
                 btn.disabled = false;
                 btn.innerHTML = originalText;
             }
         }
-    }
-
-    function openDirectWhatsApp() {
-        const orderCode = currentOrder.orderCode || 'LANGSUNG';
-        const title = currentOrder.title || 'Produk Kios Mandiri';
-        const qty = currentOrder.quantity || 1;
-        const total = formatRupiah(currentOrder.totalPrice);
-        const name = currentOrder.customerName || '-';
-        const phone = currentOrder.customerPhone || '-';
-
-        const message = `Halo Admin Kios Mandiri YPKABK,%0A%0ASaya ingin konfirmasi pembayaran produk donasi:%0A- *Kode Pesanan:* ${orderCode}%0A- *Produk:* ${encodeURIComponent(title)} (${qty} pcs)%0A- *Total:* ${encodeURIComponent(total)}%0A- *Nama Pemesan:* ${encodeURIComponent(name)}%0A- *No. Kontak:* ${encodeURIComponent(phone)}%0A%0ASaya mengirimkan bukti transfer melalui chat WhatsApp ini. Mohon dibantu verifikasi pesanan saya ya, terima kasih!`;
-
-        window.open(`https://wa.me/6281234567890?text=${message}`, '_blank');
-    }
-
-    function openSuccessWhatsApp() {
-        const orderCode = currentOrder.orderCode || 'LANGSUNG';
-        const title = currentOrder.title || 'Produk Kios Mandiri';
-        const qty = currentOrder.quantity || 1;
-        const total = formatRupiah(currentOrder.totalPrice);
-        const name = currentOrder.customerName || '-';
-
-        const message = `Halo Admin Kios Mandiri YPKABK,%0A%0ASaya telah melakukan pembayaran dan mengunggah bukti transfer di website untuk pesanan berikut:%0A- *Kode Pesanan:* ${orderCode}%0A- *Produk:* ${encodeURIComponent(title)} (${qty} pcs)%0A- *Total:* ${encodeURIComponent(total)}%0A- *Nama Pemesan:* ${encodeURIComponent(name)}%0A%0ABukti transfer sudah saya upload melalui website. Mohon dicek dan diproses ya, terima kasih banyak!`;
-
-        window.open(`https://wa.me/6281234567890?text=${message}`, '_blank');
     }
 
     // Tutup modal saat klik backdrop

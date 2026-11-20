@@ -48,7 +48,32 @@ class DonationController extends Controller
             'category_name' => ['nullable', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:1000'],
             'item_count' => ['nullable', 'integer', 'min:1', 'max:1000'],
+            'item_photo' => ['nullable', 'file', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+            'item_photos' => ['nullable', 'array', 'max:5'],
+            'item_photos.*' => ['file', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+        ], [
+            'item_photos.max' => 'Foto barang donasi maksimal 5 foto.',
+            'item_photos.*.max' => 'Ukuran setiap foto barang maksimal 5MB.',
+            'item_photos.*.image' => 'File yang diunggah harus berupa gambar (JPG, PNG, atau WebP).',
         ]);
+
+        $storedPaths = [];
+
+        if ($request->hasFile('item_photos')) {
+            foreach ($request->file('item_photos') as $file) {
+                if ($file && $file->isValid()) {
+                    $storedPaths[] = $file->store('donations', 'public');
+                }
+            }
+        } elseif ($request->hasFile('item_photo')) {
+            $singlePath = $request->file('item_photo')->store('donations', 'public');
+            $storedPaths[] = $singlePath;
+        }
+
+        if (! empty($storedPaths)) {
+            $validated['item_photos'] = $storedPaths;
+            $validated['item_photo_path'] = $storedPaths[0];
+        }
 
         $donation = $this->donationService->createDonation($validated);
 

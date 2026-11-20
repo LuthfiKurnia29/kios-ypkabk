@@ -1,5 +1,7 @@
 @extends('user.shared.Layout')
 
+@section('title', 'Tentang Kami')
+
 @section('content')
 <div class="space-y-16 lg:space-y-24 pb-20 pt-24">
 
@@ -145,8 +147,5 @@
     </section>
 
 </div>
-
-@include('user.pages.home._modal-donasi')
-@include('user.pages.home._scripts')
 @endsection
 

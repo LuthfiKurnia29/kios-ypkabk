@@ -16,6 +16,8 @@ class AuthenticationTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('Login Admin');
+        $response->assertSee('<title>Login Admin</title>', false);
+        $response->assertDontSee('—');
     }
 
     public function test_user_can_login_and_is_redirected_to_home(): void

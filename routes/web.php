@@ -80,6 +80,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/purchases', [PurchaseController::class, 'index'])->name('admin.purchases.index');
     Route::get('/admin/purchases/export', [PurchaseController::class, 'export'])->name('admin.purchases.export');
     Route::patch('/admin/purchases/{purchase}/status', [PurchaseController::class, 'updateStatus'])->name('admin.purchases.update-status');
+    Route::patch('/admin/purchases/{purchase}/shipping', [PurchaseController::class, 'updateShipping'])->name('admin.purchases.update-shipping');
 
     Route::get('/admin/donations', [DonationController::class, 'index'])->name('admin.donations.index');
     Route::get('/admin/donations/export', [DonationController::class, 'export'])->name('admin.donations.export');
@@ -90,6 +91,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::put('/admin/site-content', [SiteContentController::class, 'update'])->name('admin.site-content.update');
     Route::put('/admin/site-content/hero', [SiteContentController::class, 'updateHero'])->name('admin.site-content.update-hero');
     Route::put('/admin/site-content/abk', [SiteContentController::class, 'updateAbk'])->name('admin.site-content.update-abk');
+    Route::put('/admin/site-content/info', [SiteContentController::class, 'updateInfo'])->name('admin.site-content.update-info');
 
     // Reviews Management (Curated)
     Route::get('/admin/reviews', [SiteContentController::class, 'reviewsIndex'])->name('admin.reviews.index');

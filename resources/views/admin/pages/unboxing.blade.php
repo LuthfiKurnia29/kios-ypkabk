@@ -5,25 +5,6 @@
 @section('content')
 <div class="space-y-5">
 
-    {{-- Alert Flash Message --}}
-    @if(session('success'))
-        <div class="p-3.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm flex items-center justify-between">
-            <span class="font-medium">{{ session('success') }}</span>
-            <button type="button" onclick="this.parentElement.remove()" class="text-emerald-500 hover:text-emerald-700" aria-label="Tutup">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-            </button>
-        </div>
-    @endif
-
-    @if(session('error'))
-        <div class="p-3.5 rounded-lg bg-rose-50 border border-rose-200 text-rose-800 text-sm flex items-center justify-between">
-            <span class="font-medium">{{ session('error') }}</span>
-            <button type="button" onclick="this.parentElement.remove()" class="text-rose-500 hover:text-rose-700" aria-label="Tutup">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-            </button>
-        </div>
-    @endif
-
     {{-- Page Header --}}
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
@@ -43,7 +24,7 @@
     </div>
 
     {{-- Summary Stats --}}
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
         <div class="bg-white rounded-lg border border-gray-200 p-4">
             <p class="text-xs font-semibold text-gray-500">Total Dokumentasi</p>
             <p class="text-2xl font-bold text-gray-900 mt-1">{{ $totalCount }}</p>
@@ -57,6 +38,10 @@
             <p class="text-2xl font-bold text-gray-900 mt-1">{{ $instagramCount }}</p>
         </div>
         <div class="bg-white rounded-lg border border-gray-200 p-4">
+            <p class="text-xs font-semibold text-gray-500">Video TikTok</p>
+            <p class="text-2xl font-bold text-gray-900 mt-1">{{ $tiktokCount ?? 0 }}</p>
+        </div>
+        <div class="bg-white rounded-lg border border-gray-200 p-4 col-span-2 sm:col-span-1">
             <p class="text-xs font-semibold text-gray-500">Tampil di Galeri</p>
             <p class="text-2xl font-bold text-gray-900 mt-1">{{ $visibleCount }}</p>
         </div>
@@ -75,6 +60,7 @@
                 <option value="">Semua Platform</option>
                 <option value="youtube" {{ request('platform') === 'youtube' ? 'selected' : '' }}>YouTube</option>
                 <option value="instagram" {{ request('platform') === 'instagram' ? 'selected' : '' }}>Instagram</option>
+                <option value="tiktok" {{ request('platform') === 'tiktok' ? 'selected' : '' }}>TikTok</option>
             </select>
         </div>
         <div class="min-w-[140px]">
@@ -131,13 +117,13 @@
                                 <td class="px-5 py-4">
                                     <div class="flex items-center gap-3">
                                         <div class="w-20 h-12 rounded-md overflow-hidden bg-gray-100 shrink-0 relative border border-gray-200">
-                                            @if($isYt && $ytId)
-                                                <img src="https://img.youtube.com/vi/{{ $ytId }}/hqdefault.jpg"
+                                            @if($item->thumbnail_url)
+                                                <img src="{{ $item->thumbnail_url }}"
                                                      alt="{{ $item->title }}"
                                                      class="w-full h-full object-cover">
                                             @else
-                                                <div class="w-full h-full flex flex-col items-center justify-center bg-gray-50 text-gray-600 text-xs font-medium">
-                                                    Video
+                                                <div class="w-full h-full flex flex-col items-center justify-center bg-gray-50 text-gray-600 text-[10px] font-semibold">
+                                                    {{ $item->platform_label }}
                                                 </div>
                                             @endif
                                         </div>
@@ -158,7 +144,7 @@
                                 <td class="px-5 py-4">
                                     <div class="space-y-1">
                                         <span class="text-[11px] font-semibold text-gray-700">
-                                            {{ $isYt ? 'YouTube' : 'Instagram' }}
+                                            {{ $item->platform_label }}
                                         </span>
                                         <div>
                                             <a href="{{ $item->url }}" target="_blank" rel="noopener noreferrer"
@@ -234,14 +220,14 @@
         <div class="flex items-center justify-between pb-4 border-b border-gray-100">
             <div>
                 <h3 id="modal-tambah-title" class="text-base font-bold text-gray-900">Tambah Galeri Unboxing</h3>
-                <p class="text-xs text-gray-500 mt-0.5">Dokumentasikan penerimaan paket barang donasi dari YouTube atau Instagram.</p>
+                <p class="text-xs text-gray-500 mt-0.5">Dokumentasikan penerimaan paket barang donasi dari YouTube, Instagram, atau TikTok.</p>
             </div>
             <button type="button" onclick="closeModal('modal-tambah')" class="p-1 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100" aria-label="Tutup">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                <span class="text-lg leading-none font-bold">&times;</span>
             </button>
         </div>
 
-        <form action="{{ route('admin.unboxing.store') }}" method="POST" class="mt-4 space-y-4">
+        <form action="{{ route('admin.unboxing.store') }}" method="POST" enctype="multipart/form-data" class="mt-4 space-y-4">
             @csrf
 
             {{-- 1. Input Nama Barang --}}
@@ -263,10 +249,10 @@
                 <p class="text-[11px] text-gray-400 mt-1">Nama barang yang dibuka atau judul dokumentasi paket donasi.</p>
             </div>
 
-            {{-- 2. Input Link YouTube / Instagram --}}
+            {{-- 2. Input Link YouTube / Instagram / TikTok --}}
             <div>
                 <label for="tambah-url" class="block text-xs font-semibold text-gray-700 mb-1">
-                    Link YouTube / Instagram <span class="text-rose-500">*</span>
+                    Link YouTube / Instagram / TikTok <span class="text-rose-500">*</span>
                 </label>
                 <input type="url"
                        name="url"
@@ -275,12 +261,12 @@
                        required
                        maxlength="500"
                        oninput="handleUrlInput(this.value, 'tambah')"
-                       placeholder="https://www.youtube.com/watch?v=... atau https://www.instagram.com/reel/..."
+                       placeholder="https://www.youtube.com/... atau https://www.instagram.com/... atau https://www.tiktok.com/..."
                        class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition font-mono @error('url') border-rose-500 @enderror">
                 @error('url')
                     <p class="text-xs text-rose-500 mt-1">{{ $message }}</p>
                 @enderror
-                <p class="text-[11px] text-gray-400 mt-1">Mendukung link video YouTube, YouTube Shorts, atau postingan Instagram Reel.</p>
+                <p class="text-[11px] text-gray-400 mt-1">Mendukung link video YouTube, YouTube Shorts, Instagram Reel, atau TikTok.</p>
             </div>
 
             {{-- Live Thumbnail / Platform Detector --}}
@@ -306,6 +292,7 @@
                         <option value="">Deteksi Otomatis</option>
                         <option value="youtube" {{ old('platform') === 'youtube' ? 'selected' : '' }}>YouTube</option>
                         <option value="instagram" {{ old('platform') === 'instagram' ? 'selected' : '' }}>Instagram</option>
+                        <option value="tiktok" {{ old('platform') === 'tiktok' ? 'selected' : '' }}>TikTok</option>
                     </select>
                 </div>
                 <div>
@@ -316,6 +303,19 @@
                            value="{{ old('recorded_at', date('Y-m-d')) }}"
                            class="w-full px-3 py-2 rounded-md border border-gray-200 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition bg-white">
                 </div>
+            </div>
+
+            {{-- Upload Thumbnail Custom --}}
+            <div>
+                <label for="tambah-thumbnail" class="block text-xs font-semibold text-gray-700 mb-1">
+                    Upload Foto Thumbnail (Opsional)
+                </label>
+                <input type="file"
+                       name="thumbnail"
+                       id="tambah-thumbnail"
+                       accept="image/jpeg,image/png,image/webp,image/jpg"
+                       class="w-full text-xs text-gray-700 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 cursor-pointer">
+                <p class="text-[11px] text-gray-400 mt-1">Format JPG, JPEG, PNG, WEBP (maks. 5 MB). Prioritas utama tampilan galeri.</p>
             </div>
 
             {{-- 4. Deskripsi / Catatan Tambahan --}}
@@ -363,14 +363,14 @@
         <div class="flex items-center justify-between pb-4 border-b border-gray-100">
             <div>
                 <h3 id="modal-edit-title" class="text-base font-bold text-gray-900">Edit Galeri Unboxing</h3>
-                <p class="text-xs text-gray-500 mt-0.5">Perbarui informasi barang dan tautan video unboxing.</p>
+                <p class="text-xs text-gray-500 mt-0.5">Perbarui informasi barang dan tautan video unboxing YouTube, Instagram, atau TikTok.</p>
             </div>
             <button type="button" onclick="closeModal('modal-edit')" class="p-1 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100" aria-label="Tutup">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                <span class="text-lg leading-none font-bold">&times;</span>
             </button>
         </div>
 
-        <form id="form-edit-unboxing" method="POST" action="" class="mt-4 space-y-4">
+        <form id="form-edit-unboxing" method="POST" action="" enctype="multipart/form-data" class="mt-4 space-y-4">
             @csrf
             @method('PUT')
 
@@ -387,10 +387,10 @@
                        class="w-full px-3 py-2 rounded-md border border-gray-200 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition">
             </div>
 
-            {{-- 2. Input Link YouTube / Instagram --}}
+            {{-- 2. Input Link YouTube / Instagram / TikTok --}}
             <div>
                 <label for="edit-url" class="block text-xs font-semibold text-gray-700 mb-1">
-                    Link YouTube / Instagram <span class="text-rose-500">*</span>
+                    Link YouTube / Instagram / TikTok <span class="text-rose-500">*</span>
                 </label>
                 <input type="url"
                        name="url"
@@ -422,6 +422,7 @@
                         <option value="">Deteksi Otomatis</option>
                         <option value="youtube">YouTube</option>
                         <option value="instagram">Instagram</option>
+                        <option value="tiktok">TikTok</option>
                     </select>
                 </div>
                 <div>
@@ -431,6 +432,19 @@
                            id="edit-recorded-at"
                            class="w-full px-3 py-2 rounded-md border border-gray-200 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition bg-white">
                 </div>
+            </div>
+
+            {{-- Ganti Thumbnail Custom --}}
+            <div>
+                <label for="edit-thumbnail" class="block text-xs font-semibold text-gray-700 mb-1">
+                    Ganti Foto Thumbnail (Opsional)
+                </label>
+                <input type="file"
+                       name="thumbnail"
+                       id="edit-thumbnail"
+                       accept="image/jpeg,image/png,image/webp,image/jpg"
+                       class="w-full text-xs text-gray-700 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 cursor-pointer">
+                <p class="text-[11px] text-gray-400 mt-1">Kosongkan jika tidak ingin mengubah thumbnail.</p>
             </div>
 
             {{-- 4. Deskripsi / Catatan Tambahan --}}
@@ -530,6 +544,7 @@
 
         const ytId = extractYoutubeId(url);
         const isInstagram = /instagram\.com/i.test(url);
+        const isTikTok = /tiktok\.com/i.test(url);
 
         if (ytId) {
             if (container) container.classList.remove('hidden');
@@ -543,6 +558,19 @@
             }
             if (platformSelect && !platformSelect.value) {
                 platformSelect.value = 'youtube';
+            }
+        } else if (isTikTok) {
+            if (container) container.classList.remove('hidden');
+            if (badge) {
+                badge.className = 'px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-purple-100 text-purple-700';
+                badge.textContent = 'TikTok';
+            }
+            if (text) text.textContent = 'Video TikTok';
+            if (thumb) {
+                thumb.innerHTML = `<div class="w-full h-full bg-purple-50 flex items-center justify-center text-purple-700 font-bold text-[10px]">TikTok</div>`;
+            }
+            if (platformSelect && !platformSelect.value) {
+                platformSelect.value = 'tiktok';
             }
         } else if (isInstagram) {
             if (container) container.classList.remove('hidden');

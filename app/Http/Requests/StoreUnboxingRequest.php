@@ -46,7 +46,8 @@ class StoreUnboxingRequest extends FormRequest
         return [
             'title' => ['required', 'string', 'max:255'],
             'url' => ['required', 'url', 'max:500'],
-            'platform' => ['nullable', 'string', 'in:youtube,instagram'],
+            'platform' => ['nullable', 'string', 'in:youtube,instagram,tiktok'],
+            'thumbnail' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
             'recorded_at' => ['nullable', 'date'],
             'is_visible' => ['nullable', 'boolean'],
             'description' => ['nullable', 'string', 'max:1000'],
@@ -62,8 +63,9 @@ class StoreUnboxingRequest extends FormRequest
     {
         return [
             'title' => 'nama barang',
-            'url' => 'link video YouTube / Instagram',
+            'url' => 'link video YouTube / Instagram / TikTok',
             'platform' => 'platform video',
+            'thumbnail' => 'foto thumbnail video',
             'recorded_at' => 'tanggal dokumentasi',
             'is_visible' => 'status tampil',
             'description' => 'keterangan',
@@ -79,8 +81,11 @@ class StoreUnboxingRequest extends FormRequest
     {
         return [
             'title.required' => 'Nama barang wajib diisi.',
-            'url.required' => 'Tautan video YouTube atau Instagram wajib diisi.',
+            'url.required' => 'Tautan video YouTube, Instagram, atau TikTok wajib diisi.',
             'url.url' => 'Format tautan video tidak valid.',
+            'thumbnail.image' => 'File thumbnail harus berupa gambar.',
+            'thumbnail.mimes' => 'Format thumbnail harus berupa JPG, JPEG, PNG, atau WEBP.',
+            'thumbnail.max' => 'Ukuran file thumbnail maksimal 5 MB.',
         ];
     }
 }

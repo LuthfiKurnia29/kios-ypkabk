@@ -81,6 +81,13 @@ class PurchaseService extends BaseService
      *     customer_name: string,
      *     customer_phone: string,
      *     customer_address?: ?string,
+     *     address?: ?string,
+     *     city?: ?string,
+     *     district?: ?string,
+     *     village?: ?string,
+     *     street_address?: ?string,
+     *     payment_method?: ?string,
+     *     bank_name?: ?string,
      *     notes?: ?string,
      * }  $customerData
      * @param  array<int, array{product_id: int, quantity: int, price?: ?float}>  $items
@@ -118,12 +125,23 @@ class PurchaseService extends BaseService
                 ];
             }
 
+            $address = $customerData['address'] ?? $customerData['customer_address'] ?? null;
+
             $purchase = Purchase::create([
                 'user_id' => $customerData['user_id'] ?? null,
                 'order_code' => $orderCode,
                 'customer_name' => trim($customerData['customer_name']),
                 'customer_phone' => trim($customerData['customer_phone']),
-                'customer_address' => $customerData['customer_address'] ?? null,
+                'customer_address' => $address,
+                'address' => $address,
+                'city' => $customerData['city'] ?? null,
+                'district' => $customerData['district'] ?? null,
+                'village' => $customerData['village'] ?? null,
+                'street_address' => $customerData['street_address'] ?? null,
+                'payment_method' => $customerData['payment_method'] ?? 'qris',
+                'bank_name' => ($customerData['payment_method'] ?? 'qris') === 'bank_transfer'
+                    ? ($customerData['bank_name'] ?? 'BCA')
+                    : null,
                 'total_price' => $totalPrice,
                 'status' => 'pending',
                 'notes' => $customerData['notes'] ?? null,
@@ -214,7 +232,7 @@ class PurchaseService extends BaseService
 
         $order->update([
             'payment_proof' => $path,
-            'payment_method' => 'qris',
+            'payment_method' => $order->payment_method ?: 'qris',
         ]);
 
         LogPurchase::create([

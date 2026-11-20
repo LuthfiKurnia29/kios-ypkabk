@@ -46,7 +46,7 @@ class PurchaseController extends Controller
             return response()->json($order);
         }
 
-        return view('admin.pages.dashboard', ['purchase' => $order]);
+        return view('user.pages.purchase-show', ['purchase' => $order]);
     }
 
     /**
@@ -54,10 +54,19 @@ class PurchaseController extends Controller
      */
     public function store(Request $request): JsonResponse|RedirectResponse
     {
+        $hasSeparateAddress = $request->filled('city') || $request->filled('street_address');
+
         $validated = $request->validate([
             'customer_name' => ['required', 'string', 'max:255'],
             'customer_phone' => ['required', 'string', 'max:50'],
-            'customer_address' => ['nullable', 'string'],
+            'city' => [$hasSeparateAddress ? 'required' : 'nullable', 'string', 'max:100'],
+            'district' => [$hasSeparateAddress ? 'required' : 'nullable', 'string', 'max:100'],
+            'village' => [$hasSeparateAddress ? 'required' : 'nullable', 'string', 'max:100'],
+            'street_address' => [$hasSeparateAddress ? 'required' : 'nullable', 'string', 'max:255'],
+            'address' => [$hasSeparateAddress ? 'required' : 'nullable', 'string', 'max:1000'],
+            'customer_address' => ['nullable', 'string', 'max:1000'],
+            'payment_method' => ['nullable', 'in:qris,bank_transfer'],
+            'bank_name' => ['nullable', 'string', 'max:50'],
             'notes' => ['nullable', 'string'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.product_id' => ['required', 'exists:products,id'],
@@ -65,11 +74,20 @@ class PurchaseController extends Controller
             'items.*.price' => ['nullable', 'numeric', 'min:0'],
         ]);
 
+        $address = $validated['address'] ?? $validated['customer_address'] ?? null;
+
         $customerData = [
             'user_id' => $request->user()?->id,
             'customer_name' => $validated['customer_name'],
             'customer_phone' => $validated['customer_phone'],
-            'customer_address' => $validated['customer_address'] ?? null,
+            'city' => $validated['city'] ?? null,
+            'district' => $validated['district'] ?? null,
+            'village' => $validated['village'] ?? null,
+            'street_address' => $validated['street_address'] ?? null,
+            'address' => $address,
+            'customer_address' => $address,
+            'payment_method' => $validated['payment_method'] ?? 'qris',
+            'bank_name' => $validated['bank_name'] ?? null,
             'notes' => $validated['notes'] ?? null,
         ];
 
@@ -81,16 +99,26 @@ class PurchaseController extends Controller
             return response()->json([
                 'message' => 'Pesanan berhasil dibuat.',
                 'data' => $purchase,
+                'order_url' => route('purchases.show', $purchase->order_code),
+                'whatsapp_receipt_url' => $purchase->whatsapp_receipt_url,
+                'payment_method' => $purchase->payment_method,
                 'qris' => [
                     'payload' => $qrisPayload,
                     'total_price' => (float) $purchase->total_price,
                     'formatted_price' => 'Rp '.number_format($purchase->total_price, 0, ',', '.'),
                     'upload_proof_url' => route('purchases.upload-proof', $purchase->order_code),
                 ],
+                'bank' => [
+                    'bank_name' => 'BCA (Bank Central Asia)',
+                    'account_number' => '018-384-9900',
+                    'raw_account_number' => '0183849900',
+                    'account_holder' => 'Yayasan Peduli Kasih ABK',
+                ],
             ], 201);
         }
 
-        return redirect()->back()->with('success', "Pesanan {$purchase->order_code} berhasil dibuat.");
+        return redirect()->route('purchases.show', $purchase->order_code)
+            ->with('success', "Pesanan {$purchase->order_code} berhasil dibuat.");
     }
 
     /**
@@ -130,7 +158,7 @@ class PurchaseController extends Controller
     public function updateStatus(Request $request, Purchase|int|string $purchase): JsonResponse|RedirectResponse
     {
         $validated = $request->validate([
-            'status' => ['required', 'in:pending,paid,cancelled,completed'],
+            'status' => ['required', 'in:pending,paid,shipped,completed,cancelled'],
             'notes' => ['nullable', 'string'],
         ]);
 
@@ -144,6 +172,53 @@ class PurchaseController extends Controller
         }
 
         return redirect()->back()->with('success', 'Status pesanan berhasil diperbarui.');
+    }
+
+    /**
+     * Update courier shipping info and tracking number.
+     */
+    public function updateShipping(Request $request, Purchase|int|string $purchase): JsonResponse|RedirectResponse
+    {
+        $validated = $request->validate([
+            'courier_name' => ['required', 'string', 'in:JNE,J&T Express,SiCepat,AnterAja,Pos Indonesia,Kurir Internal,Ambil di Kios'],
+            'tracking_number' => ['required_unless:courier_name,Ambil di Kios', 'nullable', 'string', 'max:100'],
+            'shipping_receipt' => ['nullable', 'file', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+        ], [
+            'courier_name.required' => 'Ekspedisi / kurir wajib dipilih.',
+            'tracking_number.required_unless' => 'Nomor resi wajib diisi jika bukan Ambil di Kios.',
+            'shipping_receipt.max' => 'Foto bukti resi maksimal 5MB.',
+        ]);
+
+        $order = $this->purchaseService->getPurchase($purchase);
+
+        $data = [
+            'courier_name' => $validated['courier_name'],
+            'tracking_number' => $validated['tracking_number'] ?? ($validated['courier_name'] === 'Ambil di Kios' ? '-' : null),
+        ];
+
+        if ($request->hasFile('shipping_receipt')) {
+            $file = $request->file('shipping_receipt');
+            $filename = 'receipt-'.$order->order_code.'-'.time().'.'.$file->getClientOriginalExtension();
+            $path = $file->storeAs('shipping_receipts', $filename, 'public');
+            $data['shipping_receipt_path'] = $path;
+        }
+
+        // If previously paid, update status to shipped
+        if ($order->status === 'paid') {
+            $data['status'] = 'shipped';
+        }
+
+        $order->update($data);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Informasi pengiriman berhasil diperbarui.',
+                'data' => $order->fresh(),
+            ]);
+        }
+
+        return redirect()->back()->with('success', "Informasi pengiriman pesanan {$order->order_code} berhasil disimpan.");
     }
 
     /**

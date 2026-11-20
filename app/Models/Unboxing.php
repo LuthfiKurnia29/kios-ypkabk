@@ -21,6 +21,7 @@ class Unboxing extends Model
         'title',
         'url',
         'platform',
+        'thumbnail_path',
         'recorded_at',
         'is_visible',
         'description',
@@ -56,12 +57,16 @@ class Unboxing extends Model
     }
 
     /**
-     * Determine platform ('youtube' or 'instagram') based on URL.
+     * Determine platform ('youtube', 'instagram', or 'tiktok') based on URL.
      */
     public static function determinePlatform(?string $url): string
     {
         if (! $url) {
             return 'youtube';
+        }
+
+        if (preg_match('/tiktok\.com/i', $url)) {
+            return 'tiktok';
         }
 
         if (preg_match('/instagram\.com/i', $url)) {
@@ -85,6 +90,49 @@ class Unboxing extends Model
         }
 
         return null;
+    }
+
+    /**
+     * Accessor for thumbnail URL with precedence:
+     * 1. Uploaded thumbnail_path
+     * 2. YouTube official HQ thumbnail
+     * 3. Null (will render clean text placeholder)
+     */
+    public function getThumbnailUrlAttribute(): ?string
+    {
+        if (! empty($this->thumbnail_path)) {
+            return asset('storage/'.ltrim($this->thumbnail_path, '/'));
+        }
+
+        if ($this->platform === 'youtube' && $this->youtube_id) {
+            return 'https://img.youtube.com/vi/'.$this->youtube_id.'/hqdefault.jpg';
+        }
+
+        return null;
+    }
+
+    /**
+     * Display label for platform.
+     */
+    public function getPlatformLabelAttribute(): string
+    {
+        return match (strtolower((string) $this->platform)) {
+            'instagram' => 'Instagram',
+            'tiktok' => 'TikTok',
+            default => 'YouTube',
+        };
+    }
+
+    /**
+     * Call to action text for platform.
+     */
+    public function getPlatformActionTextAttribute(): string
+    {
+        return match (strtolower((string) $this->platform)) {
+            'instagram' => 'Tonton di Instagram',
+            'tiktok' => 'Tonton di TikTok',
+            default => 'Tonton di YouTube',
+        };
     }
 
     /**

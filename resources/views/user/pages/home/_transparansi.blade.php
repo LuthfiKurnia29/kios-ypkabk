@@ -16,8 +16,7 @@
                 </p>
             </div>
             <div class="shrink-0">
-                <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#2B2430]/5 text-[#2B2430]/70 text-xs font-medium">
-                    <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0012.04 2z"/></svg>
+                <span class="inline-flex items-center px-4 py-2 rounded-full bg-[#2B2430]/5 text-[#2B2430]/70 text-xs font-medium">
                     Ulasan dikirim lewat WhatsApp setelah transaksi selesai
                 </span>
             </div>
@@ -30,10 +29,7 @@
                     <div class="bg-white rounded-[16px] p-6 sm:p-7 border border-[#2B2430]/10 flex flex-col justify-between space-y-5 shadow-xs hover:shadow-md transition-shadow h-full">
                         <div class="space-y-3">
                             <div class="flex items-center justify-between gap-2">
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold {{ $review->source === 'buyer' ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-pink-50 text-primary border border-pink-200' }}">
-                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                                    </svg>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold {{ $review->source === 'buyer' ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-pink-50 text-primary border border-pink-200' }}">
                                     {{ $review->verified_label }}
                                 </span>
                                 @if($review->created_at)
@@ -65,13 +61,8 @@
                 @endforeach
             </div>
         @else
-            {{-- State Kosong: Belum ada ulasan aktif (Tidak ada data palsu / dummy) --}}
-            <div class="bg-white rounded-2xl border border-gray-200/80 p-10 sm:p-12 text-center max-w-xl mx-auto shadow-xs space-y-4">
-                <div class="w-14 h-14 rounded-full bg-pink-50 text-primary mx-auto flex items-center justify-center border border-pink-100">
-                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-                    </svg>
-                </div>
+            {{-- State Kosong: Belum ada ulasan aktif (Tanpa ikon ilustrasi dekoratif) --}}
+            <div class="bg-white rounded-2xl border border-gray-200/80 p-8 sm:p-10 text-center max-w-xl mx-auto shadow-xs space-y-3">
                 <div class="space-y-1.5">
                     <h3 class="text-base sm:text-lg font-bold text-gray-900">Belum Ada Cerita yang Ditampilkan</h3>
                     <p class="text-xs sm:text-sm text-gray-500 max-w-md mx-auto leading-relaxed">
@@ -79,8 +70,7 @@
                     </p>
                 </div>
                 <div class="pt-2">
-                    <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#2B2430]/5 text-[#2B2430]/75 text-xs font-semibold">
-                        <svg class="w-4 h-4 text-emerald-600" fill="currentColor" viewBox="0 0 24 24"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0012.04 2z"/></svg>
+                    <span class="inline-flex items-center px-4 py-2 rounded-full bg-[#2B2430]/5 text-[#2B2430]/75 text-xs font-semibold">
                         Ulasan dikirim lewat WhatsApp setelah transaksi selesai
                     </span>
                 </div>

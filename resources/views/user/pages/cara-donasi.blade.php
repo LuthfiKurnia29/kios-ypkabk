@@ -1,5 +1,7 @@
 @extends('user.shared.Layout')
 
+@section('title', 'Cara Donasi')
+
 @section('content')
 {{-- Header Halaman (Komponen <x-page-header>) --}}
 <x-page-header
@@ -142,15 +144,15 @@
 
                 <div class="space-y-3 text-xs sm:text-sm text-teks/85 bg-white p-5 rounded-[12px] border border-teks/10 shadow-xs">
                     <div>
-                        <p class="font-bold text-teks">Sentra Sidoarjo:</p>
-                        <p class="mt-0.5 leading-relaxed font-normal text-teks/80">Jl. Wonocolo Pabrik Kulit No. 34, Sepanjang, Sidoarjo, Jawa Timur</p>
+                        <p class="font-bold text-teks">{{ $siteSettings['sentra_sidoarjo_name'] ?? 'Sentra Sidoarjo' }}:</p>
+                        <p class="mt-0.5 leading-relaxed font-normal text-teks/80">{{ $siteSettings['sentra_sidoarjo_address'] ?? 'Jl. Wonocolo Pabrik Kulit No. 34, Sepanjang, Sidoarjo, Jawa Timur' }}</p>
                     </div>
                     <div class="pt-2 border-t border-teks/10">
-                        <p class="font-bold text-teks">Sentra Mojokerto:</p>
-                        <p class="mt-0.5 leading-relaxed font-normal text-teks/80">Jl. Raya Brangkal No. 12, Sooko, Mojokerto, Jawa Timur</p>
+                        <p class="font-bold text-teks">{{ $siteSettings['sentra_mojokerto_name'] ?? 'Sentra Mojokerto' }}:</p>
+                        <p class="mt-0.5 leading-relaxed font-normal text-teks/80">{{ $siteSettings['sentra_mojokerto_address'] ?? 'Jl. Raya Brangkal No. 12, Sooko, Mojokerto, Jawa Timur' }}</p>
                     </div>
                     <div class="pt-2 border-t border-teks/10 text-teks/70 text-xs font-normal">
-                        <strong class="font-semibold text-teks">Jam layanan:</strong> Senin sampai Sabtu, 08.00 sampai 16.00 WIB
+                        <strong class="font-semibold text-teks">Jam layanan:</strong> {{ $siteSettings['service_hours'] ?? 'Senin sampai Sabtu, 08.00 sampai 16.00 WIB' }}
                     </div>
                 </div>
             </div>
@@ -187,7 +189,4 @@
         </div>
     </div>
 </section>
-
-@include('user.pages.home._modal-donasi')
-@include('user.pages.home._scripts')
 @endsection

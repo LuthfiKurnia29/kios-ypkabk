@@ -8,6 +8,7 @@ use App\Models\Unboxing;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class UnboxingController extends Controller
@@ -27,7 +28,7 @@ class UnboxingController extends Controller
             });
         }
 
-        if ($request->filled('platform') && in_array($request->input('platform'), ['youtube', 'instagram'], true)) {
+        if ($request->filled('platform') && in_array($request->input('platform'), ['youtube', 'instagram', 'tiktok'], true)) {
             $query->where('platform', $request->input('platform'));
         }
 
@@ -43,6 +44,7 @@ class UnboxingController extends Controller
         $totalCount = Unboxing::count();
         $youtubeCount = Unboxing::where('platform', 'youtube')->count();
         $instagramCount = Unboxing::where('platform', 'instagram')->count();
+        $tiktokCount = Unboxing::where('platform', 'tiktok')->count();
         $visibleCount = Unboxing::where('is_visible', true)->count();
 
         if ($request->wantsJson()) {
@@ -52,6 +54,7 @@ class UnboxingController extends Controller
                     'total' => $totalCount,
                     'youtube' => $youtubeCount,
                     'instagram' => $instagramCount,
+                    'tiktok' => $tiktokCount,
                     'visible' => $visibleCount,
                 ],
             ]);
@@ -62,6 +65,7 @@ class UnboxingController extends Controller
             'totalCount',
             'youtubeCount',
             'instagramCount',
+            'tiktokCount',
             'visibleCount'
         ));
     }
@@ -83,6 +87,10 @@ class UnboxingController extends Controller
 
         if (empty($validated['recorded_at'])) {
             $validated['recorded_at'] = now()->toDateString();
+        }
+
+        if ($request->hasFile('thumbnail')) {
+            $validated['thumbnail_path'] = $request->file('thumbnail')->store('unboxing', 'public');
         }
 
         $unboxing = Unboxing::create($validated);
@@ -113,6 +121,13 @@ class UnboxingController extends Controller
             ? $request->boolean('is_visible')
             : false;
 
+        if ($request->hasFile('thumbnail')) {
+            if ($unboxing->thumbnail_path && Storage::disk('public')->exists($unboxing->thumbnail_path)) {
+                Storage::disk('public')->delete($unboxing->thumbnail_path);
+            }
+            $validated['thumbnail_path'] = $request->file('thumbnail')->store('unboxing', 'public');
+        }
+
         $unboxing->update($validated);
 
         if ($request->wantsJson()) {
@@ -132,6 +147,11 @@ class UnboxingController extends Controller
     public function destroy(Request $request, Unboxing $unboxing): JsonResponse|RedirectResponse
     {
         $title = $unboxing->title;
+
+        if ($unboxing->thumbnail_path && Storage::disk('public')->exists($unboxing->thumbnail_path)) {
+            Storage::disk('public')->delete($unboxing->thumbnail_path);
+        }
+
         $unboxing->delete();
 
         if ($request->wantsJson()) {

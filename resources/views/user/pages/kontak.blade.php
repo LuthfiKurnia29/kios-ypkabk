@@ -1,5 +1,7 @@
 @extends('user.shared.Layout')
 
+@section('title', 'Kontak')
+
 @section('content')
 {{-- Header Halaman --}}
 <x-page-header
@@ -29,28 +31,31 @@
                 </div>
 
                 {{-- Dua Kartu Sentra Berdampingan --}}
+                @php
+                    $site = $siteSettings ?? \App\Models\SiteSetting::getPublicSettings();
+                @endphp
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                     {{-- Sentra Sidoarjo --}}
                     <div class="bg-white rounded-[12px] p-5 sm:p-6 border border-teks/10 flex flex-col justify-between space-y-4 shadow-xs">
                         <div class="space-y-2.5">
                             <h3 class="font-semibold text-base text-teks">
-                                Sentra Sidoarjo
+                                {{ $site['sentra_sidoarjo_name'] }}
                             </h3>
                             <div class="text-xs text-teks/80 space-y-1">
-                                <p><span class="font-medium text-teks">Alamat:</span> Jl. Wonocolo Pabrik Kulit No. 34, Sepanjang, Sidoarjo, Jawa Timur</p>
-                                <p><span class="font-medium text-teks">Jadwal:</span> Senin &ndash; Sabtu, 08.00 &ndash; 16.00 WIB</p>
-                                <p><span class="font-medium text-teks">Kontak:</span> +62 812-3456-7890</p>
+                                <p><span class="font-medium text-teks">Alamat:</span> {{ $site['sentra_sidoarjo_address'] }}</p>
+                                <p><span class="font-medium text-teks">Jadwal:</span> {{ $site['service_hours'] }}</p>
+                                <p><span class="font-medium text-teks">Kontak:</span> {{ $site['contact_whatsapp'] }}</p>
                             </div>
                         </div>
 
                         <div class="flex flex-wrap gap-2 pt-2 border-t border-teks/10">
-                            <a href="https://wa.me/6281234567890"
+                            <a href="{{ $site['contact_whatsapp_link'] }}"
                                target="_blank"
                                rel="noopener noreferrer"
                                class="inline-flex items-center justify-center px-3.5 h-9 rounded-[8px] bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs transition-colors">
                                 Chat WhatsApp
                             </a>
-                            <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode('Jl. Wonocolo Pabrik Kulit No. 34, Sepanjang, Sidoarjo') }}"
+                            <a href="{{ $site['sentra_sidoarjo_maps_url'] }}"
                                target="_blank"
                                rel="noopener noreferrer"
                                class="inline-flex items-center justify-center px-3.5 h-9 rounded-[8px] border border-teks/20 text-teks hover:bg-white/80 font-semibold text-xs transition-colors">
@@ -63,23 +68,23 @@
                     <div class="bg-white rounded-[12px] p-5 sm:p-6 border border-teks/10 flex flex-col justify-between space-y-4 shadow-xs">
                         <div class="space-y-2.5">
                             <h3 class="font-semibold text-base text-teks">
-                                Sentra Mojokerto
+                                {{ $site['sentra_mojokerto_name'] }}
                             </h3>
                             <div class="text-xs text-teks/80 space-y-1">
-                                <p><span class="font-medium text-teks">Alamat:</span> Jl. Raya Brangkal No. 12, Sooko, Mojokerto, Jawa Timur</p>
-                                <p><span class="font-medium text-teks">Jadwal:</span> Senin &ndash; Sabtu, 08.00 &ndash; 16.00 WIB</p>
-                                <p><span class="font-medium text-teks">Kontak:</span> +62 812-3456-7890</p>
+                                <p><span class="font-medium text-teks">Alamat:</span> {{ $site['sentra_mojokerto_address'] }}</p>
+                                <p><span class="font-medium text-teks">Jadwal:</span> {{ $site['service_hours'] }}</p>
+                                <p><span class="font-medium text-teks">Kontak:</span> {{ $site['contact_whatsapp'] }}</p>
                             </div>
                         </div>
 
                         <div class="flex flex-wrap gap-2 pt-2 border-t border-teks/10">
-                            <a href="https://wa.me/6281234567890"
+                            <a href="{{ $site['contact_whatsapp_link'] }}"
                                target="_blank"
                                rel="noopener noreferrer"
                                class="inline-flex items-center justify-center px-3.5 h-9 rounded-[8px] bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs transition-colors">
                                 Chat WhatsApp
                             </a>
-                            <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode('Jl. Raya Brangkal No. 12, Sooko, Mojokerto') }}"
+                            <a href="{{ $site['sentra_mojokerto_maps_url'] }}"
                                target="_blank"
                                rel="noopener noreferrer"
                                class="inline-flex items-center justify-center px-3.5 h-9 rounded-[8px] border border-teks/20 text-teks hover:bg-white/80 font-semibold text-xs transition-colors">
@@ -95,9 +100,19 @@
                         Peta Wilayah Sentra Jawa Timur (Koridor Sidoarjo &ndash; Mojokerto)
                     </span>
                     <p class="text-xs sm:text-sm text-teks/80 leading-relaxed max-w-lg mx-auto">
-                        <strong>Sentra 1 (Sidoarjo):</strong> Jl. Wonocolo Pabrik Kulit No. 34, Sepanjang.<br>
-                        <strong>Sentra 2 (Mojokerto):</strong> Jl. Raya Brangkal No. 12, Sooko.
+                        <strong>{{ $site['sentra_sidoarjo_name'] }}:</strong> {{ $site['sentra_sidoarjo_address'] }}.<br>
+                        <strong>{{ $site['sentra_mojokerto_name'] }}:</strong> {{ $site['sentra_mojokerto_address'] }}.
                     </p>
+                    <div class="pt-2 flex flex-wrap items-center justify-center gap-3">
+                        <a href="{{ $site['sentra_sidoarjo_maps_url'] }}" target="_blank" rel="noopener noreferrer" class="text-xs text-primary font-semibold hover:underline">
+                            Peta {{ $site['sentra_sidoarjo_name'] }} &rarr;
+                        </a>
+                        <span class="text-teks/30">&bull;</span>
+                        <a href="{{ $site['sentra_mojokerto_maps_url'] }}" target="_blank" rel="noopener noreferrer" class="text-xs text-primary font-semibold hover:underline">
+                            Peta {{ $site['sentra_mojokerto_name'] }} &rarr;
+                        </a>
+                    </div>
+                </div>
                     <p class="text-[11px] text-teks/60 pt-1">
                         Akses mudah via rute darat Surabaya &ndash; Mojokerto.
                     </p>
@@ -231,7 +246,4 @@
         </div>
     </div>
 </section>
-
-@include('user.pages.home._modal-donasi')
-@include('user.pages.home._scripts')
 @endsection

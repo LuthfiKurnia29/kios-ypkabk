@@ -89,6 +89,8 @@ class DonationService extends BaseService
             'category_name' => $categoryName,
             'description' => $data['description'] ?? null,
             'item_count' => isset($data['item_count']) ? max(1, (int) $data['item_count']) : 1,
+            'item_photo_path' => $data['item_photo_path'] ?? null,
+            'item_photos' => $data['item_photos'] ?? null,
             'status' => $data['status'] ?? 'pending',
             'received_at' => ($data['status'] ?? null) === 'received' ? now() : null,
         ]);
