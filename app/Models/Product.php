@@ -44,6 +44,14 @@ class Product extends Model
     }
 
     /**
+     * Images of the product.
+     */
+    public function images(): HasMany
+    {
+        return $this->hasMany(ProductImage::class);
+    }
+
+    /**
      * Scope a query to only include featured products.
      */
     public function scopeFeatured(Builder $query): Builder

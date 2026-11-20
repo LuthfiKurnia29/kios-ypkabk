@@ -6,6 +6,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DonationController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProductImageController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ReviewController;
@@ -68,9 +69,12 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
 
     Route::get('/admin/products', [ProductController::class, 'adminIndex'])->name('admin.products.index');
+    Route::get('/admin/products/{product}', [ProductController::class, 'adminShow'])->name('admin.products.show');
     Route::post('/admin/products', [ProductController::class, 'store'])->name('admin.products.store');
     Route::put('/admin/products/{product}', [ProductController::class, 'update'])->name('admin.products.update');
     Route::delete('/admin/products/{product}', [ProductController::class, 'destroy'])->name('admin.products.destroy');
+    Route::delete('/admin/products/{product}/images/{image}', [ProductImageController::class, 'destroy'])->name('admin.products.images.destroy');
+    Route::delete('/admin/products/{product}/cover-image', [ProductImageController::class, 'destroyCover'])->name('admin.products.cover.destroy');
 
     Route::get('/admin/categories', [CategoryController::class, 'index'])->name('admin.categories.index');
     Route::post('/admin/categories', [CategoryController::class, 'store'])->name('admin.categories.store');

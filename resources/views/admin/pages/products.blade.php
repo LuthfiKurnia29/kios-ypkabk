@@ -105,9 +105,16 @@
                                     @endif
                                     <div class="min-w-0">
                                         <p class="font-semibold text-gray-900 truncate max-w-[200px]">{{ $product->name }}</p>
-                                        @if($product->artisan_name)
-                                            <p class="text-[11px] text-gray-400 truncate">oleh {{ $product->artisan_name }}</p>
-                                        @endif
+                                        <div class="flex items-center gap-1.5 mt-0.5">
+                                            @if($product->artisan_name)
+                                                <p class="text-[11px] text-gray-400 truncate">oleh {{ $product->artisan_name }}</p>
+                                            @endif
+                                            @if($product->images->count() > 1)
+                                                <span class="inline-flex items-center text-[10px] bg-pink-50 text-primary px-1.5 py-0.5 rounded font-medium">
+                                                    {{ $product->images->count() }} foto
+                                                </span>
+                                            @endif
+                                        </div>
                                     </div>
                                 </div>
                             </td>
@@ -141,8 +148,12 @@
                             </td>
                             <td class="px-5 py-4 whitespace-nowrap text-right">
                                 <div class="flex items-center justify-end gap-2">
+                                    <a href="{{ route('admin.products.show', $product) }}"
+                                        class="px-2.5 py-1 rounded-md border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs font-medium transition">
+                                        Detail
+                                    </a>
                                     <button type="button"
-                                        onclick="openEditModal({{ $product->id }}, {{ json_encode($product->name) }}, {{ $product->price }}, {{ $product->stock }}, {{ json_encode($product->description ?? '') }}, {{ json_encode($product->image ?? '') }}, {{ json_encode($product->source ?? '') }}, {{ json_encode($product->condition ?? '') }}, {{ json_encode($product->artisan_name ?? '') }}, {{ $product->category_id ?? 'null' }}, {{ $product->is_featured ? 'true' : 'false' }})"
+                                        onclick="openEditModal({{ $product->id }}, {{ json_encode($product->name) }}, {{ $product->price }}, {{ $product->stock }}, {{ json_encode($product->description ?? '') }}, {{ json_encode($product->image ?? '') }}, {{ json_encode($product->source ?? '') }}, {{ json_encode($product->condition ?? '') }}, {{ json_encode($product->artisan_name ?? '') }}, {{ $product->category_id ?? 'null' }}, {{ $product->is_featured ? 'true' : 'false' }}, {{ json_encode($product->images->map(fn($img) => ['id' => $img->id, 'image' => $img->image])) }})"
                                         class="px-2.5 py-1 rounded-md border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs font-medium transition">
                                         Edit
                                     </button>
@@ -243,15 +254,13 @@
         document.body.classList.add('overflow-hidden');
 
         if (id === 'modal-tambah') {
-            const imgPreview = document.getElementById('img-preview-tambah');
-            const iconPlaceholder = document.getElementById('icon-placeholder-tambah');
             const fileInput = document.getElementById('file-input-tambah');
             if (fileInput) fileInput.value = '';
-            if (imgPreview) {
-                imgPreview.src = '';
-                imgPreview.classList.add('hidden');
+            const multiPreview = document.getElementById('multi-preview-tambah');
+            if (multiPreview) {
+                multiPreview.innerHTML = '';
+                multiPreview.classList.add('hidden');
             }
-            if (iconPlaceholder) iconPlaceholder.classList.remove('hidden');
         }
     }
 
@@ -263,23 +272,31 @@
         document.body.classList.remove('overflow-hidden');
     }
 
-    function handleImagePreview(input, imgId, iconId) {
-        const img = document.getElementById(imgId);
-        const icon = document.getElementById(iconId);
-        if (!img || !icon) return;
-
-        if (input.files && input.files[0]) {
+    function handleMultipleImagePreview(input, containerId) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        container.innerHTML = '';
+        if (!input.files || input.files.length === 0) {
+            container.classList.add('hidden');
+            return;
+        }
+        container.classList.remove('hidden');
+        Array.from(input.files).forEach((file, index) => {
             const reader = new FileReader();
             reader.onload = function(e) {
-                img.src = e.target.result;
-                img.classList.remove('hidden');
-                icon.classList.add('hidden');
+                const div = document.createElement('div');
+                div.className = 'w-14 h-14 rounded-xl border border-gray-200 overflow-hidden relative shadow-xs shrink-0 bg-white';
+                div.innerHTML = `
+                    <img src="${e.target.result}" class="w-full h-full object-cover">
+                    <span class="absolute bottom-0 inset-x-0 bg-black/60 text-[9px] text-white text-center py-0.5 font-bold">#${index + 1}</span>
+                `;
+                container.appendChild(div);
             };
-            reader.readAsDataURL(input.files[0]);
-        }
+            reader.readAsDataURL(file);
+        });
     }
 
-    function openEditModal(id, name, price, stock, description, image, source, condition, artisanName, categoryId, isFeatured) {
+    function openEditModal(id, name, price, stock, description, image, source, condition, artisanName, categoryId, isFeatured, imagesList = []) {
         const form = document.getElementById('form-edit');
         form.action = '/admin/products/' + id;
 
@@ -302,26 +319,84 @@
         setValue('[name="category_id"]', categoryId);
         setCheck('[name="is_featured"]', isFeatured);
 
-        // Atur preview gambar saat ini
-        const imgPreview = document.getElementById('img-preview-edit');
-        const iconPlaceholder = document.getElementById('icon-placeholder-edit');
+        // Reset input file dan preview baru
         const fileInput = document.getElementById('file-input-edit');
         if (fileInput) fileInput.value = '';
+        const multiPreview = document.getElementById('multi-preview-edit');
+        if (multiPreview) {
+            multiPreview.innerHTML = '';
+            multiPreview.classList.add('hidden');
+        }
 
-        if (image && typeof image === 'string' && image.trim() !== '') {
-            const src = (image.startsWith('data:image') || image.startsWith('http')) 
-                ? image 
-                : ('/' + image.replace(/^\//, ''));
-            imgPreview.src = src;
-            imgPreview.classList.remove('hidden');
-            iconPlaceholder.classList.add('hidden');
-        } else {
-            imgPreview.src = '';
-            imgPreview.classList.add('hidden');
-            iconPlaceholder.classList.remove('hidden');
+        // Tampilkan foto-foto yang sudah tersimpan
+        const existingWrapper = document.getElementById('existing-images-wrapper-edit');
+        const existingContainer = document.getElementById('existing-images-edit');
+        if (existingContainer && existingWrapper) {
+            existingContainer.innerHTML = '';
+            const allImages = (imagesList && imagesList.length > 0)
+                ? imagesList
+                : (image ? [{ id: null, image: image }] : []);
+
+            if (allImages.length > 0) {
+                existingWrapper.classList.remove('hidden');
+                allImages.forEach((item, idx) => {
+                    const src = (item.image.startsWith('data:image') || item.image.startsWith('http')) 
+                        ? item.image 
+                        : ('/' + item.image.replace(/^\//, ''));
+                    const targetImageId = item.id ? item.id : 'cover';
+
+                    const card = document.createElement('div');
+                    card.className = 'relative w-20 h-20 rounded-xl border border-gray-200 overflow-hidden bg-white shrink-0 shadow-xs flex flex-col justify-end group';
+                    card.innerHTML = `
+                        <img src="${src}" class="absolute inset-0 w-full h-full object-cover">
+                        <div class="relative z-10 bg-gradient-to-t from-black/85 via-black/50 to-transparent p-1 flex items-center justify-between">
+                            <span class="text-[9px] text-white font-bold px-0.5">#${idx + 1}</span>
+                            <button type="button" onclick="deleteExistingImage(${id}, '${targetImageId}', this)"
+                                class="px-1.5 py-0.5 rounded bg-rose-600 hover:bg-rose-700 text-white text-[9px] font-bold shadow-sm transition flex items-center gap-0.5 cursor-pointer"
+                                title="Hapus foto ini">
+                                <span>Hapus</span>
+                            </button>
+                        </div>
+                    `;
+                    existingContainer.appendChild(card);
+                });
+            } else {
+                existingWrapper.classList.add('hidden');
+            }
         }
 
         openModal('modal-edit');
+    }
+
+    async function deleteExistingImage(productId, imageId, btn) {
+        if (!confirm('Hapus foto ini dari produk?')) return;
+        const card = btn.closest('.relative');
+        const url = (imageId === 'cover')
+            ? `/admin/products/${productId}/cover-image`
+            : `/admin/products/${productId}/images/${imageId}`;
+        try {
+            btn.disabled = true;
+            const res = await fetch(url, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Accept': 'application/json',
+                }
+            });
+            if (res.ok) {
+                card.remove();
+                const container = document.getElementById('existing-images-edit');
+                if (container && container.children.length === 0) {
+                    document.getElementById('existing-images-wrapper-edit')?.classList.add('hidden');
+                }
+            } else {
+                alert('Gagal menghapus foto.');
+                btn.disabled = false;
+            }
+        } catch (e) {
+            alert('Terjadi kesalahan jaringan.');
+            btn.disabled = false;
+        }
     }
 
     function openDeleteModal(id, name) {
