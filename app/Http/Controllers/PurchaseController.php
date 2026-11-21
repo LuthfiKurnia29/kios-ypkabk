@@ -9,6 +9,7 @@ use App\Models\Purchase;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
@@ -153,12 +154,136 @@ class PurchaseController extends Controller
     }
 
     /**
+     * Store a newly created print-on-demand purchase order.
+     */
+    public function storeOnDemand(Request $request): JsonResponse|RedirectResponse
+    {
+        $hasSeparateAddress = $request->filled('city') || $request->filled('street_address');
+
+        $validated = $request->validate([
+            'customer_name' => ['required', 'string', 'max:255'],
+            'customer_phone' => ['required', 'string', 'max:50'],
+            'city' => [$hasSeparateAddress ? 'required' : 'nullable', 'string', 'max:100'],
+            'district' => [$hasSeparateAddress ? 'required' : 'nullable', 'string', 'max:100'],
+            'village' => [$hasSeparateAddress ? 'required' : 'nullable', 'string', 'max:100'],
+            'street_address' => [$hasSeparateAddress ? 'required' : 'nullable', 'string', 'max:255'],
+            'address' => [$hasSeparateAddress ? 'required' : 'nullable', 'string', 'max:1000'],
+            'customer_address' => ['nullable', 'string', 'max:1000'],
+            'product_id' => ['nullable', 'exists:products,id'],
+            'quantity' => ['required', 'integer', 'min:1', 'max:10000'],
+            'price' => ['nullable', 'numeric', 'min:0'],
+            'design_notes' => ['nullable', 'string', 'max:2000'],
+            'design_file' => ['required', 'file', 'mimes:jpg,jpeg,png,webp,pdf', 'max:10240'],
+            'payment_method' => ['nullable', 'in:qris,bank_transfer'],
+            'bank_name' => ['nullable', 'string', 'max:50'],
+            'notes' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        $address = $validated['address'] ?? $validated['customer_address'] ?? null;
+
+        $designPath = null;
+        if ($request->hasFile('design_file')) {
+            $file = $request->file('design_file');
+            $filename = 'pod-design-'.time().'-'.Str::random(8).'.'.$file->getClientOriginalExtension();
+            $designPath = $file->storeAs('on_demand_designs', $filename, 'public');
+        }
+
+        $customerData = [
+            'user_id' => $request->user()?->id,
+            'customer_name' => $validated['customer_name'],
+            'customer_phone' => $validated['customer_phone'],
+            'city' => $validated['city'] ?? null,
+            'district' => $validated['district'] ?? null,
+            'village' => $validated['village'] ?? null,
+            'street_address' => $validated['street_address'] ?? null,
+            'address' => $address,
+            'customer_address' => $address,
+            'payment_method' => $validated['payment_method'] ?? 'qris',
+            'bank_name' => $validated['bank_name'] ?? null,
+            'notes' => $validated['notes'] ?? null,
+            'design_notes' => $validated['design_notes'] ?? null,
+            'design_file_path' => $designPath,
+        ];
+
+        $onDemandItem = [
+            'product_id' => $validated['product_id'] ?? null,
+            'quantity' => (int) $validated['quantity'],
+            'price' => isset($validated['price']) ? (float) $validated['price'] : null,
+        ];
+
+        $purchase = $this->purchaseService->createOnDemandPurchase($customerData, $onDemandItem);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'Pesanan Print on Demand berhasil diajukan dan sedang menunggu persetujuan admin.',
+                'data' => $purchase,
+                'order_url' => route('purchases.show', $purchase->order_code),
+                'whatsapp_receipt_url' => $purchase->whatsapp_receipt_url,
+            ], 201);
+        }
+
+        return redirect()->route('purchases.show', $purchase->order_code)
+            ->with('success', "Pesanan Print on Demand {$purchase->order_code} berhasil diajukan dan sedang menunggu persetujuan admin.");
+    }
+
+    /**
+     * Approve a print-on-demand purchase order.
+     */
+    public function approveOnDemand(Request $request, Purchase|int|string $purchase): JsonResponse|RedirectResponse
+    {
+        $validated = $request->validate([
+            'adjusted_price' => ['nullable', 'numeric', 'min:0'],
+            'admin_notes' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        $adjustedPrice = isset($validated['adjusted_price']) && $validated['adjusted_price'] !== ''
+            ? (float) $validated['adjusted_price']
+            : null;
+
+        $order = $this->purchaseService->approveOnDemand($purchase, $adjustedPrice, $validated['admin_notes'] ?? null);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Pesanan Print on Demand berhasil disetujui.',
+                'data' => $order,
+            ]);
+        }
+
+        return redirect()->back()->with('success', "Pesanan Print on Demand {$order->order_code} berhasil disetujui.");
+    }
+
+    /**
+     * Reject a print-on-demand purchase order.
+     */
+    public function rejectOnDemand(Request $request, Purchase|int|string $purchase): JsonResponse|RedirectResponse
+    {
+        $validated = $request->validate([
+            'reason' => ['required', 'string', 'max:1000'],
+        ], [
+            'reason.required' => 'Alasan penolakan pesanan wajib diisi.',
+        ]);
+
+        $order = $this->purchaseService->rejectOnDemand($purchase, $validated['reason']);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Pesanan Print on Demand berhasil ditolak.',
+                'data' => $order,
+            ]);
+        }
+
+        return redirect()->back()->with('success', "Pesanan Print on Demand {$order->order_code} telah ditolak.");
+    }
+
+    /**
      * Update the status of the specified purchase order.
      */
     public function updateStatus(Request $request, Purchase|int|string $purchase): JsonResponse|RedirectResponse
     {
         $validated = $request->validate([
-            'status' => ['required', 'in:pending,paid,shipped,completed,cancelled'],
+            'status' => ['required', 'in:waiting_approval,pending,paid,shipped,completed,cancelled'],
             'notes' => ['nullable', 'string'],
         ]);
 

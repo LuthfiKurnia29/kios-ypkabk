@@ -35,6 +35,7 @@ Route::get('/products/{product}', [ProductController::class, 'show'])->name('pro
 
 // Public Guest Orders & Checkout (FR-06 / NFR-02)
 Route::post('/purchases', [PurchaseController::class, 'store'])->name('purchases.store');
+Route::post('/purchases/on-demand', [PurchaseController::class, 'storeOnDemand'])->name('purchases.on-demand.store');
 Route::get('/purchases/{purchase}', [PurchaseController::class, 'show'])->name('purchases.show');
 Route::post('/purchases/{purchase}/payment-proof', [PurchaseController::class, 'uploadPaymentProof'])->name('purchases.upload-proof');
 
@@ -85,6 +86,8 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/purchases/export', [PurchaseController::class, 'export'])->name('admin.purchases.export');
     Route::patch('/admin/purchases/{purchase}/status', [PurchaseController::class, 'updateStatus'])->name('admin.purchases.update-status');
     Route::patch('/admin/purchases/{purchase}/shipping', [PurchaseController::class, 'updateShipping'])->name('admin.purchases.update-shipping');
+    Route::patch('/admin/purchases/{purchase}/approve-on-demand', [PurchaseController::class, 'approveOnDemand'])->name('admin.purchases.approve-on-demand');
+    Route::patch('/admin/purchases/{purchase}/reject-on-demand', [PurchaseController::class, 'rejectOnDemand'])->name('admin.purchases.reject-on-demand');
 
     Route::get('/admin/donations', [DonationController::class, 'index'])->name('admin.donations.index');
     Route::get('/admin/donations/export', [DonationController::class, 'export'])->name('admin.donations.export');

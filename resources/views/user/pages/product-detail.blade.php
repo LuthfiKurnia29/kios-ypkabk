@@ -190,28 +190,37 @@
                 </div>
 
                 {{-- Tombol Aksi Utama --}}
-                <div class="pt-3 flex flex-col sm:flex-row gap-3">
-                    @if($isOutOfStock)
-                        <button type="button" disabled
-                                class="flex-1 h-12 rounded-[10px] bg-stone-200 text-stone-500 font-bold text-sm flex items-center justify-center cursor-not-allowed border border-stone-300">
-                            Stok Sedang Habis
-                        </button>
-                    @else
-                        <button type="button"
-                                onclick="openOrderModal('{{ addslashes($product->name) }}', '{{ number_format((float) $product->price, 0, ',', '.') }}', {{ $product->id }})"
-                                class="flex-1 h-12 rounded-[10px] bg-primary hover:bg-primary/90 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-sm transition-all active:scale-[0.98]">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-                            </svg>
-                            <span>Beli / Pesan Sekarang</span>
-                        </button>
-                    @endif
+                <div class="pt-3 space-y-2.5">
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        @if($isOutOfStock)
+                            <button type="button" disabled
+                                    class="flex-1 h-12 rounded-[10px] bg-stone-200 text-stone-500 font-bold text-sm flex items-center justify-center cursor-not-allowed border border-stone-300">
+                                Stok Ready Habis
+                            </button>
+                        @else
+                            <button type="button"
+                                    onclick="openOrderModal('{{ addslashes($product->name) }}', '{{ number_format((float) $product->price, 0, ',', '.') }}', {{ $product->id }})"
+                                    class="flex-1 h-12 rounded-[10px] bg-primary hover:bg-primary/90 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-sm transition-all active:scale-[0.98]">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                                </svg>
+                                <span>Beli Ready Stock</span>
+                            </button>
+                        @endif
 
-                    <a href="https://wa.me/6281234567890?text={{ urlencode('Halo Admin Kios YPKABK, saya ingin bertanya tentang produk: ' . $product->name . ' (' . route('products.show', $product->id) . ')') }}"
-                       target="_blank"
-                       class="px-5 h-12 rounded-[10px] border border-[#2B2430]/20 bg-white hover:bg-stone-50 text-[#2B2430] font-semibold text-sm flex items-center justify-center gap-2 transition-colors">
-                        <span>💬 Tanya via WA</span>
-                    </a>
+                        <a href="https://wa.me/6281234567890?text={{ urlencode('Halo Admin Kios YPKABK, saya ingin bertanya tentang produk: ' . $product->name . ' (' . route('products.show', $product->id) . ')') }}"
+                           target="_blank"
+                           class="px-5 h-12 rounded-[10px] border border-[#2B2430]/20 bg-white hover:bg-stone-50 text-[#2B2430] font-semibold text-sm flex items-center justify-center gap-2 transition-colors">
+                            <span>💬 Tanya via WA</span>
+                        </a>
+                    </div>
+
+                    {{-- Opsi Print on Demand Kustom --}}
+                    <button type="button"
+                            onclick="openOnDemandModal('{{ addslashes($product->name) }}', '{{ number_format((float) $product->price, 0, ',', '.') }}', {{ $product->id }})"
+                            class="w-full h-11 rounded-[10px] bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer">
+                        <span>🎨 Pesan Cetak Kustom (Print on Demand) &rarr;</span>
+                    </button>
                 </div>
 
             </div>
