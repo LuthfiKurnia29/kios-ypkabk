@@ -16,6 +16,7 @@ class Purchase extends Model
     protected $fillable = [
         'user_id',
         'order_code',
+        'order_type',
         'customer_name',
         'customer_phone',
         'customer_address',
@@ -28,10 +29,13 @@ class Purchase extends Model
         'payment_method',
         'bank_name',
         'payment_proof',
+        'design_file_path',
         'courier_name',
         'tracking_number',
         'shipping_receipt_path',
         'notes',
+        'design_notes',
+        'admin_notes',
         'status',
         'review_token',
         'created_at',
@@ -39,6 +43,7 @@ class Purchase extends Model
     ];
 
     protected $attributes = [
+        'order_type' => 'regular',
         'payment_method' => 'qris',
     ];
 
@@ -190,6 +195,22 @@ class Purchase extends Model
     }
 
     /**
+     * Determine if this purchase is a Print on Demand order.
+     */
+    public function isOnDemand(): bool
+    {
+        return ($this->order_type ?? 'regular') === 'on_demand';
+    }
+
+    /**
+     * Determine if this on-demand purchase is waiting for admin approval.
+     */
+    public function isWaitingApproval(): bool
+    {
+        return $this->status === 'waiting_approval';
+    }
+
+    /**
      * Build the WhatsApp receipt text for this purchase order.
      */
     public function buildWhatsappReceiptText(): string
@@ -198,6 +219,23 @@ class Purchase extends Model
         foreach ($this->detailPurchases as $item) {
             $productName = $item->product?->name ?? 'Produk';
             $itemsList .= "• {$productName} (x{$item->quantity}) - Rp ".number_format($item->total_price, 0, ',', '.')."\n";
+        }
+
+        $orderUrl = route('purchases.show', $this->order_code);
+        $dateStr = $this->created_at ? $this->created_at->format('d M Y H:i') : now()->format('d M Y H:i');
+
+        if ($this->isOnDemand() && $this->isWaitingApproval()) {
+            return "Halo {$this->customer_name}, terima kasih telah mengajukan pesanan *Print on Demand* di Kios Mandiri YPKABK!\n\n"
+                ."*KODE PESANAN:* {$this->order_code} (Print on Demand)\n"
+                ."*STATUS:* Menunggu Persetujuan Admin\n"
+                ."*TANGGAL:* {$dateStr}\n\n"
+                ."*RINCIAN PESANAN:*\n{$itemsList}\n"
+                .'*ESTIMASI TOTAL:* Rp '.number_format($this->total_price, 0, ',', '.')."\n\n"
+                ."*CATATAN KUSTOM:*\n".($this->design_notes ?: '-')."\n\n"
+                ."*ALAMAT PENGIRIMAN:*\n{$this->full_address}\n\n"
+                ."*TAUTAN DETAIL PESANAN:*\n{$orderUrl}\n\n"
+                ."_Pesanan Anda sedang ditinjau oleh Admin. Instruksi pembayaran akan kami informasikan segera setelah pesanan disetujui._\n"
+                .'Terima kasih atas kepedulian Anda mendukung karya anak berkebutuhan khusus!';
         }
 
         if ($this->payment_method === 'bank_transfer') {
@@ -210,11 +248,8 @@ class Purchase extends Model
             $paymentInfo = 'QRIS Kios Mandiri YPKABK (Scan / Upload Bukti)';
         }
 
-        $orderUrl = route('purchases.show', $this->order_code);
-        $dateStr = $this->created_at ? $this->created_at->format('d M Y H:i') : now()->format('d M Y H:i');
-
         return "Halo {$this->customer_name}, berikut adalah rincian nota pesanan Anda di Kios Mandiri YPKABK:\n\n"
-            ."*KODE PESANAN:* {$this->order_code}\n"
+            ."*KODE PESANAN:* {$this->order_code}".($this->isOnDemand() ? ' (Print on Demand)' : '')."\n"
             ."*TANGGAL:* {$dateStr}\n\n"
             ."*DAFTAR PRODUK:*\n{$itemsList}\n"
             .'*TOTAL PEMBAYARAN:* Rp '.number_format($this->total_price, 0, ',', '.')."\n"
@@ -234,6 +269,37 @@ class Purchase extends Model
         $encodedText = rawurlencode($this->buildWhatsappReceiptText());
 
         return "https://wa.me/{$phone}?text={$encodedText}";
+    }
+
+    /**
+     * Get the WhatsApp URL for admin to notify the customer about order approval.
+     */
+    public function getWhatsappApprovalNotificationUrlAttribute(): string
+    {
+        $phone = $this->international_phone;
+        $orderUrl = route('purchases.show', $this->order_code);
+        $text = "Halo {$this->customer_name},\n\nKabar baik! Pesanan Print on Demand Anda dengan kode *{$this->order_code}* telah *DISETUJUI* oleh Admin Kios Mandiri YPKABK.\n\n"
+            .'*Total Pembayaran:* Rp '.number_format($this->total_price, 0, ',', '.')."\n"
+            .($this->admin_notes ? "*Catatan Admin:* {$this->admin_notes}\n\n" : "\n")
+            ."Silakan buka tautan berikut untuk melihat rincian dan melakukan pembayaran via QRIS atau Transfer Bank:\n{$orderUrl}\n\n"
+            .'Terima kasih banyak atas dukungannya!';
+
+        return "https://wa.me/{$phone}?text=".rawurlencode($text);
+    }
+
+    /**
+     * Get the WhatsApp URL for admin to notify the customer about order rejection.
+     */
+    public function getWhatsappRejectionNotificationUrlAttribute(): string
+    {
+        $phone = $this->international_phone;
+        $orderUrl = route('purchases.show', $this->order_code);
+        $text = "Halo {$this->customer_name},\n\nMohon maaf, pesanan Print on Demand Anda dengan kode *{$this->order_code}* belum dapat kami setujui.\n\n"
+            .($this->admin_notes ? "*Alasan / Catatan Admin:* {$this->admin_notes}\n\n" : "\n")
+            ."Detail pesanan dapat dilihat di: {$orderUrl}\n\n"
+            .'Silakan hubungi kami kembali jika ingin berkonsultasi mengenai spesifikasi desain atau opsi lain. Terima kasih!';
+
+        return "https://wa.me/{$phone}?text=".rawurlencode($text);
     }
 
     /**

@@ -40,7 +40,7 @@
                 <tr>
                     <td class="text-center">{{ $index + 1 }}</td>
                     <td>{{ $item->created_at ? $item->created_at->format('d/m/Y H:i') : '-' }}</td>
-                    <td><code>{{ $item->order_code }}</code></td>
+                    <td><code>{{ $item->order_code }}</code>@if($item->order_type === 'on_demand')<br><small style="color: #4f46e5; font-weight: bold;">On Demand</small>@endif</td>
                     <td>{{ $item->customer_name }}</td>
                     <td class="text-right">Rp {{ number_format($item->total_price, 0, ',', '.') }}</td>
                     <td class="text-center">{{ strtoupper($item->status) }}</td>

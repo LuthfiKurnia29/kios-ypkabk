@@ -37,6 +37,10 @@ class PurchaseService extends BaseService
             $query->where('status', $filters['status']);
         }
 
+        if (! empty($filters['order_type'])) {
+            $query->where('order_type', $filters['order_type']);
+        }
+
         if (! empty($filters['user_id'])) {
             $query->where('user_id', $filters['user_id']);
         }
@@ -171,6 +175,154 @@ class PurchaseService extends BaseService
     }
 
     /**
+     * Create a print-on-demand purchase order awaiting admin approval.
+     *
+     * @param  array{
+     *     user_id?: ?int,
+     *     customer_name: string,
+     *     customer_phone: string,
+     *     customer_address?: ?string,
+     *     address?: ?string,
+     *     city?: ?string,
+     *     district?: ?string,
+     *     village?: ?string,
+     *     street_address?: ?string,
+     *     payment_method?: ?string,
+     *     bank_name?: ?string,
+     *     notes?: ?string,
+     *     design_notes?: ?string,
+     *     design_file_path?: ?string,
+     * }  $customerData
+     * @param  array{
+     *     product_id?: ?int,
+     *     quantity: int,
+     *     price?: ?float,
+     * }  $onDemandItem
+     */
+    public function createOnDemandPurchase(array $customerData, array $onDemandItem): Purchase
+    {
+        $quantity = max(1, (int) ($onDemandItem['quantity'] ?? 1));
+
+        return DB::transaction(function () use ($customerData, $onDemandItem, $quantity) {
+            $orderCode = 'POD-'.now()->format('Ymd').'-'.strtoupper(Str::random(5));
+
+            $product = null;
+            $unitPrice = 0.0;
+
+            if (! empty($onDemandItem['product_id'])) {
+                /** @var Product $product */
+                $product = $this->productService->getDataProduct($onDemandItem['product_id']);
+                $unitPrice = isset($onDemandItem['price']) ? (float) $onDemandItem['price'] : (float) $product->price;
+            } elseif (isset($onDemandItem['price'])) {
+                $unitPrice = (float) $onDemandItem['price'];
+            }
+
+            $totalPrice = $unitPrice * $quantity;
+            $address = $customerData['address'] ?? $customerData['customer_address'] ?? null;
+
+            $purchase = Purchase::create([
+                'user_id' => $customerData['user_id'] ?? null,
+                'order_code' => $orderCode,
+                'order_type' => 'on_demand',
+                'customer_name' => trim($customerData['customer_name']),
+                'customer_phone' => trim($customerData['customer_phone']),
+                'customer_address' => $address,
+                'address' => $address,
+                'city' => $customerData['city'] ?? null,
+                'district' => $customerData['district'] ?? null,
+                'village' => $customerData['village'] ?? null,
+                'street_address' => $customerData['street_address'] ?? null,
+                'payment_method' => $customerData['payment_method'] ?? 'qris',
+                'bank_name' => ($customerData['payment_method'] ?? 'qris') === 'bank_transfer'
+                    ? ($customerData['bank_name'] ?? 'BCA')
+                    : null,
+                'total_price' => $totalPrice,
+                'status' => 'waiting_approval',
+                'notes' => $customerData['notes'] ?? null,
+                'design_notes' => $customerData['design_notes'] ?? null,
+                'design_file_path' => $customerData['design_file_path'] ?? null,
+            ]);
+
+            if ($product) {
+                DetailPurchase::create([
+                    'purchase_id' => $purchase->id,
+                    'product_id' => $product->id,
+                    'quantity' => $quantity,
+                    'price' => $unitPrice,
+                    'total_price' => $totalPrice,
+                ]);
+            }
+
+            LogPurchase::create([
+                'purchase_id' => $purchase->id,
+                'action' => 'created_on_demand',
+                'desc' => "Pesanan Print on Demand baru diajukan (Qty: {$quantity}) dan menunggu persetujuan admin.",
+            ]);
+
+            return $purchase->load(['user', 'detailPurchases.product', 'logPurchases']);
+        });
+    }
+
+    /**
+     * Approve a print-on-demand order, moving it to pending payment.
+     */
+    public function approveOnDemand(Purchase|int|string $purchase, ?float $adjustedPrice = null, ?string $adminNotes = null): Purchase
+    {
+        return DB::transaction(function () use ($purchase, $adjustedPrice, $adminNotes) {
+            $order = $this->getPurchase($purchase);
+
+            $updates = [
+                'status' => 'pending',
+            ];
+
+            if ($adjustedPrice !== null && $adjustedPrice >= 0) {
+                $updates['total_price'] = $adjustedPrice;
+            }
+
+            if ($adminNotes !== null) {
+                $updates['admin_notes'] = $adminNotes;
+            }
+
+            $order->update($updates);
+
+            LogPurchase::create([
+                'purchase_id' => $order->id,
+                'action' => 'on_demand_approved',
+                'desc' => $adminNotes ? "Pesanan On Demand disetujui oleh admin. Catatan: {$adminNotes}" : 'Pesanan On Demand disetujui oleh admin, menunggu pembayaran.',
+            ]);
+
+            SiteStatsService::clearCache();
+
+            return $order->fresh(['user', 'detailPurchases.product', 'logPurchases']);
+        });
+    }
+
+    /**
+     * Reject a print-on-demand order with reason notes.
+     */
+    public function rejectOnDemand(Purchase|int|string $purchase, string $reason): Purchase
+    {
+        return DB::transaction(function () use ($purchase, $reason) {
+            $order = $this->getPurchase($purchase);
+
+            $order->update([
+                'status' => 'cancelled',
+                'admin_notes' => $reason,
+            ]);
+
+            LogPurchase::create([
+                'purchase_id' => $order->id,
+                'action' => 'on_demand_rejected',
+                'desc' => "Pesanan On Demand ditolak oleh admin. Alasan: {$reason}",
+            ]);
+
+            SiteStatsService::clearCache();
+
+            return $order->fresh(['user', 'detailPurchases.product', 'logPurchases']);
+        });
+    }
+
+    /**
      * Update the status of a purchase and write to purchase audit log.
      */
     public function updateStatus(Purchase|int|string $purchase, string $newStatus, ?string $notes = null): Purchase
@@ -183,17 +335,20 @@ class PurchaseService extends BaseService
                 return $order;
             }
 
-            // If order was cancelled, restore stocks
-            if ($newStatus === 'cancelled' && $previousStatus !== 'cancelled') {
-                foreach ($order->detailPurchases as $item) {
-                    $this->productService->updateStock($item->product_id, (int) $item->quantity);
+            // Only regular stock purchases deduct/restore inventory
+            if ($order->order_type !== 'on_demand') {
+                // If order was cancelled, restore stocks
+                if ($newStatus === 'cancelled' && $previousStatus !== 'cancelled') {
+                    foreach ($order->detailPurchases as $item) {
+                        $this->productService->updateStock($item->product_id, (int) $item->quantity);
+                    }
                 }
-            }
 
-            // If reactivating a previously cancelled order, re-deduct stocks
-            if ($previousStatus === 'cancelled' && $newStatus !== 'cancelled') {
-                foreach ($order->detailPurchases as $item) {
-                    $this->productService->updateStock($item->product_id, -((int) $item->quantity));
+                // If reactivating a previously cancelled order, re-deduct stocks
+                if ($previousStatus === 'cancelled' && $newStatus !== 'cancelled') {
+                    foreach ($order->detailPurchases as $item) {
+                        $this->productService->updateStock($item->product_id, -((int) $item->quantity));
+                    }
                 }
             }
 

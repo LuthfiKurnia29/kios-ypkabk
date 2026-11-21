@@ -32,6 +32,32 @@ class ProductController extends Controller
     }
 
     /**
+     * Display the specified product in the admin back-office panel.
+     */
+    public function adminShow(Request $request, Product|int|string $product): View|JsonResponse
+    {
+        $productData = $this->productService->getDataProduct($product);
+        $productData->loadMissing(['category', 'images', 'detailPurchases.purchase']);
+
+        $totalSold = $productData->detailPurchases->sum('quantity');
+        $totalRevenue = $productData->detailPurchases->sum(fn ($item) => $item->quantity * $item->price);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'product' => $productData,
+                'total_sold' => $totalSold,
+                'total_revenue' => $totalRevenue,
+            ]);
+        }
+
+        return view('admin.pages.product-show', [
+            'product' => $productData,
+            'totalSold' => $totalSold,
+            'totalRevenue' => $totalRevenue,
+        ]);
+    }
+
+    /**
      * Display a listing of products.
      */
     public function index(Request $request): View|JsonResponse
@@ -54,12 +80,23 @@ class ProductController extends Controller
     public function show(Request $request, Product|int|string $product): View|JsonResponse
     {
         $productData = $this->productService->getDataProduct($product);
+        $productData->loadMissing(['category', 'images']);
 
         if ($request->wantsJson()) {
             return response()->json($productData);
         }
 
-        return view('user.pages.katalog', ['product' => $productData]);
+        $relatedProducts = Product::with('category')
+            ->where('id', '!=', $productData->id)
+            ->when($productData->category_id, fn ($q) => $q->where('category_id', $productData->category_id))
+            ->available()
+            ->limit(4)
+            ->get();
+
+        return view('user.pages.product-detail', [
+            'product' => $productData,
+            'relatedProducts' => $relatedProducts,
+        ]);
     }
 
     /**
@@ -74,11 +111,25 @@ class ProductController extends Controller
             'stock' => ['required', 'integer', 'min:0'],
             'description' => ['nullable', 'string'],
             'image' => ['nullable'],
+            'images' => ['nullable', 'array'],
+            'images.*' => ['file', 'image', 'max:5120'],
             'source' => ['nullable', 'in:karya,preloved'],
             'condition' => ['nullable', 'in:baru,mulus,layak'],
             'artisan_name' => ['nullable', 'string', 'max:255'],
             'is_featured' => ['nullable', 'boolean'],
         ]);
+
+        $uploadedImages = [];
+
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $file) {
+                if ($file->isValid()) {
+                    $mime = $file->getClientMimeType() ?: $file->getMimeType() ?: 'image/jpeg';
+                    $base64 = base64_encode(file_get_contents($file->getRealPath()));
+                    $uploadedImages[] = "data:{$mime};base64,{$base64}";
+                }
+            }
+        }
 
         if ($request->hasFile('image')) {
             $request->validate([
@@ -87,12 +138,33 @@ class ProductController extends Controller
             $file = $request->file('image');
             $mime = $file->getClientMimeType() ?: $file->getMimeType() ?: 'image/jpeg';
             $base64 = base64_encode(file_get_contents($file->getRealPath()));
-            $validated['image'] = "data:{$mime};base64,{$base64}";
-        } elseif (! is_string($validated['image'] ?? null)) {
+            $singleImage = "data:{$mime};base64,{$base64}";
+            if (! in_array($singleImage, $uploadedImages, true)) {
+                array_unshift($uploadedImages, $singleImage);
+            }
+        } elseif (is_string($validated['image'] ?? null) && ! empty($validated['image'])) {
+            if (! in_array($validated['image'], $uploadedImages, true)) {
+                array_unshift($uploadedImages, $validated['image']);
+            }
+        }
+
+        if (! empty($uploadedImages)) {
+            $validated['image'] = $uploadedImages[0];
+        } else {
             $validated['image'] = null;
         }
 
+        unset($validated['images']);
+
         $product = $this->productService->createDataProduct($validated);
+
+        foreach ($uploadedImages as $imgData) {
+            $product->images()->create([
+                'image' => $imgData,
+            ]);
+        }
+
+        $product->loadMissing('images');
 
         if ($request->wantsJson()) {
             return response()->json([
@@ -116,12 +188,25 @@ class ProductController extends Controller
             'stock' => ['sometimes', 'required', 'integer', 'min:0'],
             'description' => ['nullable', 'string'],
             'image' => ['nullable'],
+            'images' => ['nullable', 'array'],
+            'images.*' => ['file', 'image', 'max:5120'],
             'source' => ['nullable', 'in:karya,preloved'],
             'condition' => ['nullable', 'in:baru,mulus,layak'],
             'artisan_name' => ['nullable', 'string', 'max:255'],
             'is_featured' => ['nullable', 'boolean'],
             'status' => ['nullable', 'in:ready,minimal_stock,empty'],
         ]);
+
+        $newUploadedImages = [];
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $file) {
+                if ($file->isValid()) {
+                    $mime = $file->getClientMimeType() ?: $file->getMimeType() ?: 'image/jpeg';
+                    $base64 = base64_encode(file_get_contents($file->getRealPath()));
+                    $newUploadedImages[] = "data:{$mime};base64,{$base64}";
+                }
+            }
+        }
 
         if ($request->hasFile('image')) {
             $request->validate([
@@ -130,12 +215,31 @@ class ProductController extends Controller
             $file = $request->file('image');
             $mime = $file->getClientMimeType() ?: $file->getMimeType() ?: 'image/jpeg';
             $base64 = base64_encode(file_get_contents($file->getRealPath()));
-            $validated['image'] = "data:{$mime};base64,{$base64}";
+            $singleImage = "data:{$mime};base64,{$base64}";
+            $validated['image'] = $singleImage;
+            if (! in_array($singleImage, $newUploadedImages, true)) {
+                $newUploadedImages[] = $singleImage;
+            }
         } elseif (! is_string($validated['image'] ?? null) || empty($validated['image'])) {
             unset($validated['image']);
         }
 
+        unset($validated['images']);
+
         $updated = $this->productService->updateDataProduct($product, $validated);
+
+        foreach ($newUploadedImages as $imgData) {
+            $updated->images()->create([
+                'image' => $imgData,
+            ]);
+        }
+
+        if (empty($updated->image) && $updated->images()->exists()) {
+            $firstImg = $updated->images()->first();
+            $updated->update(['image' => $firstImg->image]);
+        }
+
+        $updated->loadMissing('images');
 
         if ($request->wantsJson()) {
             return response()->json([

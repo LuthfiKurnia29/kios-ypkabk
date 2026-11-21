@@ -24,6 +24,7 @@ class Product extends Model
             'stock' => 'integer',
             'isEmpty' => 'boolean',
             'is_featured' => 'boolean',
+            'is_on_demand' => 'boolean',
         ];
     }
 
@@ -44,6 +45,14 @@ class Product extends Model
     }
 
     /**
+     * Images of the product.
+     */
+    public function images(): HasMany
+    {
+        return $this->hasMany(ProductImage::class);
+    }
+
+    /**
      * Scope a query to only include featured products.
      */
     public function scopeFeatured(Builder $query): Builder
@@ -57,5 +66,13 @@ class Product extends Model
     public function scopeAvailable(Builder $query): Builder
     {
         return $query->where('stock', '>', 0)->where('status', '!=', 'empty');
+    }
+
+    /**
+     * Scope a query to only include products available for on-demand printing.
+     */
+    public function scopeOnDemand(Builder $query): Builder
+    {
+        return $query->where('is_on_demand', true);
     }
 }

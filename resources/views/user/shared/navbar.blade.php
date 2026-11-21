@@ -45,8 +45,13 @@
                 </a>
             </nav>
 
-            {{-- Right Action: Tombol Donasikan Barang (Kanan) --}}
-            <div class="hidden lg:flex items-center">
+            {{-- Right Action: Tombol Print on Demand & Donasikan Barang (Kanan) --}}
+            <div class="hidden lg:flex items-center gap-2.5">
+                <button type="button"
+                        onclick="openOnDemandModal()"
+                        class="inline-flex items-center justify-center px-4 h-[44px] rounded-[8px] bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-sm font-semibold transition-all active:scale-95 cursor-pointer">
+                    Print on Demand
+                </button>
                 <button type="button"
                         onclick="openDonationModal()"
                         class="inline-flex items-center justify-center px-5 h-[44px] rounded-[8px] bg-primary hover:bg-primary/90 text-white text-sm font-semibold transition-all active:scale-95 shadow-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary">
@@ -103,7 +108,12 @@
                 </a>
             </nav>
 
-            <div class="pt-2 border-t border-teks/10">
+            <div class="pt-2 border-t border-teks/10 space-y-2">
+                <button type="button"
+                        onclick="openOnDemandModal(); if (typeof closeMobileMenu === 'function') closeMobileMenu();"
+                        class="w-full h-[44px] flex items-center justify-center rounded-[8px] bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 font-semibold text-sm transition-all active:scale-95 cursor-pointer">
+                    Print on Demand (Kustom)
+                </button>
                 <button type="button"
                         onclick="openDonationModal()"
                         class="w-full h-[44px] flex items-center justify-center rounded-[8px] bg-primary hover:bg-primary/90 text-white font-semibold text-sm transition-all active:scale-95 shadow-xs">

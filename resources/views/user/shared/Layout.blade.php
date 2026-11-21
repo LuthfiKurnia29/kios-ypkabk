@@ -58,6 +58,9 @@
     {{-- Modal Donasi Global (Dapat diakses dari semua halaman) --}}
     @include('user.pages.home._modal-donasi')
 
+    {{-- Modal Print on Demand Global --}}
+    @include('user.pages.home._modal-on-demand')
+
     {{-- Floating Quick WhatsApp Help --}}
     @php
         $siteLayout = $siteSettings ?? \App\Models\SiteSetting::getPublicSettings();

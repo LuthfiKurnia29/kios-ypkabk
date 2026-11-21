@@ -21,7 +21,7 @@
             <tr>
                 <td style="border: 1px solid #e5e7eb;">{{ $index + 1 }}</td>
                 <td style="border: 1px solid #e5e7eb;">{{ $item->created_at ? $item->created_at->format('d/m/Y H:i') : '-' }}</td>
-                <td style="border: 1px solid #e5e7eb;">{{ $item->order_code }}</td>
+                <td style="border: 1px solid #e5e7eb;">{{ $item->order_code }}{{ $item->order_type === 'on_demand' ? ' (On Demand)' : '' }}</td>
                 <td style="border: 1px solid #e5e7eb;">{{ $item->customer_name }}</td>
                 <td style="border: 1px solid #e5e7eb;" data-format="#,##0">{{ (int) $item->total_price }}</td>
                 <td style="border: 1px solid #e5e7eb;">{{ strtoupper($item->status) }}</td>

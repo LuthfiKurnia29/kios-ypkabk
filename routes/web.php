@@ -6,6 +6,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DonationController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProductImageController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ReviewController;
@@ -34,6 +35,7 @@ Route::get('/products/{product}', [ProductController::class, 'show'])->name('pro
 
 // Public Guest Orders & Checkout (FR-06 / NFR-02)
 Route::post('/purchases', [PurchaseController::class, 'store'])->name('purchases.store');
+Route::post('/purchases/on-demand', [PurchaseController::class, 'storeOnDemand'])->name('purchases.on-demand.store');
 Route::get('/purchases/{purchase}', [PurchaseController::class, 'show'])->name('purchases.show');
 Route::post('/purchases/{purchase}/payment-proof', [PurchaseController::class, 'uploadPaymentProof'])->name('purchases.upload-proof');
 
@@ -68,9 +70,12 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
 
     Route::get('/admin/products', [ProductController::class, 'adminIndex'])->name('admin.products.index');
+    Route::get('/admin/products/{product}', [ProductController::class, 'adminShow'])->name('admin.products.show');
     Route::post('/admin/products', [ProductController::class, 'store'])->name('admin.products.store');
     Route::put('/admin/products/{product}', [ProductController::class, 'update'])->name('admin.products.update');
     Route::delete('/admin/products/{product}', [ProductController::class, 'destroy'])->name('admin.products.destroy');
+    Route::delete('/admin/products/{product}/images/{image}', [ProductImageController::class, 'destroy'])->name('admin.products.images.destroy');
+    Route::delete('/admin/products/{product}/cover-image', [ProductImageController::class, 'destroyCover'])->name('admin.products.cover.destroy');
 
     Route::get('/admin/categories', [CategoryController::class, 'index'])->name('admin.categories.index');
     Route::post('/admin/categories', [CategoryController::class, 'store'])->name('admin.categories.store');
@@ -81,6 +86,8 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/purchases/export', [PurchaseController::class, 'export'])->name('admin.purchases.export');
     Route::patch('/admin/purchases/{purchase}/status', [PurchaseController::class, 'updateStatus'])->name('admin.purchases.update-status');
     Route::patch('/admin/purchases/{purchase}/shipping', [PurchaseController::class, 'updateShipping'])->name('admin.purchases.update-shipping');
+    Route::patch('/admin/purchases/{purchase}/approve-on-demand', [PurchaseController::class, 'approveOnDemand'])->name('admin.purchases.approve-on-demand');
+    Route::patch('/admin/purchases/{purchase}/reject-on-demand', [PurchaseController::class, 'rejectOnDemand'])->name('admin.purchases.reject-on-demand');
 
     Route::get('/admin/donations', [DonationController::class, 'index'])->name('admin.donations.index');
     Route::get('/admin/donations/export', [DonationController::class, 'export'])->name('admin.donations.export');

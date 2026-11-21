@@ -5,6 +5,7 @@
 @section('content')
 @php
     $statusColors = [
+        'waiting_approval' => 'bg-amber-50 text-amber-800 border-amber-200',
         'pending' => 'bg-amber-50 text-amber-800 border-amber-200',
         'paid' => 'bg-emerald-50 text-emerald-800 border-emerald-200',
         'shipped' => 'bg-sky-50 text-sky-800 border-sky-200',
@@ -13,11 +14,12 @@
     ];
 
     $statusLabels = [
+        'waiting_approval' => 'Menunggu Persetujuan Admin',
         'pending' => 'Menunggu Pembayaran',
         'paid' => 'Pembayaran Diterima (Diproses)',
         'shipped' => 'Sedang Dikirim',
         'completed' => 'Pesanan Selesai',
-        'cancelled' => 'Dibatalkan',
+        'cancelled' => 'Dibatalkan / Ditolak',
     ];
 
     $statusClass = $statusColors[$purchase->status] ?? 'bg-stone-100 text-teks/80 border-teks/20';
@@ -58,9 +60,16 @@
             {{-- 1. Header Pesanan & Status --}}
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-teks/10">
                 <div class="space-y-1">
-                    <span class="inline-block text-[11px] font-bold text-primary uppercase tracking-wider bg-primary/10 border border-primary/20 px-2.5 py-0.5 rounded-md">
-                        Nota Pesanan Publik
-                    </span>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="inline-block text-[11px] font-bold text-primary uppercase tracking-wider bg-primary/10 border border-primary/20 px-2.5 py-0.5 rounded-md">
+                            Nota Pesanan Publik
+                        </span>
+                        @if($purchase->isOnDemand())
+                            <span class="inline-block text-[11px] font-bold text-indigo-700 uppercase tracking-wider bg-indigo-50 border border-indigo-200 px-2.5 py-0.5 rounded-md">
+                                Print on Demand
+                            </span>
+                        @endif
+                    </div>
                     <h1 class="text-2xl sm:text-3xl font-extrabold text-teks tracking-tight">{{ $purchase->order_code }}</h1>
                     <p class="text-xs text-teks/60">
                         Waktu pemesanan: {{ $purchase->created_at->format('d F Y, H:i') }} WIB
@@ -73,6 +82,76 @@
                     </span>
                 </div>
             </div>
+
+            {{-- NOTIFIKASI KHUSUS STATUS ON DEMAND & ADMIN REJECT --}}
+            @if($purchase->isOnDemand() && $purchase->isWaitingApproval())
+                <div class="bg-amber-50/80 border border-amber-200 rounded-xl p-5 sm:p-6 space-y-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-10 h-10 rounded-full bg-amber-100 text-amber-800 flex items-center justify-center shrink-0 font-bold text-lg">
+                            ⏳
+                        </div>
+                        <div class="space-y-1.5 flex-1">
+                            <h3 class="text-base font-bold text-amber-900">Pesanan Print on Demand Sedang Ditinjau Admin</h3>
+                            <p class="text-xs text-amber-800/90 leading-relaxed">
+                                Terima kasih atas pesanan cetak kustom Anda. Saat ini pesanan Anda sedang diperiksa oleh tim admin Kios Mandiri YPKABK untuk memastikan kesiapan file desain dan ketersediaan bahan.
+                            </p>
+                            <p class="text-xs font-semibold text-amber-900">
+                                Instruksi pembayaran (QRIS / Rekening Transfer Bank) akan muncul otomatis di halaman ini setelah pesanan Anda disetujui oleh admin.
+                            </p>
+                        </div>
+                    </div>
+
+                    {{-- Detail Desain & Catatan Kustom --}}
+                    <div class="bg-white rounded-xl border border-amber-200/80 p-4 space-y-3 text-xs">
+                        <h4 class="font-bold text-gray-800 uppercase tracking-wider text-[11px]">Informasi Cetak Kustom</h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <span class="text-teks/60 block">File Desain yang Diunggah:</span>
+                                @if($purchase->design_file_path)
+                                    <div class="mt-1 flex items-center gap-2">
+                                        <a href="{{ asset('storage/'.$purchase->design_file_path) }}" target="_blank"
+                                           class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-50 border border-indigo-200 text-indigo-700 font-bold text-xs hover:bg-indigo-100 transition-colors">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                            <span>Lihat File Desain &rarr;</span>
+                                        </a>
+                                    </div>
+                                @else
+                                    <span class="text-teks/50 italic">Tidak ada lampiran file.</span>
+                                @endif
+                            </div>
+                            <div>
+                                <span class="text-teks/60 block">Catatan Spesifikasi:</span>
+                                <p class="font-medium text-teks mt-1 bg-stone-50 p-2.5 rounded-lg border border-teks/10">
+                                    {{ $purchase->design_notes ?: 'Tidak ada catatan spesifikasi khusus.' }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @elseif($purchase->status === 'cancelled' && $purchase->admin_notes)
+                <div class="bg-rose-50 border border-rose-200 rounded-xl p-5 space-y-1.5 text-xs">
+                    <h3 class="text-sm font-bold text-rose-900">Pesanan Belum Dapat Disetujui / Dibatalkan</h3>
+                    <p class="text-rose-800 leading-relaxed">
+                        Catatan Admin: <strong>{{ $purchase->admin_notes }}</strong>
+                    </p>
+                </div>
+            @elseif($purchase->isOnDemand() && !$purchase->isWaitingApproval() && $purchase->status !== 'cancelled')
+                <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4 sm:p-5 space-y-2 text-xs">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
+                        <h3 class="text-sm font-bold text-emerald-900">Pesanan Print on Demand Telah Disetujui Admin!</h3>
+                    </div>
+                    <p class="text-emerald-800 leading-relaxed">
+                        Pesanan cetak kustom Anda telah disetujui. Silakan selesaikan pembayaran melalui petunjuk QRIS atau Rekening Bank di bawah ini.
+                    </p>
+                    @if($purchase->admin_notes)
+                        <div class="bg-white/80 border border-emerald-200 p-2.5 rounded-lg mt-1">
+                            <span class="text-emerald-900 font-bold block mb-0.5">Catatan Tambahan dari Admin:</span>
+                            <p class="text-emerald-950 font-medium">{{ $purchase->admin_notes }}</p>
+                        </div>
+                    @endif
+                </div>
+            @endif
 
             {{-- 2. NOTA WHATSAPP & CADANGAN TAUTAN --}}
             <div class="bg-[#FFFDFB] border border-teks/10 rounded-xl p-5 space-y-3.5">
@@ -156,6 +235,7 @@
             @endif
 
             {{-- 4. INSTRUKSI PEMBAYARAN SESUAI METODE (QRIS / BANK) & UPLOAD BUKTI --}}
+            @if(!$purchase->isWaitingApproval() && $purchase->status !== 'cancelled')
             <div class="bg-white border border-teks/10 rounded-xl p-5 sm:p-6 space-y-5">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-teks/10">
                     <div class="space-y-0.5">
@@ -253,6 +333,7 @@
                     </form>
                 </div>
             </div>
+            @endif
 
             {{-- 5. DETAIL ALAMAT TUJUAN PENGIRIMAN --}}
             <div class="bg-white border border-teks/10 rounded-xl p-5 sm:p-6 space-y-4">

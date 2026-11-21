@@ -32,7 +32,7 @@ class ProductService extends BaseService
      */
     public function getProducts(array $filters = [], ?int $perPage = null): LengthAwarePaginator|Collection
     {
-        $query = Product::with('category');
+        $query = Product::with(['category', 'images']);
 
         // Search text
         $search = trim((string) ($filters['search'] ?? $filters['q'] ?? ''));
@@ -122,14 +122,14 @@ class ProductService extends BaseService
     public function getDataProduct(Product|int|string $product): Product
     {
         if ($product instanceof Product) {
-            return $product->loadMissing('category');
+            return $product->loadMissing(['category', 'images']);
         }
 
         if (is_numeric($product)) {
-            return Product::with('category')->findOrFail((int) $product);
+            return Product::with(['category', 'images'])->findOrFail((int) $product);
         }
 
-        return Product::with('category')
+        return Product::with(['category', 'images'])
             ->where('id', $product)
             ->orWhere('name', $product)
             ->firstOrFail();
@@ -146,7 +146,7 @@ class ProductService extends BaseService
 
         $product = Product::create($normalized);
 
-        return $product->loadMissing('category');
+        return $product->loadMissing(['category', 'images']);
     }
 
     /**
@@ -161,7 +161,7 @@ class ProductService extends BaseService
 
         $targetProduct->update($normalized);
 
-        return $targetProduct->fresh('category');
+        return $targetProduct->fresh(['category', 'images']);
     }
 
     /**
