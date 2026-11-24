@@ -49,7 +49,7 @@
             <div class="hidden lg:flex items-center gap-2.5">
                 <button type="button"
                         onclick="openOnDemandModal()"
-                        class="inline-flex items-center justify-center px-4 h-[44px] rounded-[8px] bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-sm font-semibold transition-all active:scale-95 cursor-pointer">
+                        class="inline-flex items-center justify-center px-4 h-[44px] rounded-[8px] bg-pink-pucat hover:bg-pink-pucat/80 text-primary border border-primary/25 text-sm font-semibold transition-all active:scale-95 cursor-pointer">
                     Print on Demand
                 </button>
                 <button type="button"
@@ -111,7 +111,7 @@
             <div class="pt-2 border-t border-teks/10 space-y-2">
                 <button type="button"
                         onclick="openOnDemandModal(); if (typeof closeMobileMenu === 'function') closeMobileMenu();"
-                        class="w-full h-[44px] flex items-center justify-center rounded-[8px] bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 font-semibold text-sm transition-all active:scale-95 cursor-pointer">
+                        class="w-full h-[44px] flex items-center justify-center rounded-[8px] bg-pink-pucat hover:bg-pink-pucat/80 text-primary border border-primary/25 font-semibold text-sm transition-all active:scale-95 cursor-pointer">
                     Print on Demand (Kustom)
                 </button>
                 <button type="button"
