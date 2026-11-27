@@ -109,28 +109,27 @@
     breadcrumb="Beranda / Katalog"
 />
 
-{{-- Banner Layanan Print on Demand --}}
-<div class="max-w-[1200px] mx-auto px-6 pt-6 -mb-4">
-    <div class="rounded-2xl p-5 sm:p-6 bg-gradient-to-r from-indigo-900 via-indigo-800 to-purple-900 text-white flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-sm border border-indigo-700/50">
-        <div class="space-y-1">
-            <span class="inline-block text-[11px] font-bold uppercase tracking-wider bg-white/20 px-2.5 py-0.5 rounded-full text-indigo-100">
-                Layanan Kustom
-            </span>
-            <h3 class="text-lg sm:text-xl font-bold">Ingin Cetak Karya ABK dengan Desain Sendiri?</h3>
-            <p class="text-xs sm:text-sm text-indigo-100/90 max-w-2xl leading-relaxed">
-                Kami melayani Print on Demand (Tote Bag, Kaos, Pouch, Mug) dalam jumlah satuan maupun partai besar. Pesanan akan ditinjau langsung oleh tim admin kami.
-            </p>
-        </div>
-        <button type="button" onclick="openOnDemandModal()"
-                class="px-5 py-2.5 rounded-xl bg-white hover:bg-stone-100 text-indigo-900 font-bold text-xs sm:text-sm shrink-0 shadow-sm transition-all active:scale-95 cursor-pointer">
-            Pesan On Demand &rarr;
-        </button>
-    </div>
-</div>
+{{-- 2. Konten Utama: Banner Layanan + Sidebar Filter + Grid Produk --}}
+<section class="w-full bg-[#FFFBF7] py-8 lg:py-12">
+    <div class="max-w-[1200px] mx-auto px-6 space-y-6 lg:space-y-8">
 
-{{-- 2. Konten Utama: Sidebar Filter + Grid Produk --}}
-<section class="w-full bg-[#FFFBF7] py-10 lg:py-16">
-    <div class="max-w-[1200px] mx-auto px-6">
+        {{-- Banner Layanan Print on Demand --}}
+        <div class="rounded-[16px] p-5 sm:p-6 bg-pink-pucat border border-primary/20 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-xs">
+            <div class="space-y-1.5">
+                <span class="inline-block text-[11px] font-bold uppercase tracking-wider bg-white border border-primary/25 px-2.5 py-0.5 rounded-full text-primary">
+                    Layanan Kustom
+                </span>
+                <h3 class="text-lg sm:text-xl font-bold text-teks">Ingin Cetak Karya ABK dengan Desain Sendiri?</h3>
+                <p class="text-xs sm:text-sm text-teks/75 max-w-2xl leading-relaxed">
+                    Kami melayani Print on Demand (Tote Bag, Kaos, Pouch, Mug) dalam jumlah satuan maupun partai besar. Pesanan akan ditinjau langsung oleh tim admin kami.
+                </p>
+            </div>
+            <button type="button" onclick="openOnDemandModal()"
+                    class="inline-flex items-center justify-center px-5 py-2.5 rounded-[8px] bg-primary hover:bg-primary/90 text-white font-semibold text-xs sm:text-sm shrink-0 shadow-xs transition-all active:scale-95 cursor-pointer">
+                Pesan On Demand &rarr;
+            </button>
+        </div>
+
         <div class="flex flex-col lg:flex-row gap-8 items-start">
 
             {{-- Mobile Filter Trigger Button --}}

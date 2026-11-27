@@ -218,7 +218,7 @@
                     {{-- Opsi Print on Demand Kustom --}}
                     <button type="button"
                             onclick="openOnDemandModal('{{ addslashes($product->name) }}', '{{ number_format((float) $product->price, 0, ',', '.') }}', {{ $product->id }})"
-                            class="w-full h-11 rounded-[10px] bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer">
+                            class="w-full h-11 rounded-[10px] bg-pink-pucat hover:bg-pink-pucat/80 text-primary border border-primary/25 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer">
                         <span>🎨 Pesan Cetak Kustom (Print on Demand) &rarr;</span>
                     </button>
                 </div>
