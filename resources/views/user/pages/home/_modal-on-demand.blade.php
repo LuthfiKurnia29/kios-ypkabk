@@ -14,7 +14,7 @@
         {{-- Step 1: Formulir Pemesanan On Demand --}}
         <div id="pod-step-1" class="space-y-4">
             <div class="space-y-1">
-                <span class="inline-block text-[11px] font-bold text-indigo-700 uppercase tracking-wider bg-indigo-50 border border-indigo-200 px-2.5 py-1 rounded-lg">
+                <span class="inline-block text-[11px] font-bold text-primary uppercase tracking-wider bg-pink-pucat border border-primary/20 px-2.5 py-1 rounded-lg">
                     Layanan Print on Demand
                 </span>
                 <h3 class="text-xl font-bold text-teks">Pesan Cetak Kustom Karya ABK</h3>
@@ -27,7 +27,7 @@
             <div class="p-4 bg-stone-50 rounded-xl border border-teks/10 space-y-2">
                 <div class="flex items-center justify-between">
                     <span class="text-[11px] font-bold text-teks/60 uppercase">Item Dasar Pesanan</span>
-                    <span id="pod-modal-base-badge" class="text-[11px] font-semibold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded">Cetak Kustom</span>
+                    <span id="pod-modal-base-badge" class="text-[11px] font-semibold text-primary bg-pink-pucat border border-primary/20 px-2 py-0.5 rounded">Cetak Kustom</span>
                 </div>
                 <h4 id="pod-modal-product-title" class="font-bold text-teks text-sm">Tote Bag Kanvas Lukis Kustom</h4>
                 <div class="flex items-center justify-between text-xs text-primary font-bold">
@@ -77,12 +77,12 @@
                     <input type="file" id="pod-design-file" name="design_file" required
                            accept="image/jpeg,image/png,image/webp,application/pdf"
                            onchange="previewPodDesign(event)"
-                           class="w-full text-xs text-teks/80 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700 cursor-pointer border border-teks/20 rounded-xl p-1.5 bg-white">
+                           class="w-full text-xs text-teks/80 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-primary file:text-white hover:file:bg-primary/90 cursor-pointer border border-teks/20 rounded-xl p-1.5 bg-white">
 
                     {{-- Image Preview Container --}}
-                    <div id="pod-design-preview-wrapper" class="hidden relative max-h-48 rounded-xl overflow-hidden border border-indigo-200 bg-indigo-50/40 p-2 flex flex-col items-center justify-center">
+                    <div id="pod-design-preview-wrapper" class="hidden relative max-h-48 rounded-xl overflow-hidden border border-primary/20 bg-pink-pucat/50 p-2 flex flex-col items-center justify-center">
                         <img id="pod-design-preview-img" src="" alt="Pratinjau Desain" class="max-h-40 object-contain rounded-lg">
-                        <span id="pod-design-filename" class="text-[11px] text-indigo-900 font-medium mt-1 truncate max-w-full"></span>
+                        <span id="pod-design-filename" class="text-[11px] text-teks font-medium mt-1 truncate max-w-full"></span>
                     </div>
 
                     <p class="text-[11px] text-teks/60 leading-relaxed">
@@ -100,7 +100,7 @@
 
                 {{-- 5. Data Pemesan --}}
                 <div class="border-t border-teks/10 pt-3 space-y-3">
-                    <h4 class="font-bold text-xs uppercase tracking-wider text-indigo-700">Data Pemesan</h4>
+                    <h4 class="font-bold text-xs uppercase tracking-wider text-primary">Data Pemesan</h4>
 
                     <div>
                         <label class="block mb-1 font-semibold text-teks">Nama Lengkap Pemesan *</label>
@@ -118,7 +118,7 @@
 
                 {{-- 6. Detail Alamat Pengiriman Berstruktur --}}
                 <div class="border-t border-teks/10 pt-3 space-y-3">
-                    <h4 class="font-bold text-xs uppercase tracking-wider text-indigo-700">Alamat Tujuan Pengiriman</h4>
+                    <h4 class="font-bold text-xs uppercase tracking-wider text-primary">Alamat Tujuan Pengiriman</h4>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
@@ -155,7 +155,7 @@
 
                 {{-- 7. Pilihan Rencana Pembayaran --}}
                 <div class="border-t border-teks/10 pt-3 space-y-3">
-                    <h4 class="font-bold text-xs uppercase tracking-wider text-indigo-700">Rencana Pembayaran (Setelah Disetujui)</h4>
+                    <h4 class="font-bold text-xs uppercase tracking-wider text-primary">Rencana Pembayaran (Setelah Disetujui)</h4>
                     <div class="grid grid-cols-2 gap-3">
                         <label class="flex items-center gap-2.5 p-3 rounded-xl border border-teks/20 cursor-pointer hover:bg-stone-50 transition-colors">
                             <input type="radio" name="payment_method" value="qris" checked class="text-primary focus:ring-primary">
@@ -177,7 +177,7 @@
                 {{-- Submit Buttons --}}
                 <div class="pt-4 border-t border-teks/10 space-y-2">
                     <button type="submit" id="pod-submit-btn"
-                            class="w-full min-h-[46px] py-3 px-4 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md transition-all active:scale-[0.98] cursor-pointer">
+                            class="w-full min-h-[46px] py-3 px-4 rounded-full bg-primary hover:bg-primary/90 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md transition-all active:scale-[0.98] cursor-pointer">
                         <span>Ajukan Pesanan On Demand</span>
                     </button>
 
@@ -200,7 +200,7 @@
                 </span>
                 <h3 class="text-xl font-bold text-teks">Pesanan Berhasil Diajukan!</h3>
                 <p class="text-xs text-teks/70">
-                    Kode Pesanan: <span id="pod-success-order-code" class="font-mono font-bold text-indigo-700 text-sm">POD-XXXX</span>
+                    Kode Pesanan: <span id="pod-success-order-code" class="font-mono font-bold text-primary text-sm">POD-XXXX</span>
                 </p>
             </div>
 
@@ -217,7 +217,7 @@
 
             <div class="space-y-2 pt-2">
                 <a id="pod-success-detail-btn" href="#"
-                   class="w-full min-h-[44px] py-2.5 px-4 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm flex items-center justify-center shadow-sm transition-all active:scale-[0.98]">
+                   class="w-full min-h-[44px] py-2.5 px-4 rounded-full bg-primary hover:bg-primary/90 text-white font-bold text-xs sm:text-sm flex items-center justify-center shadow-sm transition-all active:scale-[0.98]">
                     <span>Buka Halaman Nota &amp; Status Pesanan</span>
                 </a>
 
