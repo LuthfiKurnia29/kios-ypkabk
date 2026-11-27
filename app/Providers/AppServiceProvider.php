@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Http\Services\FinancialReportService;
+use App\Http\Services\PaymentSettingService;
 use App\Models\Category;
 use App\Models\Expense;
 use App\Models\Purchase;
@@ -47,6 +48,10 @@ class AppServiceProvider extends ServiceProvider
                 $donationCategories = collect();
             }
             $view->with('donationCategories', $donationCategories);
+        });
+
+        View::composer(['user.pages.home', 'user.pages.purchase-show', 'user.pages.katalog'], function ($view) {
+            $view->with('paymentConfig', app(PaymentSettingService::class)->getPaymentConfig());
         });
     }
 }

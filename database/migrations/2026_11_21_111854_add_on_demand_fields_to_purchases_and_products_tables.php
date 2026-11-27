@@ -35,9 +35,9 @@ return new class extends Migration
             DB::statement("ALTER TABLE purchases ADD CONSTRAINT purchases_status_check CHECK (status IN ('waiting_approval', 'pending', 'paid', 'shipped', 'completed', 'cancelled'));");
         }
 
-        if (\Illuminate\Support\Facades\DB::getDriverName() === 'pgsql') {
-            \Illuminate\Support\Facades\DB::statement('ALTER TABLE purchases DROP CONSTRAINT IF EXISTS purchases_status_check;');
-            \Illuminate\Support\Facades\DB::statement("ALTER TABLE purchases ADD CONSTRAINT purchases_status_check CHECK (status IN ('waiting_approval', 'pending', 'paid', 'shipped', 'completed', 'cancelled'));");
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement('ALTER TABLE purchases DROP CONSTRAINT IF EXISTS purchases_status_check;');
+            DB::statement("ALTER TABLE purchases ADD CONSTRAINT purchases_status_check CHECK (status IN ('waiting_approval', 'pending', 'paid', 'shipped', 'completed', 'cancelled'));");
         }
 
         Schema::table('products', function (Blueprint $table) {

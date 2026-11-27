@@ -244,7 +244,7 @@
                             @if($purchase->payment_method === 'bank_transfer')
                                 Transfer {{ $bankAccount['name'] ?? ($purchase->bank_name ? 'Bank '.$purchase->bank_name : 'Bank BCA') }}
                             @else
-                                QRIS Kios Mandiri YPKABK
+                                QRIS Kios Mandiri ({{ app(\App\Http\Services\PaymentSettingService::class)->getQrisMerchantName() }})
                             @endif
                         </h3>
                     </div>

@@ -14,7 +14,7 @@
 
             {{-- Brand Logo (Kiri) - Tinggi 40px tanpa teks tambahan --}}
             <a href="{{ route('home') }}" class="flex items-center py-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-lg">
-                <img src="{{ file_exists(public_path('images/logo/logo.webp')) ? asset('images/logo/logo.webp') : asset('images/logo.webp') }}" alt="Logo Kios Mandiri YPKABK" class="h-10 w-auto object-contain">
+                <img src="{{ file_exists(public_path('images/logo/Logo Kios.jpg')) ? asset('images/logo/Logo Kios.jpg') : asset('images/Logo Kios.jpg') }}" alt="Logo Kios Mandiri YPKABK" class="h-20 w-auto object-contain overview-hidden">
             </a>
 
             {{-- Desktop Navigation Links (Tengah) --}}

@@ -153,26 +153,40 @@
                     </div>
                 </div>
 
+                @php
+                    $payCfg = $paymentConfig ?? app(\App\Http\Services\PaymentSettingService::class)->getPaymentConfig();
+                    $isQrisActive = !empty($payCfg['qris_enabled']);
+                    $isBankActive = !empty($payCfg['bank_enabled']);
+                    $activeBanks = $payCfg['bank_accounts'] ?? [];
+                    $defaultMethod = $payCfg['default_method'] ?? 'qris';
+                @endphp
+
                 {{-- 7. Pilihan Rencana Pembayaran --}}
+                @if($isQrisActive || $isBankActive)
                 <div class="border-t border-teks/10 pt-3 space-y-3">
                     <h4 class="font-bold text-xs uppercase tracking-wider text-primary">Rencana Pembayaran (Setelah Disetujui)</h4>
-                    <div class="grid grid-cols-2 gap-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        @if($isQrisActive)
                         <label class="flex items-center gap-2.5 p-3 rounded-xl border border-teks/20 cursor-pointer hover:bg-stone-50 transition-colors">
-                            <input type="radio" name="payment_method" value="qris" checked class="text-primary focus:ring-primary">
+                            <input type="radio" name="payment_method" value="qris" {{ $defaultMethod === 'qris' ? 'checked' : '' }} class="text-primary focus:ring-primary">
                             <div>
                                 <span class="font-bold text-xs block text-teks">QRIS</span>
                                 <span class="text-[10px] text-teks/60">Semua E-Wallet &amp; M-Banking</span>
                             </div>
                         </label>
+                        @endif
+                        @if($isBankActive)
                         <label class="flex items-center gap-2.5 p-3 rounded-xl border border-teks/20 cursor-pointer hover:bg-stone-50 transition-colors">
-                            <input type="radio" name="payment_method" value="bank_transfer" class="text-primary focus:ring-primary">
+                            <input type="radio" name="payment_method" value="bank_transfer" {{ $defaultMethod === 'bank_transfer' ? 'checked' : '' }} class="text-primary focus:ring-primary">
                             <div>
                                 <span class="font-bold text-xs block text-teks">Transfer Bank</span>
-                                <span class="text-[10px] text-teks/60">BCA, BRI, Mandiri, BNI</span>
+                                <span class="text-[10px] text-teks/60">{{ implode(', ', array_slice(array_keys($activeBanks), 0, 4)) }}</span>
                             </div>
                         </label>
+                        @endif
                     </div>
                 </div>
+                @endif
 
                 {{-- Submit Buttons --}}
                 <div class="pt-4 border-t border-teks/10 space-y-2">
