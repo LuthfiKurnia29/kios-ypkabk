@@ -5,36 +5,22 @@
     // ========================================================
     // ORDER MODAL & QRIS DINAMIS / TRANSFER BANK LOGIC
     // ========================================================
-    const staticBankAccounts = {
-        'BCA': {
-            name: 'Bank BCA',
-            short_name: 'BCA',
-            number: '018-384-9900',
-            raw: '0183849900',
-            holder: 'Yayasan Peduli Kasih ABK'
-        },
-        'BRI': {
-            name: 'Bank BRI',
-            short_name: 'BRI',
-            number: '009-601-002-345-502',
-            raw: '009601002345502',
-            holder: 'Yayasan Peduli Kasih ABK'
-        },
-        'Mandiri': {
-            name: 'Bank Mandiri',
-            short_name: 'Mandiri',
-            number: '142-00-1988234-1',
-            raw: '1420019882341',
-            holder: 'Yayasan Peduli Kasih ABK'
-        },
-        'BNI': {
-            name: 'Bank BNI',
-            short_name: 'BNI',
-            number: '083-912-4567',
-            raw: '0839124567',
-            holder: 'Yayasan Peduli Kasih ABK'
+    @php
+        $payCfg = $paymentConfig ?? app(\App\Http\Services\PaymentSettingService::class)->getPaymentConfig();
+        $jsBankAccounts = [];
+        foreach (($payCfg['bank_accounts'] ?? []) as $k => $b) {
+            $jsBankAccounts[$k] = [
+                'name' => $b['name'],
+                'short_name' => $b['short_name'] ?? $b['code'],
+                'number' => $b['account_number'],
+                'raw' => $b['account_number_raw'] ?? preg_replace('/\D+/', '', $b['account_number']),
+                'holder' => $b['account_holder'],
+            ];
         }
-    };
+    @endphp
+    const staticBankAccounts = @json($jsBankAccounts);
+    const defaultPaymentMethod = @json($payCfg['default_method'] ?? 'qris');
+    const defaultBankName = @json($payCfg['default_bank'] ?? 'BCA');
 
     let currentOrder = {
         productId: null,
@@ -45,8 +31,8 @@
         orderCode: '',
         customerName: '',
         customerPhone: '',
-        paymentMethod: 'qris',
-        bankName: 'BCA',
+        paymentMethod: defaultPaymentMethod,
+        bankName: defaultBankName,
         orderUrl: '',
         whatsappReceiptUrl: '',
         uploadProofUrl: '',
@@ -107,7 +93,12 @@
     }
 
     function copyBankAccount() {
-        const bank = staticBankAccounts[currentOrder.bankName] || staticBankAccounts['BCA'];
+        const bank = staticBankAccounts[currentOrder.bankName] || Object.values(staticBankAccounts)[0] || {
+            name: 'Bank Transfer',
+            number: '018-384-9900',
+            raw: '0183849900',
+            holder: 'Yayasan Peduli Kasih ABK'
+        };
         navigator.clipboard.writeText(bank.raw).then(() => {
             window.showAppToast(`Nomor rekening ${bank.name} (${bank.number}) berhasil disalin!`);
         }).catch(() => {
@@ -148,7 +139,7 @@
         currentOrder.orderCode = '';
         currentOrder.uploadProofUrl = '';
         currentOrder.qrisPayload = '';
-        currentOrder.bankName = 'BCA';
+        currentOrder.bankName = defaultBankName;
 
         // Reset step view
         const step1 = document.getElementById('order-step-1');
@@ -159,8 +150,8 @@
         if (step2) step2.classList.add('hidden');
         if (step3) step3.classList.add('hidden');
 
-        // Reset method choice to QRIS
-        selectPaymentMethod('qris');
+        // Reset method choice to default method
+        selectPaymentMethod(defaultPaymentMethod);
 
         // Reset proof preview & inputs
         const proofInput = document.getElementById('modal-proof-file');
@@ -296,7 +287,7 @@
                     if (viewQris) viewQris.classList.add('hidden');
                     if (viewBank) viewBank.classList.remove('hidden');
 
-                    const selectedBank = staticBankAccounts[currentOrder.bankName] || staticBankAccounts['BCA'];
+                    const selectedBank = staticBankAccounts[currentOrder.bankName] || Object.values(staticBankAccounts)[0] || { name: 'Transfer Bank', number: '-' };
                     if (badgeEl) badgeEl.innerText = `Transfer ${selectedBank.name}`;
 
                     const bankBadgeName = document.getElementById('modal-bank-badge-name');

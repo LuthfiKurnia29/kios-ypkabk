@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DonationController;
+use App\Http\Controllers\PaymentSettingController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductImageController;
 use App\Http\Controllers\PurchaseController;
@@ -92,6 +93,15 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/donations', [DonationController::class, 'index'])->name('admin.donations.index');
     Route::get('/admin/donations/export', [DonationController::class, 'export'])->name('admin.donations.export');
     Route::patch('/admin/donations/{donation}/status', [DonationController::class, 'updateStatus'])->name('admin.donations.update-status');
+
+    // Payment Settings (QRIS & Transfer Bank)
+    Route::get('/admin/payment-settings', [PaymentSettingController::class, 'index'])->name('admin.payment-settings.index');
+    Route::put('/admin/payment-settings/qris', [PaymentSettingController::class, 'updateQris'])->name('admin.payment-settings.update-qris');
+    Route::put('/admin/payment-settings/bank', [PaymentSettingController::class, 'updateBankTransfer'])->name('admin.payment-settings.update-bank');
+    Route::post('/admin/payment-settings/banks', [PaymentSettingController::class, 'storeBankAccount'])->name('admin.payment-settings.banks.store');
+    Route::put('/admin/payment-settings/banks/{code}', [PaymentSettingController::class, 'updateBankAccount'])->name('admin.payment-settings.banks.update');
+    Route::patch('/admin/payment-settings/banks/{code}/toggle', [PaymentSettingController::class, 'toggleBankAccount'])->name('admin.payment-settings.banks.toggle');
+    Route::delete('/admin/payment-settings/banks/{code}', [PaymentSettingController::class, 'destroyBankAccount'])->name('admin.payment-settings.banks.destroy');
 
     // Site Content Management
     Route::get('/admin/site-content', [SiteContentController::class, 'edit'])->name('admin.site-content.edit');

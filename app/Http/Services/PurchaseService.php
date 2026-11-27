@@ -404,12 +404,7 @@ class PurchaseService extends BaseService
      */
     public function generateDynamicQris(float|int $amount, ?string $baseQris = null): string
     {
-        $baseQris = $baseQris ?: config('services.qris.base_string');
-
-        // Default standard EMVCo static QRIS for KIOS MANDIRI YPKABK
-        if (empty($baseQris)) {
-            $baseQris = '00020101021126600016ID.CO.QRIS.WWW0118936009990000000000021000000000000303UMI51440014ID.CO.QRIS.WWW02150000000000000000303UMI5204581453033605802ID5920KIOS MANDIRI YPKABK6008SIDOARJO61056121862070703A016304';
-        }
+        $baseQris = $baseQris ?: app(PaymentSettingService::class)->getQrisBaseString();
 
         // 1. Strip existing CRC tag (Tag 63) if present
         $payload = preg_replace('/6304[A-Fa-f0-9]{4}$/', '', trim($baseQris));

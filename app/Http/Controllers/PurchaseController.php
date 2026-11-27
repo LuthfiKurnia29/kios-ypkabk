@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\AdminExportRequest;
 use App\Http\Services\ExportService;
+use App\Http\Services\PaymentSettingService;
 use App\Http\Services\PurchaseService;
 use App\Models\Purchase;
 use Illuminate\Http\JsonResponse;
@@ -57,6 +58,13 @@ class PurchaseController extends Controller
     {
         $hasSeparateAddress = $request->filled('city') || $request->filled('street_address');
 
+        $paymentSetting = app(PaymentSettingService::class);
+        $allowedMethods = $paymentSetting->getActivePaymentMethods();
+        if (empty($allowedMethods)) {
+            $allowedMethods = ['qris', 'bank_transfer'];
+        }
+        $defaultMethod = $paymentSetting->getDefaultPaymentMethod();
+
         $validated = $request->validate([
             'customer_name' => ['required', 'string', 'max:255'],
             'customer_phone' => ['required', 'string', 'max:50'],
@@ -66,7 +74,7 @@ class PurchaseController extends Controller
             'street_address' => [$hasSeparateAddress ? 'required' : 'nullable', 'string', 'max:255'],
             'address' => [$hasSeparateAddress ? 'required' : 'nullable', 'string', 'max:1000'],
             'customer_address' => ['nullable', 'string', 'max:1000'],
-            'payment_method' => ['nullable', 'in:qris,bank_transfer'],
+            'payment_method' => ['nullable', 'in:'.implode(',', $allowedMethods)],
             'bank_name' => ['nullable', 'string', 'max:50'],
             'notes' => ['nullable', 'string'],
             'items' => ['required', 'array', 'min:1'],
@@ -76,6 +84,10 @@ class PurchaseController extends Controller
         ]);
 
         $address = $validated['address'] ?? $validated['customer_address'] ?? null;
+        $chosenPaymentMethod = $validated['payment_method'] ?? $defaultMethod;
+        if (! in_array($chosenPaymentMethod, $allowedMethods, true)) {
+            $chosenPaymentMethod = $defaultMethod;
+        }
 
         $customerData = [
             'user_id' => $request->user()?->id,
@@ -87,7 +99,7 @@ class PurchaseController extends Controller
             'street_address' => $validated['street_address'] ?? null,
             'address' => $address,
             'customer_address' => $address,
-            'payment_method' => $validated['payment_method'] ?? 'qris',
+            'payment_method' => $chosenPaymentMethod,
             'bank_name' => $validated['bank_name'] ?? null,
             'notes' => $validated['notes'] ?? null,
         ];
@@ -96,6 +108,7 @@ class PurchaseController extends Controller
 
         if ($request->wantsJson()) {
             $qrisPayload = $this->purchaseService->generateDynamicQris($purchase->total_price);
+            $selectedBank = $purchase->selected_bank_account;
 
             return response()->json([
                 'message' => 'Pesanan berhasil dibuat.',
@@ -110,10 +123,10 @@ class PurchaseController extends Controller
                     'upload_proof_url' => route('purchases.upload-proof', $purchase->order_code),
                 ],
                 'bank' => [
-                    'bank_name' => 'BCA (Bank Central Asia)',
-                    'account_number' => '018-384-9900',
-                    'raw_account_number' => '0183849900',
-                    'account_holder' => 'Yayasan Peduli Kasih ABK',
+                    'bank_name' => $selectedBank['name'] ?? 'BCA (Bank Central Asia)',
+                    'account_number' => $selectedBank['account_number'] ?? '018-384-9900',
+                    'raw_account_number' => $selectedBank['account_number_raw'] ?? '0183849900',
+                    'account_holder' => $selectedBank['account_holder'] ?? 'Yayasan Peduli Kasih ABK',
                 ],
             ], 201);
         }
@@ -160,6 +173,13 @@ class PurchaseController extends Controller
     {
         $hasSeparateAddress = $request->filled('city') || $request->filled('street_address');
 
+        $paymentSetting = app(PaymentSettingService::class);
+        $allowedMethods = $paymentSetting->getActivePaymentMethods();
+        if (empty($allowedMethods)) {
+            $allowedMethods = ['qris', 'bank_transfer'];
+        }
+        $defaultMethod = $paymentSetting->getDefaultPaymentMethod();
+
         $validated = $request->validate([
             'customer_name' => ['required', 'string', 'max:255'],
             'customer_phone' => ['required', 'string', 'max:50'],
@@ -174,12 +194,16 @@ class PurchaseController extends Controller
             'price' => ['nullable', 'numeric', 'min:0'],
             'design_notes' => ['nullable', 'string', 'max:2000'],
             'design_file' => ['required', 'file', 'mimes:jpg,jpeg,png,webp,pdf', 'max:10240'],
-            'payment_method' => ['nullable', 'in:qris,bank_transfer'],
+            'payment_method' => ['nullable', 'in:'.implode(',', $allowedMethods)],
             'bank_name' => ['nullable', 'string', 'max:50'],
             'notes' => ['nullable', 'string', 'max:1000'],
         ]);
 
         $address = $validated['address'] ?? $validated['customer_address'] ?? null;
+        $chosenPaymentMethod = $validated['payment_method'] ?? $defaultMethod;
+        if (! in_array($chosenPaymentMethod, $allowedMethods, true)) {
+            $chosenPaymentMethod = $defaultMethod;
+        }
 
         $designPath = null;
         if ($request->hasFile('design_file')) {
@@ -198,7 +222,7 @@ class PurchaseController extends Controller
             'street_address' => $validated['street_address'] ?? null,
             'address' => $address,
             'customer_address' => $address,
-            'payment_method' => $validated['payment_method'] ?? 'qris',
+            'payment_method' => $chosenPaymentMethod,
             'bank_name' => $validated['bank_name'] ?? null,
             'notes' => $validated['notes'] ?? null,
             'design_notes' => $validated['design_notes'] ?? null,

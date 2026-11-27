@@ -7,8 +7,8 @@
     <title>@hasSection('title')@yield('title')@else{{ $title ?? $computedHeaderTitle }}@endif</title>
     
     <!-- Favicon -->
-    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/favicon-32.png') }}">
-    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('images/favicon-180.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/Logo Kios.jpg') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('images/Logo Kios.jpg') }}">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -64,6 +64,7 @@
 
         $isSiteContent = request()->routeIs('admin.site-content.*');
         $isReviews = request()->routeIs('admin.reviews.*');
+        $isPaymentSettings = request()->routeIs('admin.payment-settings.*');
     @endphp
 
     {{-- Mobile Sidebar Backdrop --}}
@@ -125,6 +126,13 @@
                        @if($isDonations) aria-current="page" @endif
                        class="block px-3.5 py-2 rounded-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 {{ $isDonations ? 'bg-primary text-white font-semibold' : 'text-teks hover:text-primary hover:bg-white/60' }}">
                         Donasi Masuk
+                    </a>
+
+                    {{-- Metode Pembayaran --}}
+                    <a href="{{ route('admin.payment-settings.index') }}"
+                       @if($isPaymentSettings) aria-current="page" @endif
+                       class="block px-3.5 py-2 rounded-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 {{ $isPaymentSettings ? 'bg-primary text-white font-semibold' : 'text-teks hover:text-primary hover:bg-white/60' }}">
+                        Metode Pembayaran
                     </a>
 
                     {{-- Laporan --}}

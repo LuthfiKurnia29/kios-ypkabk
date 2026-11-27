@@ -8,8 +8,8 @@
     <title>@yield('title', 'Kios Mandiri YPKABK')</title>
 
     {{-- Favicon --}}
-    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/favicon-32.png') }}">
-    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('images/favicon-180.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/Logo Kios.jpg') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('images/Logo Kios.jpg') }}">
 
     {{-- Typography: Google Fonts Plus Jakarta Sans --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">

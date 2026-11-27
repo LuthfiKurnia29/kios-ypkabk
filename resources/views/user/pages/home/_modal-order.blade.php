@@ -104,16 +104,26 @@
                     </div>
                 </div>
 
+                @php
+                    $payCfg = $paymentConfig ?? app(\App\Http\Services\PaymentSettingService::class)->getPaymentConfig();
+                    $isQrisActive = !empty($payCfg['qris_enabled']);
+                    $isBankActive = !empty($payCfg['bank_enabled']);
+                    $activeBanks = $payCfg['bank_accounts'] ?? [];
+                    $defaultMethod = $payCfg['default_method'] ?? 'qris';
+                    $defaultBank = $payCfg['default_bank'] ?? 'BCA';
+                @endphp
+
                 {{-- 3. Pilihan Metode Pembayaran (QRIS / Transfer Bank) --}}
                 <div class="border-t border-teks/10 pt-3 space-y-3">
                     <label class="block font-bold text-teks text-xs uppercase tracking-wider text-primary">Metode Pembayaran *</label>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         {{-- Opsi 1: QRIS --}}
+                        @if($isQrisActive)
                         <label id="payment-card-qris"
                                onclick="selectPaymentMethod('qris')"
-                               class="relative flex items-start gap-3 p-3.5 rounded-xl border-2 border-primary bg-primary/5 cursor-pointer transition-all">
-                            <input type="radio" name="payment_method" value="qris" checked
+                               class="relative flex items-start gap-3 p-3.5 rounded-xl border-2 {{ $defaultMethod === 'qris' ? 'border-primary bg-primary/5' : 'border-teks/15 hover:border-primary/50 bg-white' }} cursor-pointer transition-all">
+                            <input type="radio" name="payment_method" value="qris" {{ $defaultMethod === 'qris' ? 'checked' : '' }}
                                    onchange="togglePaymentMethodChoice('qris')"
                                    class="mt-0.5 w-4 h-4 text-primary accent-primary cursor-pointer">
                             <div class="space-y-0.5">
@@ -121,63 +131,42 @@
                                 <span class="text-[11px] text-teks/65 block">Scan m-Banking &amp; e-Wallet langsung</span>
                             </div>
                         </label>
+                        @endif
 
                         {{-- Opsi 2: Transfer Bank --}}
+                        @if($isBankActive)
                         <label id="payment-card-bank"
                                onclick="selectPaymentMethod('bank_transfer')"
-                               class="relative flex items-start gap-3 p-3.5 rounded-xl border-2 border-teks/15 hover:border-primary/50 bg-white cursor-pointer transition-all">
-                            <input type="radio" name="payment_method" value="bank_transfer"
+                               class="relative flex items-start gap-3 p-3.5 rounded-xl border-2 {{ $defaultMethod === 'bank_transfer' ? 'border-primary bg-primary/5' : 'border-teks/15 hover:border-primary/50 bg-white' }} cursor-pointer transition-all">
+                            <input type="radio" name="payment_method" value="bank_transfer" {{ $defaultMethod === 'bank_transfer' ? 'checked' : '' }}
                                    onchange="togglePaymentMethodChoice('bank_transfer')"
                                    class="mt-0.5 w-4 h-4 text-primary accent-primary cursor-pointer">
                             <div class="space-y-0.5">
                                 <span class="text-xs font-bold text-teks block">Transfer Bank</span>
-                                <span class="text-[11px] text-teks/65 block">BCA, BRI, Mandiri, BNI</span>
+                                <span class="text-[11px] text-teks/65 block">{{ implode(', ', array_slice(array_keys($activeBanks), 0, 4)) }}</span>
                             </div>
                         </label>
+                        @endif
                     </div>
 
-                    {{-- Pilihan Rekening Bank Statis (Muncul saat Transfer Bank aktif) --}}
-                    <div id="bank-choice-container" class="hidden pt-2 space-y-2 bg-stone-50 p-3.5 rounded-xl border border-teks/10">
+                    {{-- Pilihan Rekening Bank Dinamis (Muncul saat Transfer Bank aktif) --}}
+                    @if($isBankActive)
+                    <div id="bank-choice-container" class="{{ $defaultMethod === 'bank_transfer' ? '' : 'hidden' }} pt-2 space-y-2 bg-stone-50 p-3.5 rounded-xl border border-teks/10">
                         <span class="text-[11px] font-bold text-teks uppercase tracking-wide block">Pilih Rekening Bank Tujuan:</span>
                         <div class="grid grid-cols-2 gap-2">
-                            {{-- BCA --}}
+                            @foreach($activeBanks as $code => $bank)
                             <label class="flex items-center gap-2 p-2.5 rounded-lg border border-teks/20 bg-white hover:border-primary cursor-pointer transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/5">
-                                <input type="radio" name="bank_name" value="BCA" checked onchange="selectBankAccount('BCA')" class="accent-primary w-3.5 h-3.5">
+                                <input type="radio" name="bank_name" value="{{ $code }}" {{ $code === $defaultBank ? 'checked' : '' }} onchange="selectBankAccount('{{ $code }}')" class="accent-primary w-3.5 h-3.5">
                                 <div>
-                                    <span class="font-bold text-xs text-teks block">Bank BCA</span>
-                                    <span class="text-[10px] text-teks/60 block">018-384-9900</span>
+                                    <span class="font-bold text-xs text-teks block">{{ $bank['name'] }}</span>
+                                    <span class="text-[10px] text-teks/60 block">{{ $bank['account_number'] }}</span>
                                 </div>
                             </label>
-
-                            {{-- BRI --}}
-                            <label class="flex items-center gap-2 p-2.5 rounded-lg border border-teks/20 bg-white hover:border-primary cursor-pointer transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/5">
-                                <input type="radio" name="bank_name" value="BRI" onchange="selectBankAccount('BRI')" class="accent-primary w-3.5 h-3.5">
-                                <div>
-                                    <span class="font-bold text-xs text-teks block">Bank BRI</span>
-                                    <span class="text-[10px] text-teks/60 block">009-601-002-345-502</span>
-                                </div>
-                            </label>
-
-                            {{-- Mandiri --}}
-                            <label class="flex items-center gap-2 p-2.5 rounded-lg border border-teks/20 bg-white hover:border-primary cursor-pointer transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/5">
-                                <input type="radio" name="bank_name" value="Mandiri" onchange="selectBankAccount('Mandiri')" class="accent-primary w-3.5 h-3.5">
-                                <div>
-                                    <span class="font-bold text-xs text-teks block">Bank Mandiri</span>
-                                    <span class="text-[10px] text-teks/60 block">142-00-1988234-1</span>
-                                </div>
-                            </label>
-
-                            {{-- BNI --}}
-                            <label class="flex items-center gap-2 p-2.5 rounded-lg border border-teks/20 bg-white hover:border-primary cursor-pointer transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/5">
-                                <input type="radio" name="bank_name" value="BNI" onchange="selectBankAccount('BNI')" class="accent-primary w-3.5 h-3.5">
-                                <div>
-                                    <span class="font-bold text-xs text-teks block">Bank BNI</span>
-                                    <span class="text-[10px] text-teks/60 block">083-912-4567</span>
-                                </div>
-                            </label>
+                            @endforeach
                         </div>
-                        <p class="text-[10px] text-teks/60 italic pt-1">Seluruh rekening resmi atas nama: <strong>Yayasan Peduli Kasih ABK</strong>.</p>
+                        <p class="text-[10px] text-teks/60 italic pt-1">Seluruh rekening resmi atas nama: <strong>{{ reset($activeBanks)['account_holder'] ?? 'Yayasan Peduli Kasih ABK' }}</strong>.</p>
                     </div>
+                    @endif
                 </div>
 
                 <div>
@@ -241,7 +230,7 @@
                     <img id="modal-qris-image" src="" alt="Kode QRIS Dinamis" class="w-full h-full object-contain">
                 </div>
                 <div class="text-center">
-                    <p class="text-[11px] font-bold text-teks">KIOS MANDIRI YPKABK</p>
+                    <p class="text-[11px] font-bold text-teks">{{ $payCfg['merchant_name'] ?? 'KIOS MANDIRI YPKABK' }}</p>
                     <p class="text-[10px] text-teks/65">BCA Mobile, Livin Mandiri, BRImo, BNI, GoPay, OVO, ShopeePay, DANA</p>
                 </div>
                 <button type="button"

@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -28,6 +29,16 @@ return new class extends Migration
             // Ensure status column can accommodate all statuses including waiting_approval
             $table->string('status', 30)->default('pending')->change();
         });
+
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement('ALTER TABLE purchases DROP CONSTRAINT IF EXISTS purchases_status_check;');
+            DB::statement("ALTER TABLE purchases ADD CONSTRAINT purchases_status_check CHECK (status IN ('waiting_approval', 'pending', 'paid', 'shipped', 'completed', 'cancelled'));");
+        }
+
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement('ALTER TABLE purchases DROP CONSTRAINT IF EXISTS purchases_status_check;');
+            DB::statement("ALTER TABLE purchases ADD CONSTRAINT purchases_status_check CHECK (status IN ('waiting_approval', 'pending', 'paid', 'shipped', 'completed', 'cancelled'));");
+        }
 
         Schema::table('products', function (Blueprint $table) {
             if (! Schema::hasColumn('products', 'is_on_demand')) {

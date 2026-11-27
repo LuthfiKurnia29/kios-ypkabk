@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Http\Services\PaymentSettingService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -133,54 +134,17 @@ class Purchase extends Model
     /**
      * Get all supported static bank accounts.
      *
-     * @return array<string, array<string, string>>
+     * @return array<string, array<string, mixed>>
      */
-    public static function getBankAccounts(): array
+    public static function getBankAccounts(bool $onlyActive = false): array
     {
-        return config('kios.bank_accounts', [
-            'BCA' => [
-                'code' => 'BCA',
-                'name' => 'Bank Central Asia (BCA)',
-                'short_name' => 'BCA',
-                'account_number' => '018-384-9900',
-                'account_number_raw' => '0183849900',
-                'account_holder' => 'Yayasan Peduli Kasih ABK',
-                'color' => 'bg-blue-50 text-blue-800 border-blue-200',
-            ],
-            'BRI' => [
-                'code' => 'BRI',
-                'name' => 'Bank Rakyat Indonesia (BRI)',
-                'short_name' => 'BRI',
-                'account_number' => '009-601-002-345-502',
-                'account_number_raw' => '009601002345502',
-                'account_holder' => 'Yayasan Peduli Kasih ABK',
-                'color' => 'bg-sky-50 text-sky-800 border-sky-200',
-            ],
-            'Mandiri' => [
-                'code' => 'Mandiri',
-                'name' => 'Bank Mandiri',
-                'short_name' => 'Mandiri',
-                'account_number' => '142-00-1988234-1',
-                'account_number_raw' => '1420019882341',
-                'account_holder' => 'Yayasan Peduli Kasih ABK',
-                'color' => 'bg-amber-50 text-amber-800 border-amber-200',
-            ],
-            'BNI' => [
-                'code' => 'BNI',
-                'name' => 'Bank Negara Indonesia (BNI)',
-                'short_name' => 'BNI',
-                'account_number' => '083-912-4567',
-                'account_number_raw' => '0839124567',
-                'account_holder' => 'Yayasan Peduli Kasih ABK',
-                'color' => 'bg-orange-50 text-orange-800 border-orange-200',
-            ],
-        ]);
+        return app(PaymentSettingService::class)->getBankAccounts($onlyActive);
     }
 
     /**
      * Get the bank account details for this order if bank_transfer.
      *
-     * @return array<string, string>|null
+     * @return array<string, mixed>|null
      */
     public function getSelectedBankAccountAttribute(): ?array
     {
@@ -191,7 +155,7 @@ class Purchase extends Model
         $banks = static::getBankAccounts();
         $key = strtoupper((string) ($this->bank_name ?: 'BCA'));
 
-        return $banks[$key] ?? $banks['BCA'] ?? null;
+        return $banks[$key] ?? $banks['BCA'] ?? (count($banks) > 0 ? reset($banks) : null);
     }
 
     /**
@@ -245,7 +209,8 @@ class Purchase extends Model
             $accHolder = $bank['account_holder'] ?? 'Yayasan Peduli Kasih ABK';
             $paymentInfo = "Transfer Bank: {$bankName}\nNo. Rekening: {$accNumber}\na.n. {$accHolder}";
         } else {
-            $paymentInfo = 'QRIS Kios Mandiri YPKABK (Scan / Upload Bukti)';
+            $merchantName = app(PaymentSettingService::class)->getQrisMerchantName();
+            $paymentInfo = "QRIS {$merchantName} (Scan / Upload Bukti)";
         }
 
         return "Halo {$this->customer_name}, berikut adalah rincian nota pesanan Anda di Kios Mandiri YPKABK:\n\n"
